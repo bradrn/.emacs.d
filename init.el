@@ -93,8 +93,12 @@
 
 ;; line numbers
 (use-package linum-relative
-  :init (global-linum-mode t)
-  :config (linum-relative-mode))
+  :init
+  (global-linum-mode t)
+  :config
+  (linum-relative-mode)
+  (setq linum-relative-current-symbol ""))
+
 
 ;; theme
 (use-package doom-themes
