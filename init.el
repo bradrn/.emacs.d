@@ -1,0 +1,581 @@
+;; from https://github.com/nilcons/emacs-use-package-fast/tree/a9cc00c5713a2a85d65399731abc4349b46756b4#a-trick-less-gc-during-startup
+(setq gc-cons-threshold 64000000)
+(add-hook 'after-init-hook
+          (lambda ()
+            ;; restore after startup
+            (setq gc-cons-threshold 800000)))
+
+;; some saner defaults
+(setq vc-make-backup-files t)                                 ; make backups file even when in version controlled dir
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups"))) ; which directory to put backups file
+(setq inhibit-startup-screen t)                               ; inhibit useless and old-school startup screen
+(set-language-environment "UTF-8")
+(setq default-fill-column 80)                                 ; toggle wrapping text at the 80th character
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; recentf
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+
+;; spaces not tabs
+(setq-default indent-tabs-mode nil)
+(setq tab-width 4)
+
+(setq package-enable-at-startup nil) ; tells emacs not to load any packages before starting up
+;; the following lines tell emacs where on the internet to look up
+;; for new packages.
+(setq package-archives '(("org"       . "http://orgmode.org/elpa/")
+                         ("gnu"       . "http://elpa.gnu.org/packages/")
+                         ("melpa"     . "http://melpa.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
+(package-initialize) ; guess what this one does ?
+
+;; use-package
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+
+(setq use-package-always-ensure t)
+
+;; bars
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
+;; server - from https://stackoverflow.com/a/5571983/7345298
+(load "server")
+(unless (server-running-p) (server-start))
+
+;; parentheses
+(electric-pair-mode 1)
+
+;; save undo history
+(setq undo-tree-auto-save-history t
+      undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+
+;; use #' - from http://endlessparentheses.com/get-in-the-habit-of-using-sharp-quote.html
+(defun elisp-insert-sharp ()
+  "Insert #' unless in a string or comment."
+  (interactive)
+  (call-interactively #'self-insert-command)
+  (let ((ppss (syntax-ppss)))
+    (unless (or (elt ppss 3)
+                (elt ppss 4)
+                (eq (char-after) ?'))
+      (insert "'"))))
+(define-key emacs-lisp-mode-map "#" #'elisp-insert-sharp)
+
+;; https://emacs.stackexchange.com/a/3008
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(set-default-font "Consolas 10")
+
+;; smooth scrolling
+(setq scroll-preserve-screen-position t
+      scroll-margin 3
+      scroll-conservatively 101)
+
+;; Sacha Chua's typing timer
+(defun timer-go ()
+  "Quick keyboard timer."
+  (interactive)
+  (insert "GO\n")
+  (run-with-timer 3 nil (lambda () (insert "\n")))  ; for warmup
+  (run-with-timer 15 nil (lambda () ; 12 seconds + the 3-second warmup
+                           (let ((col (- (point) (line-beginning-position))))
+                             (insert (format " | %d | \n" col))))))
+                           
+(global-set-key (kbd "<f7>") #'timer-go)
+
+;; line numbers
+(use-package linum-relative
+  :init (global-linum-mode t)
+  :config (linum-relative-mode))
+
+;; theme
+(use-package doom-themes
+  :config
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  (load-theme 'doom-one t))
+
+;; hl-todo
+(use-package hl-todo
+  :config
+  (global-hl-todo-mode))
+
+;; evil
+(use-package evil
+  :defer .1
+  :config
+  (evil-mode 1)
+  (setq-default evil-move-beyond-eol t
+                evil-ex-substitute-global t
+                evil-ex-visual-char-range t))
+(use-package evil-escape
+  :after evil
+  :init (evil-escape-mode)
+  :config
+  (setq-default evil-escape-key-sequence "jw"
+                evil-escape-delay 0.2))
+(use-package evil-surround
+  :after evil
+  :config
+  (global-evil-surround-mode 1))
+(use-package evil-snipe
+  :after evil
+  :config
+  (setq evil-snipe-scope 'buffer)
+  (evil-snipe-mode 1))
+(use-package evil-nerd-commenter
+  :after evil
+  :config
+  (define-key evil-normal-state-map "gc" #'evilnc-comment-operator))
+(use-package evil-exchange
+  :after evil
+  :config
+  (evil-exchange-install))
+(use-package evil-unimpaired
+  :after evil
+  :load-path "~/.emacs.d/evil-unimpaired"
+  :config
+  (evil-unimpaired-mode t)
+  (evil-unimpaired-define-pair "q" '(flycheck-previous-error . flycheck-next-error)))
+(use-package evil-search-highlight-persist
+  :after evil
+  :config
+  (global-evil-search-highlight-persist t))
+(use-package evil-god-state
+  :after evil
+  :config
+  (add-hook 'evil-god-state-entry-hook (lambda () (setq cursor-type 'hollow)))
+  (add-hook 'evil-god-state-exit-hook (lambda () (setq cursor-type 'box))))
+(use-package evil-matchit
+  :after evil
+  :config
+  (global-evil-matchit-mode 1))
+
+;; magit
+(use-package magit :defer 3)
+(use-package evil-magit :after magit)
+
+;; company
+(use-package company
+  :commands global-company-mode
+  :init
+  (add-hook 'after-init-hook #'global-company-mode)
+
+  :config
+  ;; from spacemacs
+  (define-key company-active-map (kbd "C-j") #'company-select-next)
+  (define-key company-active-map (kbd "C-k") #'company-select-previous)
+  (define-key company-active-map (kbd "C-l") #'company-complete-selection))
+(use-package helm-company
+  :after company
+  :commands helm-company
+  :init
+  (define-key company-mode-map   (kbd "C-:") #'helm-company)
+  (define-key company-active-map (kbd "C-:") #'helm-company))
+
+;; rainbow-delimiters & parinfer
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+(use-package parinfer
+  :ensure t
+  :bind (("C-," . parinfer-toggle-mode))
+  :init
+  (setq parinfer-extensions
+        '(defaults       ; should be included.
+          pretty-parens  ; different paren styles for different modes.
+          evil           ; If you use Evil.
+          smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+          smart-yank))   ; Yank behavior depend on mode.
+  (add-hook 'emacs-lisp-mode-hook #'parinfer-mode))
+
+;; flycheck
+(use-package flycheck
+  :commands global-flycheck-mode
+  :init
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+  (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list))
+(use-package flycheck-inline
+  :after flycheck
+  :config
+  (flycheck-inline-mode))
+
+;; flyspell
+(setq ispell-dictionary "british")
+(setq-default ispell-program-name "c:/cygwin64/bin/aspell.exe")
+
+;; helm
+(use-package helm
+  :defer .1
+  :config
+  (helm-mode 1)
+  (global-set-key (kbd "M-x") #'helm-M-x)
+
+  (add-hook 'helm-major-mode-hook
+            (lambda ()
+              (setq auto-composition-mode nil)))
+
+  ;; always display helm at bottom - adapted from spacemacs
+  (setq helm-display-function
+        (lambda (buffer &optional resume)
+          (let ((display-buffer-alist
+                 (list '("*.*Helm.*Help.**")
+                       '("*.*helm.**"
+                         (display-buffer-in-side-window)
+                         (inhabit-same-window . t)
+                         (side . bottom)        ; the important line!!
+                         (window-width . 0.6)
+                         (window-height . 0.4)))))
+            (helm-default-display-buffer buffer))))
+
+  ;; from https://github.com/syl20bnr/spacemacs/blob/c7a103a772d808101d7635ec10f292ab9202d9ee/layers/%2Bspacemacs/spacemacs-completion/funcs.el#L78
+  (define-key helm-map (kbd "C-j") #'helm-next-line)
+  (define-key helm-map (kbd "C-k") #'helm-previous-line)
+  (define-key helm-map (kbd "C-h") #'helm-next-source)
+  (define-key helm-map (kbd "C-S-h") #'describe-key)
+  (define-key helm-map (kbd "C-l") (kbd "RET"))
+  (with-eval-after-load 'helm-files
+    (dolist (keymap (list helm-find-files-map helm-read-file-map))
+      (define-key keymap (kbd "C-l") #'helm-execute-persistent-action)
+      (define-key keymap (kbd "C-h") #'helm-find-files-up-one-level)
+      ;; rebind `describe-key' for convenience
+      (define-key keymap (kbd "C-S-h") #'describe-key))))
+(use-package helm-flx
+  :config
+  (setq helm-flx-for-helm-find-files nil)
+  (helm-flx-mode))
+(use-package helm-themes
+  :defer t)
+
+;; thanks http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/
+(defun find-user-init-file ()
+  "Edit the `user-init-file', in another window."
+  (interactive)
+  (find-file user-init-file))
+
+(use-package avy)
+
+(use-package which-key
+  :config
+  (which-key-mode)
+  (which-key-enable-god-mode-support))
+
+;; thanks https://emacs.stackexchange.com/a/18064/20375
+(defun switch-to-previous-buffer ()
+  (interactive)
+  (switch-to-buffer (other-buffer)))
+
+(use-package general
+  :config
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :prefix "SPC"
+   :non-normal-prefix "C-SPC"
+
+   "SPC" #'helm-M-x
+   "TAB" #'switch-to-previous-buffer
+   "RET" #'evil-execute-in-god-state
+   "$"   #'set-selective-display
+   "!"   #'shell-command
+
+   "b"   '(:ignore t :which-key "buffers")
+   "bb"  #'helm-buffers-list
+   "bd"  #'kill-this-buffer
+   
+   "c"   #'evil-search-highlight-persist-remove-all
+
+   "e"   '(:ignore t :which-key "errors")
+   "el"  #'flycheck-list-errors
+   "e["  #'flycheck-previous-error
+   "e]"  #'flycheck-next-error
+   
+   "f"   '(:ignore t :which-key "files")
+   "ff"  #'helm-find-files
+   "fr"  #'helm-recentf
+   "fi"  #'find-user-init-file
+
+   "i"   '(:ignore t :which-key "UI")
+   "iu"  #'undo-tree-visualize
+   "it"  #'helm-themes
+
+   "g"   #'magit-status
+
+   "j"   '(:ignore t :which-key "jump")
+   "ji"  #'helm-semantic-or-imenu
+   "jj"  #'evil-avy-goto-char
+   "jJ"  #'evil-avy-goto-char-2
+
+   "u"   #'universal-argument
+
+   "w"   '(:ignore t :which-key "window")
+   "wh"  #'evil-window-left
+   "wj"  #'evil-window-down
+   "wk"  #'evil-window-up
+   "wl"  #'evil-window-right
+   "wH"  #'evil-window-move-far-left
+   "wL"  #'evil-window-move-far-right
+   "wJ"  #'evil-window-move-very-bottom
+   "wK"  #'evil-window-move-very-top
+   "w-"  #'split-window-below
+   "w/"  #'split-window-right)
+
+  ;; keybindings for elisp
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'emacs-lisp-mode-map
+   :prefix "K"
+   :non-normal-prefix "C-0"
+   "e"  '(:ignore t :which-key "eval")
+   "ee" 'eval-last-sexp
+   "er" 'eval-region
+   "ex" 'eval-expression
+   "p"  '(:ignore t :which-key "eval with pp")
+   "pe" 'pp-eval-last-sexp
+   "px" 'pp-eval-expression
+   "pm" 'pp-macroexpand-last-sexp))
+
+;; winum
+
+(use-package winum
+  :config
+  (setq winum-auto-assign-0-to-minibuffer nil)
+  (set-face-attribute 'winum-face nil :weight 'bold :inverse-video t)
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :prefix "SPC"
+   :non-normal-prefix "C-SPC"
+   "0" 'winum-select-window-0-or-10
+   "1" 'winum-select-window-1
+   "2" 'winum-select-window-2
+   "3" 'winum-select-window-3
+   "4" 'winum-select-window-4
+   "5" 'winum-select-window-5
+   "6" 'winum-select-window-6
+   "7" 'winum-select-window-7
+   "8" 'winum-select-window-8
+   "9" 'winum-select-window-9)
+
+  ;; adapted from spacemacs
+  (push '(("\\(.*\\) 0" . "winum-select-window-0-or-10") . ("\\1 0..9" . "window 0..9"))
+        which-key-replacement-alist)
+  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist)
+
+  (winum-mode))
+
+;; scratch-el
+(use-package scratch
+  :commands scratch
+  :init
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :prefix "SPC"
+   :non-normal-prefix "C-SPC"
+   "s" #'scratch))
+
+;; haskell
+(use-package intero
+  :commands intero-mode
+  :preface
+  ;; from spacemacs
+  (defun haskell-intero-display-repl (&optional prompt-options)
+    (interactive "P")
+    (let ((buffer (intero-repl-buffer prompt-options)))
+      (unless (get-buffer-window buffer 'visible)
+        (display-buffer buffer))))
+
+  (defun haskell-intero-pop-to-repl (&optional prompt-options)
+    (interactive "P")
+    (pop-to-buffer (intero-repl-buffer prompt-options)))
+
+  ;; fix indent
+  (setq-default haskell-indentation-layout-offset     4
+                haskell-indentation-left-offset       4
+                haskell-indentation-starter-offset    4
+                haskell-indentation-where-post-offset 4
+                haskell-indentation-where-pre-offset  4)
+
+  :init
+  ;; from spacemacs haskell layer docs
+  (defun haskell-indentation-advice ()
+    (when (and (< 1 (line-number-at-pos))
+               (save-excursion
+                 (forward-line -1)
+                 (string= "" (s-trim (buffer-substring (line-beginning-position) (line-end-position))))))
+      (delete-region (line-beginning-position) (point))))
+  (advice-add #'haskell-indentation-newline-and-indent
+              :after 'haskell-indentation-advice)
+  (add-hook 'haskell-mode-hook #'intero-mode)
+
+  :config
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'haskell-mode-map
+   :prefix "K"
+   :non-normal-prefix "C-0"
+   "ir" #'intero-restart
+   "r"  '(:ignore t :which-key "repl")
+   "rb" #'intero-repl-load
+   "rs" #'haskell-intero-display-repl
+   "rS" #'haskell-intero-pop-to-repl
+   "hh" #'hoogle
+   "hH" #'haskell-hoogle-lookup-from-local))
+
+(use-package company-cabal
+  :config
+  (add-to-list 'company-backends 'company-cabal))
+(use-package hasky-extensions
+  :commands (hasky-extensions hasky-extensions-browse-docs)
+  :init
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'haskell-mode-map
+   :prefix "K"
+   :non-normal-prefix "C-0"
+   "xx" #'hasky-extensions
+   "xd" #'hasky-extensions-browse-docs))
+(use-package hasky-stack
+  :commands hasky-stack-execute
+  :init
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'haskell-mode-map
+   :prefix "K"
+   :non-normal-prefix "C-0"
+   "s" #'hasky-stack-execute))
+
+;; LaTeX - partly lifted from spacemacs
+(use-package tex
+  :ensure auctex
+  :mode ("\\.tex\\'" . TeX-latex-mode)
+
+  :preface
+  ;; from spacemacs
+  (defun LaTeX-build ()
+    (interactive)
+    (progn
+      (let ((TeX-save-query nil))
+        (TeX-save-document (TeX-master-file)))
+      (TeX-command "LaTeX" 'TeX-master-file -1)))
+
+  :init
+  (setq TeX-command-default "LaTeX"
+        TeX-auto-save t
+        TeX-parse-self t
+        TeX-syntactic-comment t
+        ;; Synctex support
+        TeX-source-correlate-start-server nil
+        ;; Don't insert line-break at inline math
+        LaTeX-fill-break-at-separators nil
+        preview-gs-command "c:/Program Files (x86)/gs/gs9.22/bin/gswin32c.exe"
+        preview-auto-reveal t)
+  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+
+  :config
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'LaTeX-mode-map
+   :prefix "K"
+   :non-normal-prefix "C-0"
+   "a"   #'TeX-command-run-all
+   "b"   #'LaTeX-build
+   "v"   #'TeX-view
+   "e"   #'LaTeX-environment
+   "c"   #'LaTeX-close-environment
+   "i"   #'LaTeX-insert-item
+   "s"   #'LaTeX-section)
+
+  ;; Rebindings for TeX-font - lifted from spacemacs
+  (defun latex/font-bold         () (interactive) (TeX-font nil ?\C-b))
+  (defun latex/font-code         () (interactive) (TeX-font nil ?\C-t))
+  (defun latex/font-emphasis     () (interactive) (TeX-font nil ?\C-e))
+  (defun latex/font-italic       () (interactive) (TeX-font nil ?\C-i))
+  (defun latex/font-small-caps   () (interactive) (TeX-font nil ?\C-c))
+  (defun latex/font-sans-serif   () (interactive) (TeX-font nil ?\C-f))
+
+  (evil-define-key 'insert TeX-mode-map (kbd "C-b") #'latex/font-bold)
+  (evil-define-key 'insert TeX-mode-map (kbd "C-t") #'latex/font-code)
+  (evil-define-key 'insert TeX-mode-map (kbd "C-e") #'latex/font-emphasis)
+  (evil-define-key 'insert TeX-mode-map (kbd "C-i") #'latex/font-italic)
+  (evil-define-key 'insert TeX-mode-map (kbd "C-s") #'latex/font-small-caps)
+  (evil-define-key 'insert TeX-mode-map (kbd "C-f") #'latex/font-sans-serif)
+
+  (setq font-latex-fontify-sectioning 'color
+        font-latex-fontify-script     nil)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (set (make-local-variable 'indent-line-function) 'indent-relative)))
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (flyspell-mode)
+              (flyspell-buffer)))
+
+  ;; adapted from https://lists.nongnu.org/archive/html/auctex/2009-11/msg00016.html
+  (evil-define-key 'insert TeX-mode-map (kbd "C-\\") 'TeX-electric-macro)
+
+  ;; from https://tex.stackexchange.com/questions/286028/inverse-search-with-emacs-auctex-and-sumatrapdf-on-windows-10
+  (setq TeX-PDF-mode t)
+  (setq TeX-source-correlate-mode t)
+  (setq TeX-source-correlate-method 'synctex)
+  (setq TeX-view-program-list
+        '(("Sumatra PDF" ("\"C:/Program Files/SumatraPDF/SumatraPDF.exe\" -reuse-instance" (mode-io-correlate " -forward-search \"%b\" %n ") " %o"))))
+  ;; (add-to-list 'TeX-expand-list '("%(cntxcom)" (lambda () "c:/context/bin/context1.bat")))
+
+  (assq-delete-all 'output-pdf TeX-view-program-selection)
+  (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
+
+;; custom
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#1B2229" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#DFDFDF"])
+ '(custom-safe-themes
+   (quote
+    ("b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "ecba61c2239fbef776a72b65295b88e5534e458dfe3e6d7d9f9cb353448a569e" "6b2636879127bf6124ce541b1b2824800afc49c6ccd65439d6eb987dbf200c36" default)))
+ '(fci-rule-color "#5B6268")
+ '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
+ '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
+ '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
+ '(package-selected-packages
+   (quote
+    (auctex hasky-stack hasky-extensions company-cabal intero scratch winum general which-key avy helm-themes helm-flx flycheck-inline flycheck parinfer rainbow-delimiters helm-company company evil-magit magit evil-matchit evil-god-state evil-search-highlight-persist evil-exchange evil-nerd-commenter evil-snipe evil-surround evil-escape evil hl-todo doom-themes linum-relative use-package)))
+ '(safe-local-variable-values (quote ((TeX-command-extra-options . "-shell-escape"))))
+ '(vc-annotate-background "#282c34")
+ '(vc-annotate-color-map
+   (list
+    (cons 20 "#98be65")
+    (cons 40 "#b4be6c")
+    (cons 60 "#d0be73")
+    (cons 80 "#ECBE7B")
+    (cons 100 "#e6ab6a")
+    (cons 120 "#e09859")
+    (cons 140 "#da8548")
+    (cons 160 "#d38079")
+    (cons 180 "#cc7cab")
+    (cons 200 "#c678dd")
+    (cons 220 "#d974b7")
+    (cons 240 "#ec7091")
+    (cons 260 "#ff6c6b")
+    (cons 280 "#cf6162")
+    (cons 300 "#9f585a")
+    (cons 320 "#6f4e52")
+    (cons 340 "#5B6268")
+    (cons 360 "#5B6268")))
+ '(vc-annotate-very-old-color nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

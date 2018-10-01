@@ -1,0 +1,10 @@
+session.*
+*~
+[#]*[#]
+elpa
+eshell
+auto-save-list
+network-security.data
+server/
+recentf
+profile-dotemacs.el
