@@ -72,7 +72,8 @@
 ;; https://emacs.stackexchange.com/a/3008
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-(set-default-font "Consolas 10")
+;; font
+(set-frame-font "Consolas 10" nil t)
 
 ;; smooth scrolling
 (setq scroll-preserve-screen-position t
@@ -162,9 +163,20 @@
   :after evil
   :config
   (global-evil-matchit-mode 1))
+(use-package evil-indent-plus
+  :after evil
+  :config
+  (evil-indent-plus-default-bindings))
 
 ;; magit
-(use-package magit :defer 3)
+(use-package magit
+  :defer 3
+  :config
+  (evil-define-key 'normal with-editor-mode-map
+    (kbd "KK") 'with-editor-finish
+    (kbd "Kk") 'with-editor-finish
+    (kbd "KC") 'with-editor-cancel
+    (kbd "Kc") 'with-editor-cancel))
 (use-package evil-magit :after magit)
 
 ;; company
@@ -306,6 +318,7 @@
    "fr"  #'helm-recentf
    "fi"  #'find-user-init-file
 
+   "h"   #'help-command
    "i"   '(:ignore t :which-key "UI")
    "iu"  #'undo-tree-visualize
    "it"  #'helm-themes
@@ -553,7 +566,7 @@
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(package-selected-packages
    (quote
-    (auctex hasky-stack hasky-extensions company-cabal intero scratch winum general which-key avy helm-themes helm-flx flycheck-inline flycheck parinfer rainbow-delimiters helm-company company evil-magit magit evil-matchit evil-god-state evil-search-highlight-persist evil-exchange evil-nerd-commenter evil-snipe evil-surround evil-escape evil hl-todo doom-themes linum-relative use-package)))
+    (evil-fringe-mark evil-indent-plus auctex hasky-stack hasky-extensions company-cabal intero scratch winum general which-key avy helm-themes helm-flx flycheck-inline flycheck parinfer rainbow-delimiters helm-company company evil-magit magit evil-matchit evil-god-state evil-search-highlight-persist evil-exchange evil-nerd-commenter evil-snipe evil-surround evil-escape evil hl-todo doom-themes linum-relative use-package)))
  '(safe-local-variable-values (quote ((TeX-command-extra-options . "-shell-escape"))))
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map
