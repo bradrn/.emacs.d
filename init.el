@@ -218,12 +218,22 @@
 (use-package flycheck
   :commands global-flycheck-mode
   :init
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-  (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list))
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 (use-package flycheck-inline
   :after flycheck
   :config
-  (flycheck-inline-mode))
+  (flycheck-inline-mode)
+
+  (defun flycheck-inline-display-errors-unless-error-list (errors)
+    "Show messages of ERRORS unless the error list is visible.
+
+Like `flycheck-inline-display-errors', but only if the error
+list (see `flycheck-list-errors') is not visible in any window in
+the current frame."
+    (unless (flycheck-get-error-list-window 'current-frame)
+      (flycheck-inline-display-errors errors)))
+
+  (setq-default flycheck-display-errors-function #'flycheck-inline-display-errors-unless-error-list))
 
 ;; flyspell
 (setq ispell-dictionary "british")
