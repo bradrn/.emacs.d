@@ -438,6 +438,9 @@ the current frame."
    :non-normal-prefix "C-SPC"
    "s" #'scratch))
 
+;; s
+(use-package s)
+
 ;; haskell
 (use-package intero
   :commands intero-mode
@@ -461,15 +464,17 @@ the current frame."
                 haskell-indentation-where-pre-offset  4)
 
   :init
-  ;; from spacemacs haskell layer docs
+  ;; from spacemacs haskell layer docs (slightly modified)
   (defun haskell-indentation-advice ()
     (when (and (< 1 (line-number-at-pos))
                (save-excursion
                  (forward-line -1)
-                 (string= "" (s-trim (buffer-substring (line-beginning-position) (line-end-position))))))
+                 (let ((prev-line (s-trim (buffer-substring (line-beginning-position) (line-end-position)))))
+                   (or (string= "" prev-line)
+                       (string-prefix-p "import" prev-line)))))
       (delete-region (line-beginning-position) (point))))
-  (advice-add #'haskell-indentation-newline-and-indent
-              :after 'haskell-indentation-advice)
+  (advice-add #'haskell-indentation-newline-and-indent :after 'haskell-indentation-advice)
+  (advice-add #'haskell-indentation-indent-line        :after 'haskell-indentation-advice)
   (add-hook 'haskell-mode-hook #'intero-mode)
 
   :config
