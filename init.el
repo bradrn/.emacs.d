@@ -300,6 +300,31 @@ the current frame."
   (interactive)
   (switch-to-buffer (other-buffer)))
 
+(defun switch-to-messages ()
+  (interactive)
+  (switch-to-buffer (messages-buffer)))
+
+;; from https://github.com/flycheck/flycheck/issues/710#issue-98533622
+(defun flycheck-list-errors-toggle ()
+  "Toggle the error list for the current buffer."
+  (interactive)
+  (let ((flycheck-errors-window (get-buffer-window flycheck-error-list-buffer)))
+    (if (not (window-live-p flycheck-errors-window))
+        (call-interactively 'flycheck-list-errors)
+      (delete-window flycheck-errors-window))))
+
+(defun avy-goto-char-forward-char (char &optional arg)
+  "Run `avy-goto-char', then move forward one character."
+  (interactive (list (read-char "char: " t)
+                     current-prefix-arg))
+  (avy-goto-char char arg)
+  (forward-char))
+
+(defun set-selective-display-current-column ()
+  (interactive)
+  (set-selective-display
+   (if selective-display nil (1+ (current-column)))))
+
 (use-package general
   :config
   (general-define-key
@@ -310,24 +335,26 @@ the current frame."
    "SPC" #'helm-M-x
    "TAB" #'switch-to-previous-buffer
    "RET" #'evil-execute-in-god-state
-   "$"   #'set-selective-display
+   "$"   #'set-selective-display-current-column
    "!"   #'shell-command
 
    "b"   '(:ignore t :which-key "buffers")
    "bb"  #'helm-buffers-list
    "bd"  #'kill-this-buffer
+   "bm"  #'switch-to-messages
    
    "c"   #'evil-search-highlight-persist-remove-all
 
    "e"   '(:ignore t :which-key "errors")
-   "el"  #'flycheck-list-errors
+   "el"  #'flycheck-list-errors-toggle
    "e["  #'flycheck-previous-error
    "e]"  #'flycheck-next-error
    
    "f"   '(:ignore t :which-key "files")
    "ff"  #'helm-find-files
-   "fr"  #'helm-recentf
    "fi"  #'find-user-init-file
+   "fr"  #'helm-recentf
+   "fs"  #'save-buffer
 
    "h"   #'help-command
    "i"   '(:ignore t :which-key "UI")
@@ -340,10 +367,13 @@ the current frame."
    "ji"  #'helm-semantic-or-imenu
    "jj"  #'evil-avy-goto-char
    "jJ"  #'evil-avy-goto-char-2
+   "jk"  #'avy-goto-char-forward-char
 
    "u"   #'universal-argument
+   "-"   #'negative-argument
 
    "w"   '(:ignore t :which-key "window")
+   "wF"  #'make-frame
    "wh"  #'evil-window-left
    "wj"  #'evil-window-down
    "wk"  #'evil-window-up
@@ -449,6 +479,7 @@ the current frame."
    :prefix "K"
    :non-normal-prefix "C-0"
    "ir" #'intero-restart
+   "is" #'intero-apply-suggestions
    "r"  '(:ignore t :which-key "repl")
    "rb" #'intero-repl-load
    "rs" #'haskell-intero-display-repl
@@ -516,6 +547,7 @@ the current frame."
    "a"   #'TeX-command-run-all
    "b"   #'LaTeX-build
    "v"   #'TeX-view
+   "h"   #'TeX-doc
    "e"   #'LaTeX-environment
    "c"   #'LaTeX-close-environment
    "i"   #'LaTeX-insert-item
