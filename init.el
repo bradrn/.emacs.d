@@ -113,6 +113,13 @@
   :config
   (global-hl-todo-mode))
 
+;; fill-column-indicator
+(use-package fill-column-indicator
+  :defer t
+  :config
+  (setq fci-always-use-textual-rule t
+        fci-rule-character 9474))
+
 ;; evil
 (use-package evil
   :defer .1
@@ -363,6 +370,7 @@ the current frame."
 
    "h"   #'help-command
    "i"   '(:ignore t :which-key "UI")
+   "if"  #'fci-mode
    "iu"  #'undo-tree-visualize
    "it"  #'helm-themes
 
