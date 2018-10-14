@@ -610,6 +610,8 @@ the current frame."
   (assq-delete-all 'output-pdf TeX-view-program-selection)
   (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
 
+(message "Time taken: %s" (emacs-init-time))
+
 ;; custom
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
