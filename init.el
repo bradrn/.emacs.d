@@ -198,6 +198,11 @@
   (define-key company-mode-map   (kbd "C-:") #'helm-company)
   (define-key company-active-map (kbd "C-:") #'helm-company))
 
+;; init-open-recentf
+(use-package init-open-recentf
+  :config
+  (init-open-recentf))
+
 ;; rainbow-delimiters & parinfer
 (use-package rainbow-delimiters
   :config
