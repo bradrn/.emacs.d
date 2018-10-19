@@ -498,6 +498,10 @@ the current frame."
   (add-hook 'haskell-mode-hook #'intero-mode)
 
   :config
+  (defun haskell-hoogle-lookup-from-local-wrapper ()
+    (interactive)
+    (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
+    (haskell-hoogle-lookup-from-local))
   (general-define-key
    :states '(normal visual insert emacs)
    :keymaps 'haskell-mode-map
@@ -510,7 +514,7 @@ the current frame."
    "rs" #'haskell-intero-display-repl
    "rS" #'haskell-intero-pop-to-repl
    "hh" #'hoogle
-   "hH" #'haskell-hoogle-lookup-from-local))
+   "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
 (use-package company-cabal
   :config
