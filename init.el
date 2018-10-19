@@ -124,6 +124,7 @@
 (use-package evil
   :defer .1
   :config
+  (evil-set-initial-state 'helpful-mode 'emacs)
   (evil-mode 1)
   (setq-default evil-move-beyond-eol t
                 evil-ex-substitute-global t
@@ -297,6 +298,14 @@ the current frame."
 (use-package helm-themes
   :defer t)
 
+
+;; helpful
+(use-package helpful
+  :config
+  (global-set-key (kbd "C-h f") #'helpful-callable)
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key)
+  (global-set-key (kbd "C-h c") #'helpful-command))
 ;; thanks http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/
 (defun find-user-init-file ()
   "Edit the `user-init-file', in another window."
