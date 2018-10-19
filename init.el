@@ -127,7 +127,10 @@
   (evil-mode 1)
   (setq-default evil-move-beyond-eol t
                 evil-ex-substitute-global t
-                evil-ex-visual-char-range t))
+                evil-ex-visual-char-range t
+                evil-want-C-u-scroll t
+                evil-want-C-d-scroll t
+                evil-want-C-i-jump t))
 (use-package evil-escape
   :after evil
   :init (evil-escape-mode)
