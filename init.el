@@ -507,6 +507,7 @@ the current frame."
    :keymaps 'haskell-mode-map
    :prefix "K"
    :non-normal-prefix "C-0"
+   "d"  #'intero-goto-definition
    "ir" #'intero-restart
    "is" #'intero-apply-suggestions
    "r"  '(:ignore t :which-key "repl")
