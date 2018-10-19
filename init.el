@@ -324,10 +324,6 @@ the current frame."
   (interactive)
   (switch-to-buffer (other-buffer)))
 
-(defun switch-to-messages ()
-  (interactive)
-  (switch-to-buffer (messages-buffer)))
-
 ;; from https://github.com/flycheck/flycheck/issues/710#issue-98533622
 (defun flycheck-list-errors-toggle ()
   "Toggle the error list for the current buffer."
@@ -365,7 +361,6 @@ the current frame."
    "b"   '(:ignore t :which-key "buffers")
    "bb"  #'helm-buffers-list
    "bd"  #'kill-this-buffer
-   "bm"  #'switch-to-messages
    
    "c"   #'evil-search-highlight-persist-remove-all
 
