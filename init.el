@@ -31,6 +31,8 @@
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 (package-initialize) ; guess what this one does ?
 
+(defun package--save-selected-packages (&rest opt) nil)
+
 ;; use-package
 
 (unless (package-installed-p 'use-package)
@@ -639,9 +641,6 @@ the current frame."
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
- '(package-selected-packages
-   (quote
-    (evil-fringe-mark evil-indent-plus auctex hasky-stack hasky-extensions company-cabal intero scratch winum general which-key avy helm-themes helm-flx flycheck-inline flycheck parinfer rainbow-delimiters helm-company company evil-magit magit evil-matchit evil-god-state evil-search-highlight-persist evil-exchange evil-nerd-commenter evil-snipe evil-surround evil-escape evil hl-todo doom-themes linum-relative use-package)))
  '(safe-local-variable-values (quote ((TeX-command-extra-options . "-shell-escape"))))
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map
