@@ -356,7 +356,7 @@ the current frame."
    "TAB" #'switch-to-previous-buffer
    "RET" #'evil-execute-in-god-state
    "$"   #'set-selective-display-current-column
-   "!"   #'shell-command
+   "!"   #'async-shell-command
 
    "b"   '(:ignore t :which-key "buffers")
    "bb"  #'helm-buffers-list
