@@ -624,6 +624,88 @@ the current frame."
   (assq-delete-all 'output-pdf TeX-view-program-selection)
   (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
 
+;; lisp - SLIME - a mix of my own stuff & spacemacs config
+(use-package slime
+  :commands slime-mode
+  :init
+  (setq slime-lisp-implementations '((sbcl ("C:\\sbcl\\sbcl.exe")))
+        inferior-lisp-program "sbcl"
+        slime-contribs '(slime-fancy
+                         slime-indentation
+                         slime-sbcl-exts
+                         slime-scratch
+                         slime-company))
+  ;; ;; for quicklisp
+  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+
+  ;; enable fuzzy matching in code buffer and SLIME REPL
+  (setq slime-complete-symbol*-fancy t)
+  (setq slime-complete-symbol-function #'slime-fuzzy-complete-symbol)
+
+  (add-hook 'lisp-mode-hook #'slime-mode)
+  (add-hook 'lisp-mode-hook #'parinfer-mode)
+  :config
+  (slime-setup)
+
+  (general-define-key
+   :states '(normal visual insert emacs)
+   :keymaps 'lisp-mode-map
+   :prefix "K"
+   :non-normal-prefix "C-0"
+   "h" '(:ignore t :which-key "help")
+   "e" '(:ignore t :which-key "eval")
+   "s" '(:ignore t :which-key "repl")
+   "c" '(:ignore t :which-key "compile")
+   "g" '(:ignore t :which-key "nav")
+   "m" '(:ignore t :which-key "macro")
+   "t" '(:ignore t :which-key "toggle")
+
+   "'"  #'slime
+
+   "cc" #'slime-compile-file
+   "cC" #'slime-compile-and-load-file
+   "cl" #'slime-load-file
+   "cf" #'slime-compile-defun
+   "cr" #'slime-compile-region
+   "cn" #'slime-remove-notes
+
+   "eb" #'slime-eval-buffer
+   "ef" #'slime-eval-defun
+   "eF" #'slime-undefine-function
+   "ee" #'slime-eval-last-expression
+   "er" #'slime-eval-region
+
+   "gb" #'slime-pop-find-definition-stack
+   "gn" #'slime-next-note
+   "gN" #'slime-previous-note
+
+   "ha" #'slime-apropos
+   "hA" #'slime-apropos-all
+   "hd" #'slime-disassemble-symbol
+   "hh" #'slime-describe-symbol
+   "hH" #'slime-hyperspec-lookup
+   "hi" #'slime-inspect-definition
+   "hp" #'slime-apropos-package
+   "ht" #'slime-toggle-trace-fdefinition
+   "hT" #'slime-untrace-all
+   "h<" #'slime-who-calls
+   "h>" #'slime-calls-who
+   "hr" #'slime-who-references
+   "hm" #'slime-who-macroexpands
+   "hs" #'slime-who-specializes
+
+   "ma" #'slime-macroexpand-all
+   "mo" #'slime-macroexpand-1
+
+   "se" #'slime-eval-last-expression-in-repl
+   "si" #'slime
+   "sq" #'slime-quit-lisp
+
+   "tf" #'slime-toggle-fancy-trace))
+
+(use-package slime-company
+  :after slime)
+
 (message "Time taken: %s" (emacs-init-time))
 
 ;; custom
