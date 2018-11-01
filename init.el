@@ -108,10 +108,13 @@
 
 ;; theme
 (use-package doom-themes
+  :defer t
   :config
   (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (load-theme 'doom-one t))
+        doom-themes-enable-italic t))
+(use-package solarized-theme
+  :defer t)
+(load-theme 'doom-one t)
 
 ;; hl-todo
 (use-package hl-todo
