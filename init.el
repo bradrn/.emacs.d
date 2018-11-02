@@ -666,6 +666,17 @@ the current frame."
   (assq-delete-all 'output-pdf TeX-view-program-selection)
   (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
 
+;; writeroom
+(use-package writeroom-mode)
+
+;; org
+(use-package org
+  :config
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (flyspell-mode)
+              (flyspell-buffer))))
+
 ;; lisp - SLIME - a mix of my own stuff & spacemacs config
 (use-package slime
   :commands slime-mode
