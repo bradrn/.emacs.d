@@ -432,6 +432,16 @@ the current frame."
    "px" 'pp-eval-expression
    "pm" 'pp-macroexpand-last-sexp))
 
+;; define-word
+(use-package define-word
+    :defer t
+    :init
+    (general-define-key
+     :states '(normal visual insert emacs)
+     :prefix "SPC"
+     :non-normal-prefix "C-SPC"
+     "d" 'define-word-at-point))
+
 ;; winum
 
 (use-package winum
