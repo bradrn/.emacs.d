@@ -679,17 +679,15 @@ the current frame."
 
 ;; lisp - SLIME - a mix of my own stuff & spacemacs config
 (use-package slime
+  :load-path "~/.roswell/lisp/quicklisp/slime-helper.el"
   :commands slime-mode
   :init
-  (setq slime-lisp-implementations '((sbcl ("C:\\sbcl\\sbcl.exe")))
-        inferior-lisp-program "sbcl"
+  (setq inferior-lisp-program "ros -Q run"
         slime-contribs '(slime-fancy
                          slime-indentation
                          slime-sbcl-exts
                          slime-scratch
                          slime-company))
-  ;; ;; for quicklisp
-  ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
 
   ;; enable fuzzy matching in code buffer and SLIME REPL
   (setq slime-complete-symbol*-fancy t)
