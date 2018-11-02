@@ -483,6 +483,8 @@ the current frame."
 ;; s
 (use-package s)
 
+(require 'cl)
+
 ;; haskell
 (use-package intero
   :commands intero-mode
@@ -560,7 +562,27 @@ the current frame."
    :keymaps 'haskell-mode-map
    :prefix "K"
    :non-normal-prefix "C-0"
-   "s" #'hasky-stack-execute))
+   "s" #'hasky-stack-execute)
+  :config
+  (defun hasky-stack-run (cmd)
+    "Execute \"stack run\" command running CMD."
+    (interactive
+     (list (read-string "Command to run: ")))
+    (cl-destructuring-bind (app . args)
+        (progn
+          (string-match
+           "^[[:blank:]]*\\(?1:[^[:blank:]]+\\)[[:blank:]]*\\(?2:.*\\)$"
+           cmd)
+          (cons (match-string 1 cmd)
+                (match-string 2 cmd)))
+      (hasky-stack--exec-command
+       hasky-stack--project-name
+       hasky-stack--last-directory
+       (if (string= args "")
+           (concat "run " app)
+         (concat "run " app " -- " args)))))
+  (magit-define-popup-action 'hasky-stack-root-popup
+    ?r "Run" 'hasky-stack-run))
 
 ;; LaTeX - partly lifted from spacemacs
 (use-package tex
