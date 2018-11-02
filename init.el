@@ -306,7 +306,10 @@ the current frame."
 (use-package init-open-recentf
   :config
   (init-open-recentf)
-  (define-key recentf-dialog-mode-map (kbd "f") 'helm-find-files))
+  (define-key recentf-dialog-mode-map (kbd "f") 'helm-find-files)
+  (define-key recentf-dialog-mode-map (kbd "j") 'next-line)
+  (define-key recentf-dialog-mode-map (kbd "k") 'previous-line)
+  (define-key recentf-dialog-mode-map (kbd "l") 'widget-button-press))
 
 ;; helpful
 (use-package helpful
