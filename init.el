@@ -703,56 +703,17 @@ the current frame."
    :keymaps 'lisp-mode-map
    :prefix "K"
    :non-normal-prefix "C-0"
-   "h" '(:ignore t :which-key "help")
-   "e" '(:ignore t :which-key "eval")
-   "s" '(:ignore t :which-key "repl")
-   "c" '(:ignore t :which-key "compile")
-   "g" '(:ignore t :which-key "nav")
-   "m" '(:ignore t :which-key "macro")
-   "t" '(:ignore t :which-key "toggle")
 
    "'"  #'slime
+   "s"  #'slime-selector
 
-   "cc" #'slime-compile-file
-   "cC" #'slime-compile-and-load-file
-   "cl" #'slime-load-file
-   "cf" #'slime-compile-defun
-   "cr" #'slime-compile-region
-   "cn" #'slime-remove-notes
+   "e"  '(:ignore t :which-key "eval")
+   "ee" #'slime-eval-defun
+   "eh" #'slime-eval-last-expression
 
-   "eb" #'slime-eval-buffer
-   "ef" #'slime-eval-defun
-   "eF" #'slime-undefine-function
-   "ee" #'slime-eval-last-expression
-   "er" #'slime-eval-region
-
-   "gb" #'slime-pop-find-definition-stack
-   "gn" #'slime-next-note
-   "gN" #'slime-previous-note
-
-   "ha" #'slime-apropos
-   "hA" #'slime-apropos-all
-   "hd" #'slime-disassemble-symbol
-   "hh" #'slime-describe-symbol
-   "hH" #'slime-hyperspec-lookup
-   "hi" #'slime-inspect-definition
-   "hp" #'slime-apropos-package
-   "ht" #'slime-toggle-trace-fdefinition
-   "hT" #'slime-untrace-all
-   "h<" #'slime-who-calls
-   "h>" #'slime-calls-who
-   "hr" #'slime-who-references
-   "hm" #'slime-who-macroexpands
-   "hs" #'slime-who-specializes
-
-   "ma" #'slime-macroexpand-all
-   "mo" #'slime-macroexpand-1
-
-   "se" #'slime-eval-last-expression-in-repl
-   "si" #'slime
-   "sq" #'slime-quit-lisp
-
-   "tf" #'slime-toggle-fancy-trace))
+   "h"  '(:ignore t :which-key "help")
+   "hd" #'slime-describe-symbol
+   "hs" #'slime-hyperspec-lookup))
 
 (use-package slime-company
   :after slime)
