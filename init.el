@@ -238,7 +238,7 @@
 (use-package flycheck
   :commands global-flycheck-mode
   :init
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+  (add-hook 'prog-mode-hook #'flycheck-mode))
 (use-package flycheck-inline
   :after flycheck
   :config
