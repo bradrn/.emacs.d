@@ -232,7 +232,8 @@
           evil           ; If you use Evil.
           smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
           smart-yank))   ; Yank behavior depend on mode.
-  (add-hook 'emacs-lisp-mode-hook #'parinfer-mode))
+  (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+  (add-hook 'lisp-mode-hook       #'parinfer-mode))
 
 ;; flycheck
 (use-package flycheck
@@ -656,46 +657,24 @@ the current frame."
               (flyspell-mode)
               (flyspell-buffer))))
 
-;; lisp - SLIME - a mix of my own stuff & spacemacs config
-(use-package slime
-  :load-path "~/.roswell/lisp/quicklisp/slime-helper.el"
-  :commands slime-mode
+;; lisp - SLY
+(use-package sly
   :init
-  (setq inferior-lisp-program "ros -Q run"
-        slime-contribs '(slime-fancy
-                         slime-indentation
-                         slime-sbcl-exts
-                         slime-scratch
-                         slime-company))
-
-  ;; enable fuzzy matching in code buffer and SLIME REPL
-  (setq slime-complete-symbol*-fancy t)
-  (setq slime-complete-symbol-function #'slime-fuzzy-complete-symbol)
-
-  (add-hook 'lisp-mode-hook #'slime-mode)
-  (add-hook 'lisp-mode-hook #'parinfer-mode)
+  (setq inferior-lisp-program "ros -Q run")
   :config
-  (slime-setup)
+  (mode-leader-define-key lisp-mode-map
+    "'"  #'sly
 
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :keymaps 'lisp-mode-map
-   :prefix "K"
-   :non-normal-prefix "C-0"
+    "c"  '(:ignore t :which-key "compile")
+    "cl" #'sly-compile-and-load-file
 
-   "'"  #'slime
-   "s"  #'slime-selector
+    "e"  '(:ignore t :which-key "eval")
+    "ee" #'sly-eval-defun
+    "eh" #'sly-eval-last-expression
 
-   "e"  '(:ignore t :which-key "eval")
-   "ee" #'slime-eval-defun
-   "eh" #'slime-eval-last-expression
-
-   "h"  '(:ignore t :which-key "help")
-   "hd" #'slime-describe-symbol
-   "hs" #'slime-hyperspec-lookup))
-
-(use-package slime-company
-  :after slime)
+    "h"  '(:ignore t :which-key "help")
+    "hd" #'sly-describe-symbol
+    "hs" #'hyperspec-lookup))
 
 (message "Time taken: %s" (emacs-init-time))
 
