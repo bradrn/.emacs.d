@@ -357,89 +357,89 @@ the current frame."
   (set-selective-display
    (if selective-display nil (1+ (current-column)))))
 
-(use-package general
-  :config
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :prefix "SPC"
-   :non-normal-prefix "C-SPC"
+(use-package general)
 
-   "SPC" #'helm-M-x
-   "TAB" #'switch-to-previous-buffer
-   "RET" #'evil-execute-in-god-state
-   "$"   #'set-selective-display-current-column
-   "!"   #'async-shell-command
+(general-create-definer spc-leader-define-key
+ :states '(normal visual insert emacs)
+ :prefix "SPC"
+ :non-normal-prefix "C-SPC")
 
-   "b"   '(:ignore t :which-key "buffers")
-   "bb"  #'helm-buffers-list
-   "bd"  #'kill-this-buffer
-   
-   "c"   #'evil-search-highlight-persist-remove-all
+(general-create-definer mode-leader-define-key
+ :states '(normal visual insert emacs)
+ :prefix "K"
+ :non-normal-prefix "C-0")
 
-   "e"   '(:ignore t :which-key "errors")
-   "el"  #'flycheck-list-errors-toggle
-   "e["  #'flycheck-previous-error
-   "e]"  #'flycheck-next-error
-   
-   "f"   '(:ignore t :which-key "files")
-   "ff"  #'helm-find-files
-   "fi"  #'find-user-init-file
-   "fr"  #'helm-recentf
-   "fs"  #'save-buffer
+(spc-leader-define-key
+ "SPC" #'helm-M-x
+ "TAB" #'switch-to-previous-buffer
+ "RET" #'evil-execute-in-god-state
+ "$"   #'set-selective-display-current-column
+ "!"   #'async-shell-command
 
-   "h"   #'help-command
-   "i"   '(:ignore t :which-key "UI")
-   "if"  #'fci-mode
-   "iu"  #'undo-tree-visualize
-   "it"  #'helm-themes
+ "b"   '(:ignore t :which-key "buffers")
+ "bb"  #'helm-buffers-list
+ "bd"  #'kill-this-buffer
+ 
+ "c"   #'evil-search-highlight-persist-remove-all
 
-   "g"   #'magit-status
+ "e"   '(:ignore t :which-key "errors")
+ "el"  #'flycheck-list-errors-toggle
+ "e["  #'flycheck-previous-error
+ "e]"  #'flycheck-next-error
+ 
+ "f"   '(:ignore t :which-key "files")
+ "ff"  #'helm-find-files
+ "fi"  #'find-user-init-file
+ "fr"  #'helm-recentf
+ "fs"  #'save-buffer
 
-   "j"   '(:ignore t :which-key "jump")
-   "ji"  #'helm-semantic-or-imenu
-   "jj"  #'evil-avy-goto-char
-   "jJ"  #'evil-avy-goto-char-2
-   "jk"  #'avy-goto-char-forward-char
+ "h"   #'help-command
+ "i"   '(:ignore t :which-key "UI")
+ "if"  #'fci-mode
+ "iu"  #'undo-tree-visualize
+ "it"  #'helm-themes
 
-   "u"   #'universal-argument
-   "-"   #'negative-argument
+ "g"   #'magit-status
 
-   "w"   '(:ignore t :which-key "window")
-   "wF"  #'make-frame
-   "wh"  #'evil-window-left
-   "wj"  #'evil-window-down
-   "wk"  #'evil-window-up
-   "wl"  #'evil-window-right
-   "wH"  #'evil-window-move-far-left
-   "wL"  #'evil-window-move-far-right
-   "wJ"  #'evil-window-move-very-bottom
-   "wK"  #'evil-window-move-very-top
-   "w-"  #'split-window-below
-   "w/"  #'split-window-right)
+ "j"   '(:ignore t :which-key "jump")
+ "ji"  #'helm-semantic-or-imenu
+ "jj"  #'evil-avy-goto-char
+ "jJ"  #'evil-avy-goto-char-2
+ "jk"  #'avy-goto-char-forward-char
 
-  ;; keybindings for elisp
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :keymaps 'emacs-lisp-mode-map
-   :prefix "K"
-   :non-normal-prefix "C-0"
-   "e"  '(:ignore t :which-key "eval")
-   "ee" 'eval-last-sexp
-   "er" 'eval-region
-   "ex" 'eval-expression
-   "p"  '(:ignore t :which-key "eval with pp")
-   "pe" 'pp-eval-last-sexp
-   "px" 'pp-eval-expression
-   "pm" 'pp-macroexpand-last-sexp))
+ "u"   #'universal-argument
+ "-"   #'negative-argument
+
+ "w"   '(:ignore t :which-key "window")
+ "wF"  #'make-frame
+ "wh"  #'evil-window-left
+ "wj"  #'evil-window-down
+ "wk"  #'evil-window-up
+ "wl"  #'evil-window-right
+ "wH"  #'evil-window-move-far-left
+ "wL"  #'evil-window-move-far-right
+ "wJ"  #'evil-window-move-very-bottom
+ "wK"  #'evil-window-move-very-top
+ "w-"  #'split-window-below
+ "w/"  #'split-window-right)
+
+;; keybindings for elisp
+(mode-leader-define-key emacs-lisp-mode-map
+ "e"  '(:ignore t :which-key "eval")
+ "ee" 'eval-defun
+ "eh" 'eval-last-sexp
+ "er" 'eval-region
+ "ex" 'eval-expression
+ "p"  '(:ignore t :which-key "eval with pp")
+ "pe" 'pp-eval-last-sexp
+ "px" 'pp-eval-expression
+ "pm" 'pp-macroexpand-last-sexp)
 
 ;; define-word
 (use-package define-word
     :defer t
     :init
-    (general-define-key
-     :states '(normal visual insert emacs)
-     :prefix "SPC"
-     :non-normal-prefix "C-SPC"
+    (spc-leader-define-key
      "d" 'define-word-at-point))
 
 ;; winum
@@ -448,10 +448,7 @@ the current frame."
   :config
   (setq winum-auto-assign-0-to-minibuffer nil)
   (set-face-attribute 'winum-face nil :weight 'bold :inverse-video t)
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :prefix "SPC"
-   :non-normal-prefix "C-SPC"
+  (spc-leader-define-key
    "0" 'winum-select-window-0-or-10
    "1" 'winum-select-window-1
    "2" 'winum-select-window-2
@@ -474,10 +471,7 @@ the current frame."
 (use-package scratch
   :commands scratch
   :init
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :prefix "SPC"
-   :non-normal-prefix "C-SPC"
+  (spc-leader-define-key
    "s" #'scratch))
 
 ;; s
@@ -526,14 +520,11 @@ the current frame."
     (interactive)
     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
     (haskell-hoogle-lookup-from-local))
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :keymaps 'haskell-mode-map
-   :prefix "K"
-   :non-normal-prefix "C-0"
+  (mode-leader-define-key haskell-mode-map
    "d"  #'intero-goto-definition
    "ir" #'intero-restart
    "is" #'intero-apply-suggestions
+   "it" #'intero-targets
    "r"  '(:ignore t :which-key "repl")
    "rb" #'intero-repl-load
    "rs" #'haskell-intero-display-repl
@@ -547,21 +538,13 @@ the current frame."
 (use-package hasky-extensions
   :commands (hasky-extensions hasky-extensions-browse-docs)
   :init
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :keymaps 'haskell-mode-map
-   :prefix "K"
-   :non-normal-prefix "C-0"
+  (mode-leader-define-key haskell-mode-map
    "xx" #'hasky-extensions
    "xd" #'hasky-extensions-browse-docs))
 (use-package hasky-stack
   :commands hasky-stack-execute
   :init
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :keymaps 'haskell-mode-map
-   :prefix "K"
-   :non-normal-prefix "C-0"
+  (mode-leader-define-key haskell-mode-map
    "s" #'hasky-stack-execute)
   :config
   (defun hasky-stack-run (cmd)
@@ -613,11 +596,7 @@ the current frame."
   (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
 
   :config
-  (general-define-key
-   :states '(normal visual insert emacs)
-   :keymaps 'LaTeX-mode-map
-   :prefix "K"
-   :non-normal-prefix "C-0"
+  (mode-leader-define-key LaTeX-mode-map
    "a"   #'TeX-command-run-all
    "b"   #'LaTeX-build
    "v"   #'TeX-view
