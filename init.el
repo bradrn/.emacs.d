@@ -648,7 +648,11 @@ the current frame."
   (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
 
 ;; writeroom
-(use-package writeroom-mode)
+(use-package writeroom-mode
+  :commands writeroom-mode
+  :init
+  (spc-leader-define-key
+    "iw" #'writeroom-mode))
 
 ;; org
 (use-package org
@@ -656,7 +660,9 @@ the current frame."
   (add-hook 'org-mode-hook
             (lambda ()
               (flyspell-mode)
-              (flyspell-buffer))))
+              (flyspell-buffer)))
+  (mode-leader-define-key org-mode-map
+    "i" #'org-insert-item))
 
 ;; lisp - SLY
 (use-package sly
