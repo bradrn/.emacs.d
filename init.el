@@ -624,6 +624,19 @@ the current frame."
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-s") #'latex/font-small-caps)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-f") #'latex/font-sans-serif)
 
+  ;; from https://stackoverflow.com/a/3466855/7345298
+  (defun LaTeX-maybe-math ()
+    "If in math mode, act as a prefix key for `LaTeX-math-keymap'.
+  Otherwise act as `self-insert-command'."
+    (interactive)
+    (if (texmathp)
+        (let* ((events (let ((overriding-local-map LaTeX-math-keymap))
+                         (read-key-sequence "math: ")))
+               (binding (lookup-key LaTeX-math-keymap events)))
+          (call-interactively binding))
+      (call-interactively 'self-insert-command)))
+  (define-key TeX-mode-map "`" 'LaTeX-maybe-math)
+
   (setq font-latex-fontify-sectioning 'color
         font-latex-fontify-script     nil)
   (add-hook 'LaTeX-mode-hook
