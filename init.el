@@ -16,7 +16,7 @@
 
 ;; recentf
 (recentf-mode 1)
-(setq recentf-max-menu-items 25)
+(setq recentf-max-menu-items 50)
 
 ;; spaces not tabs
 (setq-default indent-tabs-mode nil)
