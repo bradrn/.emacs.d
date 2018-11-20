@@ -394,6 +394,7 @@ the current frame."
  "fs"  #'save-buffer
 
  "h"   #'help-command
+
  "i"   '(:ignore t :which-key "UI")
  "if"  #'fci-mode
  "iu"  #'undo-tree-visualize
