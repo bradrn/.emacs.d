@@ -189,6 +189,12 @@
   :after evil
   :config
   (evil-indent-plus-default-bindings))
+(use-package evil-lion
+  :after evil
+  :config
+  (evil-lion-mode))
+(use-package evil-numbers
+  :after evil)
 
 ;; magit
 (use-package magit
@@ -409,6 +415,10 @@ the current frame."
  "jj"  #'evil-avy-goto-char
  "jJ"  #'evil-avy-goto-char-2
  "jk"  #'avy-goto-char-forward-char
+
+ "n"   '(:ignore t :which-key "numbers")
+ "n+"  #'evil-numbers/inc-at-pt
+ "n-"  #'evil-numbers/dec-at-pt
 
  "u"   #'universal-argument
  "-"   #'negative-argument
