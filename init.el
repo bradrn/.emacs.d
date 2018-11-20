@@ -157,8 +157,7 @@
   :config
   (setq evil-snipe-scope 'buffer
         evil-snipe-smart-case t)
-  (evil-snipe-mode 1)
-  (evil-snipe-override-mode 1))
+  (evil-snipe-mode 1))
 (use-package evil-nerd-commenter
   :after evil
   :config
