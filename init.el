@@ -140,6 +140,7 @@
                 evil-want-C-i-jump t)
   :config
   (evil-set-initial-state 'helpful-mode 'emacs)
+  (evil-set-initial-state 'flycheck-error-list-mode 'emacs)
   (evil-mode 1))
 (use-package evil-escape
   :after evil
