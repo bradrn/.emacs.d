@@ -399,6 +399,10 @@ the current frame."
  "if"  #'fci-mode
  "iu"  #'undo-tree-visualize
  "it"  #'helm-themes
+ "ic"  '(:ignore t :which-key "customise")
+ "icg" #'customize-group
+ "icf" #'customize-face
+ "icv" #'customize-variable
 
  "g"   #'magit-status
 
@@ -408,6 +412,8 @@ the current frame."
  "jJ"  #'evil-avy-goto-char-2
  "jk"  #'avy-goto-char-forward-char
 
+ "k"   #'kill-compilation
+
  "n"   '(:ignore t :which-key "numbers")
  "n+"  #'evil-numbers/inc-at-pt
  "n-"  #'evil-numbers/dec-at-pt
@@ -416,7 +422,7 @@ the current frame."
  "-"   #'negative-argument
 
  "w"   '(:ignore t :which-key "window")
- "wF"  #'make-frame
+ "wf"  #'make-frame
  "wh"  #'evil-window-left
  "wj"  #'evil-window-down
  "wk"  #'evil-window-up
