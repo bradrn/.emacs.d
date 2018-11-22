@@ -542,13 +542,17 @@ the current frame."
     (interactive)
     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
     (haskell-hoogle-lookup-from-local))
+  (defun haskell-run-glade (file)
+    (interactive "f")
+    (async-shell-command (concat "stack exec -- glade " file)))
   (mode-leader-define-key haskell-mode-map
    "d"  #'intero-goto-definition
+   "g"  #'haskell-run-glade
    "ir" #'intero-restart
    "is" #'intero-apply-suggestions
    "it" #'intero-targets
    "r"  '(:ignore t :which-key "repl")
-   "rb" #'intero-repl-load
+   "rl" #'intero-repl-load
    "rs" #'haskell-intero-display-repl
    "rS" #'haskell-intero-pop-to-repl
    "hh" #'hoogle
