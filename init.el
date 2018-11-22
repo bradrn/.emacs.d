@@ -615,7 +615,14 @@ the current frame."
    "e"   #'LaTeX-environment
    "c"   #'LaTeX-close-environment
    "i"   #'LaTeX-insert-item
-   "s"   #'LaTeX-section)
+   "s"   #'LaTeX-section
+
+   "p"   '(:ignore t :which-key "preview")
+   "pb"  #'preview-buffer
+   "pp"  #'preview-at-point
+   "pc"  '(:ignore t :which-key "clearout")
+   "pcb" #'preview-clearout-buffer
+   "pcp" #'preview-clearout-at-point)
 
   ;; Rebindings for TeX-font - lifted from spacemacs
   (defun latex/font-bold         () (interactive) (TeX-font nil ?\C-b))
