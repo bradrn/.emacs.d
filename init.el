@@ -700,6 +700,7 @@ the current frame."
 
 ;; org
 (use-package org
+  :defer
   :config
   (add-hook 'org-mode-hook
             (lambda ()
@@ -710,9 +711,9 @@ the current frame."
 
 ;; lisp - SLY
 (use-package sly
+  :defer
   :init
   (setq inferior-lisp-program "ros -Q run")
-  :config
   (mode-leader-define-key lisp-mode-map
     "'"  #'sly
 
