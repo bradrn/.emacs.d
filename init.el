@@ -327,6 +327,7 @@ the current frame."
 
 (use-package which-key
   :config
+  (setq which-key-allow-evil-operators t)
   (which-key-mode)
   (which-key-enable-god-mode-support))
 
