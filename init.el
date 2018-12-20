@@ -202,7 +202,8 @@
     (kbd "KK") 'with-editor-finish
     (kbd "Kk") 'with-editor-finish
     (kbd "KC") 'with-editor-cancel
-    (kbd "Kc") 'with-editor-cancel))
+    (kbd "Kc") 'with-editor-cancel)
+  (add-hook 'git-commit-setup-hook 'evil-insert-state))
 (use-package evil-magit :after magit)
 
 ;; company
