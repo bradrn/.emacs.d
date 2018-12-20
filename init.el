@@ -708,6 +708,7 @@ the current frame."
               (flyspell-mode)
               (flyspell-buffer)))
   (mode-leader-define-key org-mode-map
+    "e" #'org-export-dispatch
     "i" #'org-insert-item))
 
 ;; lisp - SLY
