@@ -497,6 +497,12 @@ the current frame."
    "ig" #'highlight-indent-guides-mode)
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
+;; move-text
+(use-package move-text
+  :after evil-unimpaired
+  :config
+  (evil-unimpaired-define-pair "e" '(move-text-up . move-text-down)))
+
 ;; s
 (use-package s)
 
