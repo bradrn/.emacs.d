@@ -692,12 +692,17 @@ the current frame."
   (assq-delete-all 'output-pdf TeX-view-program-selection)
   (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
 
-;; writeroom
-(use-package writeroom-mode
-  :commands writeroom-mode
+;; olivetti
+(use-package olivetti
+  :after general
+  :commands olivetti-mode
   :init
   (spc-leader-define-key
-    "iw" #'writeroom-mode))
+    "io"  '(:ignore t :which-key "olivetti")
+    "ioo" #'olivetti-mode
+    "io[" #'olivetti-shrink
+    "io]" #'olivetti-expand
+    "iow" #'olivetti-set-width))
 
 ;; org
 (use-package org
