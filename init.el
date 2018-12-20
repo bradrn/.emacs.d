@@ -217,7 +217,7 @@
   (define-key company-active-map (kbd "C-k") #'company-select-previous)
   (define-key company-active-map (kbd "C-l") #'company-complete-selection))
 (use-package helm-company
-  :after company
+  :after (company helm)
   :commands helm-company
   :init
   (define-key company-mode-map   (kbd "C-:") #'helm-company)
