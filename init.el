@@ -499,8 +499,7 @@ the current frame."
         highlight-indent-guides-auto-character-face-perc 2.5
         highlight-indent-guides-responsive 'top)
   (spc-leader-define-key
-   "ig" #'highlight-indent-guides-mode)
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+   "ig" #'highlight-indent-guides-mode))
 
 ;; move-text
 (use-package move-text
