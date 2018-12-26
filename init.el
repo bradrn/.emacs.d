@@ -680,10 +680,12 @@ the current frame."
    "c"   #'LaTeX-close-environment
    "i"   #'LaTeX-insert-item
    "s"   #'LaTeX-section
+   "\\"  #'TeX-electric-macro
 
    "p"   '(:ignore t :which-key "preview")
    "pb"  #'preview-buffer
    "pp"  #'preview-at-point
+   "pr"  #'preview-region
    "pc"  '(:ignore t :which-key "clearout")
    "pcb" #'preview-clearout-buffer
    "pcp" #'preview-clearout-at-point)
@@ -696,12 +698,22 @@ the current frame."
   (defun latex/font-small-caps   () (interactive) (TeX-font nil ?\C-c))
   (defun latex/font-sans-serif   () (interactive) (TeX-font nil ?\C-f))
 
+  (defvar latex-current-insert-command "textit" "The command inserted by C-w.")
+  (defun latex/font-current (arg)
+    (interactive "*P")
+    (if arg
+        (progn
+          (call-interactively 'TeX-insert-macro)
+          (setq latex-current-insert-command TeX-default-macro))
+      (TeX-insert-macro latex-current-insert-command)))
+
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-b") #'latex/font-bold)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-t") #'latex/font-code)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-e") #'latex/font-emphasis)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "<C-i>") #'latex/font-italic)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-s") #'latex/font-small-caps)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-f") #'latex/font-sans-serif)
+  (evil-define-key '(insert visual) TeX-mode-map (kbd "C-w") #'latex/font-current)
 
   ;; from https://stackoverflow.com/a/3466855/7345298
   (defun LaTeX-maybe-math ()
