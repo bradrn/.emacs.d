@@ -206,6 +206,19 @@
   (add-hook 'git-commit-setup-hook 'evil-insert-state))
 (use-package evil-magit :after magit)
 
+;; yasnippet
+(use-package yasnippet
+  :after evil
+  :defer 2
+  :config
+  (yas-global-mode))
+(use-package yasnippet-snippets :after yasnippet)
+(use-package helm-c-yasnippet
+  :after (yasnippet general)
+  :config
+  (spc-leader-define-key
+    "x" 'helm-yas-complete))
+
 ;; company
 (use-package company
   :commands global-company-mode
