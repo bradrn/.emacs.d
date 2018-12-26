@@ -358,82 +358,87 @@ the current frame."
   (set-selective-display
    (if selective-display nil (1+ (current-column)))))
 
-(use-package general)
+(use-package general
+  :config
+  (general-create-definer spc-leader-define-key
+   :states '(normal visual insert emacs)
+   :prefix "SPC"
+   :non-normal-prefix "C-SPC")
 
-(general-create-definer spc-leader-define-key
- :states '(normal visual insert emacs)
- :prefix "SPC"
- :non-normal-prefix "C-SPC")
+  (general-create-definer mode-leader-define-key
+   :states '(normal visual insert emacs)
+   :prefix "K"
+   :non-normal-prefix "C-0")
 
-(general-create-definer mode-leader-define-key
- :states '(normal visual insert emacs)
- :prefix "K"
- :non-normal-prefix "C-0")
+  (spc-leader-define-key
+   "SPC" #'helm-M-x
+   "TAB" #'switch-to-previous-buffer
+   "RET" #'evil-execute-in-god-state
+   "$"   #'set-selective-display-current-column
+   "!"   #'shell-command
+   "&"   #'async-shell-command
 
-(spc-leader-define-key
- "SPC" #'helm-M-x
- "TAB" #'switch-to-previous-buffer
- "RET" #'evil-execute-in-god-state
- "$"   #'set-selective-display-current-column
- "!"   #'async-shell-command
+   "b"   '(:ignore t :which-key "buffers")
+   "bb"  #'helm-buffers-list
+   "bd"  #'kill-this-buffer
 
- "b"   '(:ignore t :which-key "buffers")
- "bb"  #'helm-buffers-list
- "bd"  #'kill-this-buffer
- 
- "c"   #'evil-search-highlight-persist-remove-all
+   "c"   #'evil-search-highlight-persist-remove-all
 
- "e"   '(:ignore t :which-key "errors")
- "el"  #'flycheck-list-errors-toggle
- "e["  #'flycheck-previous-error
- "e]"  #'flycheck-next-error
- 
- "f"   '(:ignore t :which-key "files")
- "ff"  #'helm-find-files
- "fi"  #'find-user-init-file
- "fr"  #'helm-recentf
- "fs"  #'save-buffer
+   "e"   #'flycheck-list-errors-toggle
 
- "h"   #'help-command
+   "f"   '(:ignore t :which-key "files")
+   "ff"  #'helm-find-files
+   "fi"  #'find-user-init-file
+   "fr"  #'helm-recentf
+   "fs"  #'save-buffer
+   "ft"  #'helm-etags-select
+   "fx"  #'delete-file
 
- "i"   '(:ignore t :which-key "UI")
- "if"  #'fci-mode
- "iu"  #'undo-tree-visualize
- "it"  #'helm-themes
- "ic"  '(:ignore t :which-key "customise")
- "icg" #'customize-group
- "icf" #'customize-face
- "icv" #'customize-variable
+   "h"   #'help-command
 
- "g"   #'magit-status
+   "i"   '(:ignore t :which-key "UI")
+   "if"  #'fci-mode
+   "iu"  #'undo-tree-visualize
+   "it"  #'helm-themes
+   "ic"  '(:ignore t :which-key "customise")
+   "icg" #'customize-group
+   "icf" #'customize-face
+   "icv" #'customize-variable
+   "il"  '(:ignore t :which-key "calc")
+   "ilq" #'quick-calc
+   "ilc" #'calc
 
- "j"   '(:ignore t :which-key "jump")
- "ji"  #'helm-semantic-or-imenu
- "jj"  #'evil-avy-goto-char
- "jJ"  #'evil-avy-goto-char-2
- "jk"  #'avy-goto-char-forward-char
+   "g"   #'magit-status
 
- "k"   #'kill-compilation
+   "j"   '(:ignore t :which-key "jump")
+   "ji"  #'helm-semantic-or-imenu
+   "jj"  #'evil-avy-goto-char
+   "jJ"  #'evil-avy-goto-char-2
+   "jk"  #'avy-goto-char-forward-char
 
- "n"   '(:ignore t :which-key "numbers")
- "n+"  #'evil-numbers/inc-at-pt
- "n-"  #'evil-numbers/dec-at-pt
+   "k"   #'kill-compilation
 
- "u"   #'universal-argument
- "-"   #'negative-argument
+   "n"   '(:ignore t :which-key "numbers")
+   "n+"  #'evil-numbers/inc-at-pt
+   "n-"  #'evil-numbers/dec-at-pt
 
- "w"   '(:ignore t :which-key "window")
- "wf"  #'make-frame
- "wh"  #'evil-window-left
- "wj"  #'evil-window-down
- "wk"  #'evil-window-up
- "wl"  #'evil-window-right
- "wH"  #'evil-window-move-far-left
- "wL"  #'evil-window-move-far-right
- "wJ"  #'evil-window-move-very-bottom
- "wK"  #'evil-window-move-very-top
- "w-"  #'split-window-below
- "w/"  #'split-window-right)
+   "r"   #'revert-buffer
+   "u"   #'universal-argument
+
+   "-"   #'negative-argument
+
+   "w"   '(:ignore t :which-key "window")
+   "wf"  #'make-frame
+   "wh"  #'evil-window-left
+   "wj"  #'evil-window-down
+   "wk"  #'evil-window-up
+   "wl"  #'evil-window-right
+   "wH"  #'evil-window-move-far-left
+   "wL"  #'evil-window-move-far-right
+   "wJ"  #'evil-window-move-very-bottom
+   "wK"  #'evil-window-move-very-top
+   "w-"  #'split-window-below
+   "w/"  #'split-window-right))
 
 ;; keybindings for elisp
 (mode-leader-define-key emacs-lisp-mode-map
