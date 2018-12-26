@@ -596,7 +596,7 @@ the current frame."
    "r"  '(:ignore t :which-key "repl")
    "rl" #'intero-repl-load
    "rs" #'haskell-intero-display-repl
-   "rS" #'haskell-intero-pop-to-repl
+   "rp" #'haskell-intero-pop-to-repl
    "hh" #'hoogle
    "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
