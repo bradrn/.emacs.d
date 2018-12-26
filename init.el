@@ -504,6 +504,10 @@ the current frame."
   (spc-leader-define-key
    "s" #'scratch))
 
+;; try
+(use-package try
+  :commands try)
+
 ;; projectile
 (use-package projectile
   :defer .1
