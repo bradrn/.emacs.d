@@ -605,6 +605,13 @@ the current frame."
   (magit-define-popup-action 'hasky-stack-root-popup
     ?r "Run" 'hasky-stack-run))
 
+(use-package shakespeare-mode
+  :defer
+  :config
+  (add-hook 'shakespeare-hamlet-mode-hook
+            (lambda ()
+              (setq sgml-basic-offset 4))))
+
 ;; LaTeX - partly lifted from spacemacs
 (use-package tex
   :ensure auctex
