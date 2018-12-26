@@ -504,6 +504,24 @@ the current frame."
   (spc-leader-define-key
    "s" #'scratch))
 
+;; projectile
+(use-package projectile
+  :defer .1
+  :after general    ; for spc-leader-define-key
+  :config
+  (projectile-mode +1)
+  (setq projectile-completion-system 'helm)
+        ;; projectile-globally-ignored-file-suffixes
+        ;; (append '("~")
+                ;; projectile-globally-ignored-file-suffixes))
+  (projectile-register-project-type 'haskell-stack '("stack.yaml")
+                                    :compile "stack build"
+                                    :run "stack run"
+                                    :test "stack build --test"
+                                    :test-suffix "Spec")
+  (spc-leader-define-key
+      "p" 'projectile-command-map))
+
 ;; highlight-indent-guides
 (use-package highlight-indent-guides
   :commands highlight-indent-guides-mode
