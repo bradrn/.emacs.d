@@ -101,6 +101,7 @@
 (use-package linum-relative
   :init
   (global-linum-mode t)
+  (column-number-mode t)  ; this is as good a place as any to put this
   :config
   (linum-relative-mode)
   (setq linum-relative-current-symbol ""))
