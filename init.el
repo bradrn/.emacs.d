@@ -118,6 +118,7 @@
 
 ;; hl-todo
 (use-package hl-todo
+  :defer .1
   :config
   (global-hl-todo-mode))
 
