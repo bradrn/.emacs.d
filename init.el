@@ -413,7 +413,11 @@ the current frame."
    "i"   '(:ignore t :which-key "UI")
    "if"  #'fci-mode
    "iu"  #'undo-tree-visualize
-   "it"  #'helm-themes
+   "it"  '(:ignore t :which-key "themes")
+   "itdo" (lambda () (interactive) (helm-themes--load-theme "doom-one"))
+   "itsd" (lambda () (interactive) (helm-themes--load-theme "solarized-dark"))
+   "itsl" (lambda () (interactive) (helm-themes--load-theme "solarized-light"))
+   "itt" #'helm-themes
    "ic"  '(:ignore t :which-key "customise")
    "icg" #'customize-group
    "icf" #'customize-face
