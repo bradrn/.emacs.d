@@ -139,6 +139,7 @@
                 evil-want-C-d-scroll t
                 evil-want-C-i-jump t)
   :config
+  (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-mode 1))
 (use-package evil-escape
   :after evil
@@ -508,6 +509,13 @@ the current frame."
   :init
   (spc-leader-define-key
    "s" #'scratch))
+
+;; dashboard
+(use-package dashboard
+  :config
+  (setq dashboard-items '((recents  . 10)
+                          (projects . 10)))
+  (dashboard-setup-startup-hook))
 
 ;; try
 (use-package try
