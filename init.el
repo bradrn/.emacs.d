@@ -612,6 +612,7 @@ the current frame."
   (mode-leader-define-key haskell-mode-map
    "d"  #'intero-goto-definition
    "g"  #'haskell-run-glade
+   "ii" #'intero-info
    "ir" #'intero-restart
    "is" #'intero-apply-suggestions
    "it" #'intero-targets
@@ -619,6 +620,7 @@ the current frame."
    "rl" #'intero-repl-load
    "rs" #'haskell-intero-display-repl
    "rp" #'haskell-intero-pop-to-repl
+   "t"  #'intero-type-at
    "hh" #'hoogle
    "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
