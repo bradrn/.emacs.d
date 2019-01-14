@@ -333,7 +333,9 @@ the current frame."
   (global-set-key (kbd "C-h f") #'helpful-callable)
   (global-set-key (kbd "C-h v") #'helpful-variable)
   (global-set-key (kbd "C-h k") #'helpful-key)
-  (global-set-key (kbd "C-h c") #'helpful-command))
+  (global-set-key (kbd "C-h c") #'helpful-command)
+  :config
+  (evil-define-key 'normal helpful-mode-map "q" 'quit-window))
 
 ;; thanks http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/
 (defun find-user-init-file ()
