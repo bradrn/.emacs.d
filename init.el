@@ -549,7 +549,7 @@ the current frame."
   :commands highlight-indent-guides-mode
   :init
   (setq highlight-indent-guides-method 'character
-        highlight-indent-guides-auto-character-face-perc 2.5
+        highlight-indent-guides-auto-character-face-perc 10
         highlight-indent-guides-responsive 'top)
   (spc-leader-define-key
    "ig" #'highlight-indent-guides-mode))
