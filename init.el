@@ -438,6 +438,7 @@ the current frame."
    "jj"  #'evil-avy-goto-char
    "jJ"  #'evil-avy-goto-char-2
    "jk"  #'avy-goto-char-forward-char
+   "jl"  #'avy-goto-line
 
    "k"   #'kill-compilation
 
