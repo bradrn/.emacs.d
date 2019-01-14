@@ -700,10 +700,12 @@ the current frame."
    "b"   #'LaTeX-build
    "v"   #'TeX-view
    "h"   #'TeX-doc
+   "l"   #'TeX-recenter-output-buffer
    "e"   #'LaTeX-environment
    "c"   #'LaTeX-close-environment
    "i"   #'LaTeX-insert-item
    "s"   #'LaTeX-section
+   "q"   #'TeX-next-error
    "\\"  #'TeX-electric-macro
 
    "p"   '(:ignore t :which-key "preview")
