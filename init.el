@@ -224,7 +224,8 @@
   :commands global-company-mode
   :init
   (add-hook 'after-init-hook #'global-company-mode)
-  (setq company-idle-delay 0.1)
+  (setq company-idle-delay 0.1
+        company-dabbrev-downcase nil)
   :config
   ;; from spacemacs
   (define-key company-active-map (kbd "C-j") #'company-select-next)
