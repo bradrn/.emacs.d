@@ -217,8 +217,8 @@
   (yas-global-mode))
 (use-package yasnippet-snippets :after yasnippet)
 (use-package helm-c-yasnippet
-  :after (yasnippet general)
-  :config
+  :after (yasnippet general helm)
+  :init
   (spc-leader-define-key
     "x" 'helm-yas-complete))
 
