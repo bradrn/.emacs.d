@@ -324,7 +324,7 @@ the current frame."
   (setq helm-flx-for-helm-find-files nil)
   (helm-flx-mode))
 (use-package helm-themes
-  :defer t)
+  :commands (helm-themes helm-themes--load-theme))
 
 ;; helpful
 (use-package helpful
