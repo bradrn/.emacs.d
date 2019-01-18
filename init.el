@@ -425,6 +425,7 @@ the current frame."
    "iu"  #'undo-tree-visualize
    "it"  '(:ignore t :which-key "themes")
    "itdo" (lambda () (interactive) (helm-themes--load-theme "doom-one"))
+   "itle" (lambda () (interactive) (helm-themes--load-theme "leuven"))
    "itsd" (lambda () (interactive) (helm-themes--load-theme "solarized-dark"))
    "itsl" (lambda () (interactive) (helm-themes--load-theme "solarized-light"))
    "itt" #'helm-themes
