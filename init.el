@@ -822,7 +822,7 @@ the current frame."
 (use-package sly
   :defer
   :init
-  (setq inferior-lisp-program "ros -Q run")
+  (setq inferior-lisp-program "sbcl")
   (mode-leader-define-key lisp-mode-map
     "'"  #'sly
 
