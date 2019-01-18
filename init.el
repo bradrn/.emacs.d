@@ -572,6 +572,10 @@ the current frame."
 (require 'cl)
 
 ;; haskell
+(defun haskell-run-yesod-devel ()
+  (interactive)
+  (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
+    (async-shell-command "stack exec -- yesod devel")))
 (use-package intero
   :commands intero-mode
   :preface
@@ -617,7 +621,9 @@ the current frame."
     (async-shell-command (concat "stack exec -- glade " file)))
   (mode-leader-define-key haskell-mode-map
    "d"  #'intero-goto-definition
-   "g"  #'haskell-run-glade
+   "c"  '(:ignore t :which-key "commands")
+   "cg" #'haskell-run-glade
+   "cy" #'haskell-run-yesod-devel
    "ii" #'intero-info
    "ir" #'intero-restart
    "is" #'intero-apply-suggestions
@@ -670,7 +676,9 @@ the current frame."
   :config
   (add-hook 'shakespeare-hamlet-mode-hook
             (lambda ()
-              (setq sgml-basic-offset 4))))
+              (setq sgml-basic-offset 4)))
+  (mode-leader-define-key shakespeare-mode-map
+    "cy" #'haskell-run-yesod-devel))
 
 ;; LaTeX - partly lifted from spacemacs
 (use-package tex
