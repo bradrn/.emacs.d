@@ -462,6 +462,8 @@ the current frame."
    "wh"  #'evil-window-left
    "wj"  #'evil-window-down
    "wk"  #'evil-window-up
+   "wo"  #'delete-other-windows
+   "wx"  #'ace-delete-window
    "wl"  #'evil-window-right
    "wH"  #'evil-window-move-far-left
    "wL"  #'evil-window-move-far-right
