@@ -184,6 +184,7 @@
 (use-package evil-god-state
   :after evil
   :config
+  (evil-global-set-key 'normal "\\" 'evil-execute-in-god-state)
   (add-hook 'evil-god-state-entry-hook (lambda () (setq cursor-type 'hollow)))
   (add-hook 'evil-god-state-exit-hook (lambda () (setq cursor-type 'box))))
 (use-package evil-matchit
@@ -396,7 +397,7 @@ the current frame."
   (spc-leader-define-key
    "SPC" #'helm-M-x
    "TAB" #'switch-to-previous-buffer
-   "RET" #'evil-execute-in-god-state
+   "RET" #'evil-execute-in-emacs-state
    "$"   #'set-selective-display-current-column
    "!"   #'shell-command
    "&"   #'async-shell-command
