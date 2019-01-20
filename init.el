@@ -883,4 +883,5 @@ the current frame."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(fixed-pitch ((t nil)))
+ '(linum ((t (:height 100))))
  '(preview-reference-face ((t (:height 1.5)))))
