@@ -523,13 +523,6 @@ the current frame."
   (spc-leader-define-key
    "s" #'scratch))
 
-;; dashboard
-(use-package dashboard
-  :config
-  (setq dashboard-items '((recents  . 10)
-                          (projects . 10)))
-  (dashboard-setup-startup-hook))
-
 ;; try
 (use-package try
   :commands try)
