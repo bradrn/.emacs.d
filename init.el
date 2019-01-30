@@ -49,8 +49,12 @@
 (scroll-bar-mode -1)
 
 ;; server - from https://stackoverflow.com/a/5571983/7345298
-(load "server")
-(unless (server-running-p) (server-start))
+(defun start-server-if-not-running ()
+  "Start the Emacs server if it is not already running."
+  (load "server")
+  (unless (server-running-p) (server-start)))
+
+;; (run-with-idle-timer 1 nil #'start-server-if-not-running)
 
 ;; parentheses
 (electric-pair-mode 1)
@@ -752,6 +756,9 @@ the current frame."
             (lambda ()
               (flyspell-mode)
               (flyspell-buffer)))
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (start-server-if-not-running)))
 
   ;; adapted from https://lists.nongnu.org/archive/html/auctex/2009-11/msg00016.html
   (evil-define-key 'insert TeX-mode-map (kbd "C-\\") 'TeX-electric-macro)
