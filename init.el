@@ -112,14 +112,14 @@
   :defer t
   :config
   (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t))
+        doom-themes-enable-italic t)
+  (doom-themes-org-config))
 (use-package solarized-theme
-  :defer t
+  :defer
   :init
-  (setq solarized-use-variable-pitch nil))
+  (setq solarized-use-variable-pitch nil
+        solarized-scale-org-headlines nil))
 (load-theme 'doom-one t)
-;; Avoid problem with large line numbers in solarized
-(set-face-attribute 'linum nil :height 100)
 
 ;; hl-todo
 (use-package hl-todo
