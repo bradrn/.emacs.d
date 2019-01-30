@@ -644,27 +644,7 @@ the current frame."
   :commands hasky-stack-execute
   :init
   (mode-leader-define-key haskell-mode-map
-   "s" #'hasky-stack-execute)
-  :config
-  (defun hasky-stack-run (cmd)
-    "Execute \"stack run\" command running CMD."
-    (interactive
-     (list (read-string "Command to run: ")))
-    (cl-destructuring-bind (app . args)
-        (progn
-          (string-match
-           "^[[:blank:]]*\\(?1:[^[:blank:]]+\\)[[:blank:]]*\\(?2:.*\\)$"
-           cmd)
-          (cons (match-string 1 cmd)
-                (match-string 2 cmd)))
-      (hasky-stack--exec-command
-       hasky-stack--project-name
-       hasky-stack--last-directory
-       (if (string= args "")
-           (concat "run " app)
-         (concat "run " app " -- " args)))))
-  (magit-define-popup-action 'hasky-stack-root-popup
-    ?r "Run" 'hasky-stack-run))
+   "s" #'hasky-stack-execute))
 
 (use-package shakespeare-mode
   :defer
