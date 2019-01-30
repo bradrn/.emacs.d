@@ -150,6 +150,8 @@
                 evil-want-C-i-jump t)
   :config
   (evil-set-initial-state 'dashboard-mode 'emacs)
+  (evil-set-initial-state 'sly-db-mode 'emacs)
+  (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1))
 (use-package evil-escape
   :after evil
@@ -181,10 +183,10 @@
   :config
   (evil-unimpaired-mode t)
   (evil-unimpaired-define-pair "q" '(flycheck-previous-error . flycheck-next-error)))
-(use-package evil-search-highlight-persist
-  :after evil
-  :config
-  (global-evil-search-highlight-persist t))
+;; (use-package evil-search-highlight-persist
+;;   :after evil
+;;   :config
+;;   (global-evil-search-highlight-persist t))
 (use-package evil-god-state
   :after evil
   :config
