@@ -632,6 +632,7 @@ the current frame."
    "c"  '(:ignore t :which-key "commands")
    "cg" #'haskell-run-glade
    "cy" #'haskell-run-yesod-devel
+   "ig" #'haskell-mode-generate-tags
    "ii" #'intero-info
    "ir" #'intero-restart
    "is" #'intero-apply-suggestions
