@@ -230,7 +230,7 @@
 ;; yasnippet
 (use-package yasnippet
   :after evil
-  :defer 2
+  :defer 4
   :config
   (yas-global-mode))
 (use-package yasnippet-snippets :after yasnippet)
@@ -542,7 +542,7 @@ the current frame."
 
 ;; projectile
 (use-package projectile
-  :defer .1
+  :defer 5
   :after general    ; for spc-leader-define-key
   :config
   (projectile-mode +1)
