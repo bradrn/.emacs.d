@@ -152,7 +152,14 @@
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
   (evil-select-search-module 'evil-search-module 'evil-search)
-  (evil-mode 1))
+  (evil-mode 1)
+
+  (evil-define-operator evil-delete-trailing-whitespace (beg end)
+    :type line
+    :move-point nil
+    "Delete trailing whitespace in the region."
+    (delete-trailing-whitespace beg end))
+  (evil-define-key '(normal visual) 'global "g$" 'evil-delete-trailing-whitespace))
 (use-package evil-escape
   :after evil
   :init (evil-escape-mode)
