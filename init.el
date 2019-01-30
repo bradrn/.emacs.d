@@ -17,6 +17,7 @@
 ;; recentf
 (recentf-mode 1)
 (setq recentf-max-menu-items 50)
+(run-with-idle-timer 2 nil #'recentf-cleanup)
 
 ;; spaces not tabs
 (setq-default indent-tabs-mode nil)
@@ -852,6 +853,7 @@ the current frame."
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(safe-local-variable-values (quote ((TeX-command-extra-options . "-shell-escape"))))
+ '(recentf-auto-cleanup (quote never))
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map
    (list
