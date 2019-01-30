@@ -259,6 +259,13 @@
   (define-key company-mode-map   (kbd "C-:") #'helm-company)
   (define-key company-active-map (kbd "C-:") #'helm-company))
 
+;; origami
+(use-package origami
+  :defer
+  :init
+  (add-hook 'prog-mode-hook #'origami-mode)
+  (add-hook 'LaTeX-mode-hook #'origami-mode))
+
 ;; rainbow-delimiters & parinfer
 (use-package rainbow-delimiters
   :config
