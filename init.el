@@ -504,10 +504,12 @@ the current frame."
    "wo"  #'delete-other-windows
    "wx"  #'ace-delete-window
    "wl"  #'evil-window-right
+   "wq"  #'delete-window
    "wH"  #'evil-window-move-far-left
    "wL"  #'evil-window-move-far-right
    "wJ"  #'evil-window-move-very-bottom
    "wK"  #'evil-window-move-very-top
+   "wQ"  #'kill-buffer-and-window
    "w-"  #'split-window-below
    "w/"  #'split-window-right))
 
