@@ -933,6 +933,7 @@ the current frame."
 
     "c"  '(:ignore t :which-key "compile")
     "cl" #'sly-compile-and-load-file
+    "cc" #'sly-compile-defun
 
     "e"  '(:ignore t :which-key "eval")
     "ee" #'sly-eval-defun
