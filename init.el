@@ -570,8 +570,10 @@ the current frame."
 
 ;; projectile
 (use-package projectile
-  :defer 5
-  :after general    ; for spc-leader-define-key
+  :defer
+  :init
+  (spc-leader-define-key
+      "pp" 'projectile-switch-project)
   :config
   (projectile-mode +1)
   (setq projectile-completion-system 'helm)
