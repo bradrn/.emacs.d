@@ -349,6 +349,8 @@ the current frame."
                          (window-height . 0.4)))))
             (helm-default-display-buffer buffer))))
 
+  (setq helm-split-window-inside-p t)
+
   ;; from https://github.com/syl20bnr/spacemacs/blob/c7a103a772d808101d7635ec10f292ab9202d9ee/layers/%2Bspacemacs/spacemacs-completion/funcs.el#L78
   (define-key helm-map (kbd "C-j") #'helm-next-line)
   (define-key helm-map (kbd "C-k") #'helm-previous-line)
