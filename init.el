@@ -1,3 +1,13 @@
+;; from https://blog.d46.us/advanced-emacs-startup/
+;; Use a hook so the message doesn't get clobbered by other messages.
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
 ;; from https://github.com/nilcons/emacs-use-package-fast/tree/a9cc00c5713a2a85d65399731abc4349b46756b4#a-trick-less-gc-during-startup
 (setq gc-cons-threshold 64000000)
 (add-hook 'after-init-hook
@@ -918,8 +928,6 @@ the current frame."
     "h"  '(:ignore t :which-key "help")
     "hd" #'sly-describe-symbol
     "hs" #'hyperspec-lookup))
-
-(message "Time taken: %s" (emacs-init-time))
 
 ;; custom
 (custom-set-variables
