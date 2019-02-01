@@ -655,7 +655,7 @@ the current frame."
     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
     (haskell-hoogle-lookup-from-local))
   (defun haskell-run-glade (file)
-    (interactive "f")
+    (interactive "fGlade file: ")
     (async-shell-command (concat "stack exec -- glade " file)))
   (mode-leader-define-key haskell-mode-map
    "d"  #'intero-goto-definition
