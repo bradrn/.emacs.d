@@ -676,6 +676,7 @@ the current frame."
    "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
 (use-package company-cabal
+  :after (company intero)
   :config
   (add-to-list 'company-backends 'company-cabal))
 (use-package hasky-extensions
