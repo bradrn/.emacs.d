@@ -807,14 +807,98 @@ the current frame."
 ;; org
 (use-package org
   :defer
+  :init
+  (spc-leader-define-key
+    "ia" '(:ignore t :which-key "org-agenda")
+    "iaa" #'org-agenda
+    "iac" #'org-capture
+    "iak" #'org-cycle-agenda-files)
   :config
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (flyspell-mode)
-              (flyspell-buffer)))
+
+  (evil-define-key 'emacs 'org-agenda-mode-map "\\" #'evil-execute-in-god-state)
   (mode-leader-define-key org-mode-map
     "e" #'org-export-dispatch
-    "i" #'org-insert-item))
+    "i" #'org-insert-item
+    "t" #'org-todo
+    "w" #'org-refile
+    "K" #'org-ctrl-c-ctrl-c
+    "r" #'org-reveal
+    "s" '(:ignore t :which-key "scheduling")
+    "ss" #'org-schedule
+    "sd" #'org-deadline)
+  (mode-leader-define-key org-agenda-mode-map
+    "o" #'org-agenda-open-link
+    "t" #'org-agenda-todo
+    "s" '(:ignore t :which-key "scheduling")
+    "ss" #'org-agenda-schedule
+    "sd" #'org-agenda-deadline)
+
+  (setq org-agenda-files '("~/Dropbox/org")
+        org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(i)" "|" "DONE(d)")
+          (sequence "WAITING(w@)" "HOLD(h@)"))
+        org-agenda-custom-commands
+        '((" " "Block agenda"
+           ((tags "REFILE"
+                  ((org-agenda-overriding-header "To refile")))
+            (todo "INPROGRESS"
+                  ((org-agenda-overriding-header "In progress")))
+            (todo "NEXT"
+                  ((org-agenda-overriding-header "Next tasks")))
+            (agenda "" nil)
+            (todo "WAITING|HOLD"
+                  ((org-agenda-overriding-header "Waiting/hold tasks"))))))
+        org-agenda-show-outline-path t
+        org-refile-targets
+        '((nil :maxlevel . 9)
+          (org-agenda-files :maxlevel . 9))
+        org-refile-use-outline-path 'file
+        org-refile-allow-creating-parent-nodes 'confirm
+        org-capture-templates
+        '(("t" "todo" entry (file "~/Dropbox/org/refile.org")
+           "* TODO %^{Description}"))
+        org-archive-mark-done nil
+        org-archive-location "%s_archive::* Archived Tasks"
+        org-enforce-todo-dependencies t
+        org-track-ordered-property-with-tag nil
+        ;; org-agenda-dim-blocked-tasks t
+        org-enforce-todo-checkbox-dependencies t
+        org-log-into-drawer t)
+
+  ;; from https://lists.gnu.org/archive/html/emacs-orgmode/2015-06/msg00266.html
+  (defun org-agenda-delete-empty-blocks ()
+    "Remove empty agenda blocks.
+  A block is identified as empty if there are fewer than 2
+  non-empty lines in the block (excluding the line with
+  `org-agenda-block-separator' characters)."
+    (when org-agenda-compact-blocks
+      (user-error "Cannot delete empty compact blocks"))
+    (setq buffer-read-only nil)
+    (save-excursion
+      (goto-char (point-min))
+      (let* ((blank-line-re "^\\s-*$")
+             (content-line-count (if (looking-at-p blank-line-re) 0 1))
+             (start-pos (point))
+             (block-re (format "%c\\{10,\\}" org-agenda-block-separator)))
+        (while (and (not (eobp)) (forward-line))
+          (cond
+           ((looking-at-p block-re)
+            (when (< content-line-count 2)
+              (delete-region start-pos (1+ (point-at-bol))))
+            (setq start-pos (point))
+            (forward-line)
+            (setq content-line-count (if (looking-at-p blank-line-re) 0 1)))
+           ((not (looking-at-p blank-line-re))
+            (setq content-line-count (1+ content-line-count)))))
+        (when (< content-line-count 2)
+          (delete-region start-pos (point-max)))
+        (goto-char (point-min))
+        ;; The above strategy can leave a separator line at the beginning
+        ;; of the buffer.
+        (when (looking-at-p block-re)
+          (delete-region (point) (1+ (point-at-eol))))))
+    (setq buffer-read-only t))
+  (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks))
 
 ;; lisp - SLY
 (use-package sly
