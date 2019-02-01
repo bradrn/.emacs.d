@@ -251,10 +251,11 @@
   (yas-global-mode))
 (use-package yasnippet-snippets :after yasnippet)
 (use-package helm-c-yasnippet
-  :after (yasnippet general helm)
+  :after (yasnippet helm)
   :init
-  (spc-leader-define-key
-    "x" 'helm-yas-complete))
+  (eval-after-load 'general
+    (spc-leader-define-key
+        "x" 'helm-yas-complete)))
 
 ;; company
 (use-package company
