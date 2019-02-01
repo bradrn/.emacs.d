@@ -446,7 +446,7 @@ the current frame."
    "bb"  #'helm-buffers-list
    "bd"  #'kill-this-buffer
 
-   "c"   #'evil-search-highlight-persist-remove-all
+   "c"   #'evil-ex-nohighlight
 
    "e"   #'flycheck-list-errors-toggle
 
