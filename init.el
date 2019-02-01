@@ -159,12 +159,16 @@
                 evil-ex-visual-char-range t
                 evil-want-C-u-scroll t
                 evil-want-C-d-scroll t
-                evil-want-C-i-jump t)
+                evil-want-C-i-jump t
+                evil-want-minibuffer t)
   :config
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
+
+  ;; don't need digraphs, but DO need to input C-k!
+  (define-key evil-insert-state-map (kbd "C-k") nil)
 
   (evil-define-operator evil-delete-trailing-whitespace (beg end)
     :type line
