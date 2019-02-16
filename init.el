@@ -572,8 +572,13 @@ CHAR and ARG are as in avy."
 (use-package projectile
   :defer
   :init
+  (defun autoload-projectile ()
+    (interactive)
+    (autoload-do-load #'projectile-switch-project))
   (spc-leader-define-key
-      "pp" 'projectile-switch-project)
+      "pf" 'projectile-find-file
+      "pp" 'projectile-switch-project
+      "pl" #'autoload-projectile)
   :config
   (projectile-mode +1)
   (setq projectile-completion-system 'helm)
