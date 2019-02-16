@@ -169,10 +169,11 @@
   (evil-define-key '(normal visual) 'global "g$" 'evil-delete-trailing-whitespace))
 (use-package evil-escape
   :after evil
-  :init (evil-escape-mode)
-  :config
+  :init
   (setq-default evil-escape-key-sequence "jw"
-                evil-escape-delay 0.2))
+                evil-escape-delay 0.2)
+  :config
+  (evil-escape-mode))
 (use-package evil-surround
   :after evil
   :config
