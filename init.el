@@ -380,8 +380,6 @@
   (interactive)
   (find-file user-init-file))
 
-(use-package avy)
-
 (use-package which-key
   :config
   (setq which-key-allow-evil-operators t)
@@ -401,13 +399,6 @@
     (if (not (window-live-p flycheck-errors-window))
         (call-interactively 'flycheck-list-errors)
       (delete-window flycheck-errors-window))))
-
-(defun avy-goto-char-forward-char (char &optional arg)
-  "Run `avy-goto-char', then move forward one character."
-  (interactive (list (read-char "char: " t)
-                     current-prefix-arg))
-  (avy-goto-char char arg)
-  (forward-char))
 
 (defun set-selective-display-current-column ()
   (interactive)
@@ -473,10 +464,6 @@
 
    "j"   '(:ignore t :which-key "jump")
    "ji"  #'helm-semantic-or-imenu
-   "jj"  #'evil-avy-goto-char
-   "jJ"  #'evil-avy-goto-char-2
-   "jk"  #'avy-goto-char-forward-char
-   "jl"  #'avy-goto-line
 
    "k"   #'kill-compilation
 
@@ -517,6 +504,24 @@
  "pe" 'pp-eval-last-sexp
  "px" 'pp-eval-expression
  "pm" 'pp-macroexpand-last-sexp)
+
+;; avy
+(defun avy-goto-char-forward-char (char &optional arg)
+  "Run `avy-goto-char', then move forward one character.
+CHAR and ARG are as in avy."
+  (interactive (list (read-char "char: " t)
+                     current-prefix-arg))
+  (avy-goto-char char arg)
+  (forward-char))
+(use-package avy
+  :defer t
+  :commands avy-goto-char-forward-char
+  :init
+  (spc-leader-define-key
+   "jj"  #'evil-avy-goto-char
+   "jJ"  #'evil-avy-goto-char-2
+   "jk"  #'avy-goto-char-forward-char
+   "jl"  #'avy-goto-line))
 
 ;; define-word
 (use-package define-word
