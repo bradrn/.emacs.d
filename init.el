@@ -702,8 +702,16 @@ CHAR and ARG are as in avy."
   (add-hook 'shakespeare-hamlet-mode-hook
             (lambda ()
               (setq sgml-basic-offset 4)))
+  (defun switch-between-hamlet-julius ()
+    "Switch between corresponding XXX.hamlet and XXX.julius files."
+    (interactive)
+    (let ((sx (file-name-sans-extension buffer-file-name)))
+      (pcase (file-name-extension buffer-file-name)
+        ("hamlet" (find-file (concat sx "." "julius")))
+        ("julius" (find-file (concat sx "." "hamlet"))))))
   (mode-leader-define-key shakespeare-mode-map
-    "cy" #'haskell-run-yesod-devel))
+    "cy" #'haskell-run-yesod-devel
+    "x"  #'switch-between-hamlet-julius))
 
 ;; LaTeX - partly lifted from spacemacs
 (use-package tex
