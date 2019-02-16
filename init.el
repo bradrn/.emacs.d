@@ -101,18 +101,6 @@
       scroll-margin 3
       scroll-conservatively 101)
 
-;; Sacha Chua's typing timer
-(defun timer-go ()
-  "Quick keyboard timer."
-  (interactive)
-  (insert "GO\n")
-  (run-with-timer 3 nil (lambda () (insert "\n")))  ; for warmup
-  (run-with-timer 15 nil (lambda () ; 12 seconds + the 3-second warmup
-                           (let ((col (- (point) (line-beginning-position))))
-                             (insert (format " | %d | \n" col))))))
-                           
-(global-set-key (kbd "<f7>") #'timer-go)
-
 ;; line numbers
 (use-package linum-relative
   :init
