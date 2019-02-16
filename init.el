@@ -94,7 +94,9 @@
 (define-key input-decode-map [?\C-i] [C-i])
 
 ;; font
-(set-frame-font "Consolas 10" nil t)
+(if (eq system-type 'gnu/linux)
+    (set-frame-font "Ubuntu Mono 12" nil t)
+  (set-frame-font "Consolas 10" nil t))
 
 ;; smooth scrolling
 (setq scroll-preserve-screen-position t
