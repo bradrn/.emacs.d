@@ -125,7 +125,7 @@
   :init
   (setq solarized-use-variable-pitch nil
         solarized-scale-org-headlines nil))
-(load-theme 'doom-one t)
+;; (load-theme 'doom-one t)
 
 ;; hl-todo
 (use-package hl-todo
