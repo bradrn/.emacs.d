@@ -1,3 +1,13 @@
+;; from https://blog.d46.us/advanced-emacs-startup/
+;; Use a hook so the message doesn't get clobbered by other messages.
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
 ;; from https://github.com/nilcons/emacs-use-package-fast/tree/a9cc00c5713a2a85d65399731abc4349b46756b4#a-trick-less-gc-during-startup
 (setq gc-cons-threshold 64000000)
 (add-hook 'after-init-hook
@@ -15,6 +25,7 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; recentf
+(setq recentf-auto-cleanup 'never)
 (recentf-mode 1)
 (setq recentf-max-menu-items 50)
 (run-with-idle-timer 2 nil #'recentf-cleanup)
@@ -92,25 +103,15 @@
       scroll-margin 3
       scroll-conservatively 101)
 
-;; Sacha Chua's typing timer
-(defun timer-go ()
-  "Quick keyboard timer."
-  (interactive)
-  (insert "GO\n")
-  (run-with-timer 3 nil (lambda () (insert "\n")))  ; for warmup
-  (run-with-timer 15 nil (lambda () ; 12 seconds + the 3-second warmup
-                           (let ((col (- (point) (line-beginning-position))))
-                             (insert (format " | %d | \n" col))))))
-                           
-(global-set-key (kbd "<f7>") #'timer-go)
-
 ;; line numbers
 (use-package linum-relative
+  :defer t
   :init
+  (add-hook 'emacs-startup-hook
+            (lambda () (linum-relative-mode)))
+  :config
   (global-linum-mode t)
   (column-number-mode t)  ; this is as good a place as any to put this
-  :config
-  (linum-relative-mode)
   (setq linum-relative-current-symbol ""))
 
 
@@ -126,7 +127,7 @@
   :init
   (setq solarized-use-variable-pitch nil
         solarized-scale-org-headlines nil))
-(load-theme 'doom-one t)
+;; (load-theme 'doom-one t)
 
 ;; hl-todo
 (use-package hl-todo
@@ -150,12 +151,17 @@
                 evil-ex-visual-char-range t
                 evil-want-C-u-scroll t
                 evil-want-C-d-scroll t
-                evil-want-C-i-jump t)
+                evil-want-C-i-jump t
+                evil-want-minibuffer t)
   :config
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
+  (evil-set-initial-state 'flycheck-error-list-mode 'emacs)
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
+
+  ;; don't need digraphs, but DO need to input C-k!
+  (define-key evil-insert-state-map (kbd "C-k") nil)
 
   (evil-define-operator evil-delete-trailing-whitespace (beg end)
     :type line
@@ -165,10 +171,11 @@
   (evil-define-key '(normal visual) 'global "g$" 'evil-delete-trailing-whitespace))
 (use-package evil-escape
   :after evil
-  :init (evil-escape-mode)
-  :config
+  :init
   (setq-default evil-escape-key-sequence "jw"
-                evil-escape-delay 0.2))
+                evil-escape-delay 0.2)
+  :config
+  (evil-escape-mode))
 (use-package evil-surround
   :after evil
   :config
@@ -238,10 +245,11 @@
   (yas-global-mode))
 (use-package yasnippet-snippets :after yasnippet)
 (use-package helm-c-yasnippet
-  :after (yasnippet general helm)
+  :after (yasnippet helm)
   :init
-  (spc-leader-define-key
-    "x" 'helm-yas-complete))
+  (eval-after-load 'general
+    (spc-leader-define-key
+        "x" 'helm-yas-complete)))
 
 ;; company
 (use-package company
@@ -290,22 +298,23 @@
 (use-package flycheck
   :commands global-flycheck-mode
   :init
+  (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
   (add-hook 'prog-mode-hook #'flycheck-mode))
-(use-package flycheck-inline
-  :after flycheck
-  :config
-  (flycheck-inline-mode)
+;; (use-package flycheck-inline
+;;   :after flycheck
+;;   :config
+;;   (flycheck-inline-mode)
 
-  (defun flycheck-inline-display-errors-unless-error-list (errors)
-    "Show messages of ERRORS unless the error list is visible.
+;;   (defun flycheck-inline-display-errors-unless-error-list (errors)
+;;     "Show messages of ERRORS unless the error list is visible.
 
-Like `flycheck-inline-display-errors', but only if the error
-list (see `flycheck-list-errors') is not visible in any window in
-the current frame."
-    (unless (flycheck-get-error-list-window 'current-frame)
-      (flycheck-inline-display-errors errors)))
+;; Like `flycheck-inline-display-errors', but only if the error
+;; list (see `flycheck-list-errors') is not visible in any window in
+;; the current frame."
+;;     (unless (flycheck-get-error-list-window 'current-frame)
+;;       (flycheck-inline-display-errors errors)))
 
-  (setq-default flycheck-display-errors-function #'flycheck-inline-display-errors-unless-error-list))
+;;   (setq-default flycheck-display-errors-function #'flycheck-inline-display-errors-unless-error-list))
 
 ;; flyspell
 (setq ispell-dictionary "british")
@@ -334,6 +343,8 @@ the current frame."
                          (window-width . 0.6)
                          (window-height . 0.4)))))
             (helm-default-display-buffer buffer))))
+
+  (setq helm-split-window-inside-p t)
 
   ;; from https://github.com/syl20bnr/spacemacs/blob/c7a103a772d808101d7635ec10f292ab9202d9ee/layers/%2Bspacemacs/spacemacs-completion/funcs.el#L78
   (define-key helm-map (kbd "C-j") #'helm-next-line)
@@ -371,8 +382,6 @@ the current frame."
   (interactive)
   (find-file user-init-file))
 
-(use-package avy)
-
 (use-package which-key
   :config
   (setq which-key-allow-evil-operators t)
@@ -392,13 +401,6 @@ the current frame."
     (if (not (window-live-p flycheck-errors-window))
         (call-interactively 'flycheck-list-errors)
       (delete-window flycheck-errors-window))))
-
-(defun avy-goto-char-forward-char (char &optional arg)
-  "Run `avy-goto-char', then move forward one character."
-  (interactive (list (read-char "char: " t)
-                     current-prefix-arg))
-  (avy-goto-char char arg)
-  (forward-char))
 
 (defun set-selective-display-current-column ()
   (interactive)
@@ -429,7 +431,7 @@ the current frame."
    "bb"  #'helm-buffers-list
    "bd"  #'kill-this-buffer
 
-   "c"   #'evil-search-highlight-persist-remove-all
+   "c"   #'evil-ex-nohighlight
 
    "e"   #'flycheck-list-errors-toggle
 
@@ -464,10 +466,6 @@ the current frame."
 
    "j"   '(:ignore t :which-key "jump")
    "ji"  #'helm-semantic-or-imenu
-   "jj"  #'evil-avy-goto-char
-   "jJ"  #'evil-avy-goto-char-2
-   "jk"  #'avy-goto-char-forward-char
-   "jl"  #'avy-goto-line
 
    "k"   #'kill-compilation
 
@@ -488,10 +486,12 @@ the current frame."
    "wo"  #'delete-other-windows
    "wx"  #'ace-delete-window
    "wl"  #'evil-window-right
+   "wq"  #'delete-window
    "wH"  #'evil-window-move-far-left
    "wL"  #'evil-window-move-far-right
    "wJ"  #'evil-window-move-very-bottom
    "wK"  #'evil-window-move-very-top
+   "wQ"  #'kill-buffer-and-window
    "w-"  #'split-window-below
    "w/"  #'split-window-right))
 
@@ -507,6 +507,24 @@ the current frame."
  "px" 'pp-eval-expression
  "pm" 'pp-macroexpand-last-sexp)
 
+;; avy
+(defun avy-goto-char-forward-char (char &optional arg)
+  "Run `avy-goto-char', then move forward one character.
+CHAR and ARG are as in avy."
+  (interactive (list (read-char "char: " t)
+                     current-prefix-arg))
+  (avy-goto-char char arg)
+  (forward-char))
+(use-package avy
+  :defer t
+  :commands avy-goto-char-forward-char
+  :init
+  (spc-leader-define-key
+   "jj"  #'evil-avy-goto-char
+   "jJ"  #'evil-avy-goto-char-2
+   "jk"  #'avy-goto-char-forward-char
+   "jl"  #'avy-goto-line))
+
 ;; define-word
 (use-package define-word
     :defer t
@@ -517,8 +535,12 @@ the current frame."
 ;; winum
 
 (use-package winum
-  :config
+  :defer t
+  :init
   (setq winum-auto-assign-0-to-minibuffer nil)
+  (add-hook 'emacs-startup-hook
+            (lambda () (winum-mode)))
+  :config
   (set-face-attribute 'winum-face nil :weight 'bold :inverse-video t)
   (spc-leader-define-key
    "0" 'winum-select-window-0-or-10
@@ -535,9 +557,7 @@ the current frame."
   ;; adapted from spacemacs
   (push '(("\\(.*\\) 0" . "winum-select-window-0-or-10") . ("\\1 0..9" . "window 0..9"))
         which-key-replacement-alist)
-  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist)
-
-  (winum-mode))
+  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist))
 
 ;; scratch-el
 (use-package scratch
@@ -552,8 +572,15 @@ the current frame."
 
 ;; projectile
 (use-package projectile
-  :defer 5
-  :after general    ; for spc-leader-define-key
+  :defer
+  :init
+  (defun autoload-projectile ()
+    (interactive)
+    (autoload-do-load #'projectile-switch-project))
+  (spc-leader-define-key
+      "pf" 'projectile-find-file
+      "pp" 'projectile-switch-project
+      "pl" #'autoload-projectile)
   :config
   (projectile-mode +1)
   (setq projectile-completion-system 'helm)
@@ -635,7 +662,7 @@ the current frame."
     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
     (haskell-hoogle-lookup-from-local))
   (defun haskell-run-glade (file)
-    (interactive "f")
+    (interactive "fGlade file: ")
     (async-shell-command (concat "stack exec -- glade " file)))
   (mode-leader-define-key haskell-mode-map
    "d"  #'intero-goto-definition
@@ -656,6 +683,7 @@ the current frame."
    "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
 (use-package company-cabal
+  :after (company intero)
   :config
   (add-to-list 'company-backends 'company-cabal))
 (use-package hasky-extensions
@@ -676,8 +704,16 @@ the current frame."
   (add-hook 'shakespeare-hamlet-mode-hook
             (lambda ()
               (setq sgml-basic-offset 4)))
+  (defun switch-between-hamlet-julius ()
+    "Switch between corresponding XXX.hamlet and XXX.julius files."
+    (interactive)
+    (let ((sx (file-name-sans-extension buffer-file-name)))
+      (pcase (file-name-extension buffer-file-name)
+        ("hamlet" (find-file (concat sx "." "julius")))
+        ("julius" (find-file (concat sx "." "hamlet"))))))
   (mode-leader-define-key shakespeare-mode-map
-    "cy" #'haskell-run-yesod-devel))
+    "cy" #'haskell-run-yesod-devel
+    "x"  #'switch-between-hamlet-julius))
 
 ;; LaTeX - partly lifted from spacemacs
 (use-package tex
@@ -809,14 +845,98 @@ the current frame."
 ;; org
 (use-package org
   :defer
+  :init
+  (spc-leader-define-key
+    "ia" '(:ignore t :which-key "org-agenda")
+    "iaa" #'org-agenda
+    "iac" #'org-capture
+    "iak" #'org-cycle-agenda-files)
   :config
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (flyspell-mode)
-              (flyspell-buffer)))
+
+  (evil-define-key 'emacs 'org-agenda-mode-map "\\" #'evil-execute-in-god-state)
   (mode-leader-define-key org-mode-map
     "e" #'org-export-dispatch
-    "i" #'org-insert-item))
+    "i" #'org-insert-item
+    "t" #'org-todo
+    "w" #'org-refile
+    "K" #'org-ctrl-c-ctrl-c
+    "r" #'org-reveal
+    "s" '(:ignore t :which-key "scheduling")
+    "ss" #'org-schedule
+    "sd" #'org-deadline)
+  (mode-leader-define-key org-agenda-mode-map
+    "o" #'org-agenda-open-link
+    "t" #'org-agenda-todo
+    "s" '(:ignore t :which-key "scheduling")
+    "ss" #'org-agenda-schedule
+    "sd" #'org-agenda-deadline)
+
+  (setq org-agenda-files '("~/Dropbox/org")
+        org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(i)" "|" "DONE(d)")
+          (sequence "WAITING(w@)" "HOLD(h@)"))
+        org-agenda-custom-commands
+        '((" " "Block agenda"
+           ((tags "REFILE"
+                  ((org-agenda-overriding-header "To refile")))
+            (todo "INPROGRESS"
+                  ((org-agenda-overriding-header "In progress")))
+            (todo "NEXT"
+                  ((org-agenda-overriding-header "Next tasks")))
+            (agenda "" nil)
+            (todo "WAITING|HOLD"
+                  ((org-agenda-overriding-header "Waiting/hold tasks"))))))
+        org-agenda-show-outline-path t
+        org-refile-targets
+        '((nil :maxlevel . 9)
+          (org-agenda-files :maxlevel . 9))
+        org-refile-use-outline-path 'file
+        org-refile-allow-creating-parent-nodes 'confirm
+        org-capture-templates
+        '(("t" "todo" entry (file "~/Dropbox/org/refile.org")
+           "* TODO %^{Description}"))
+        org-archive-mark-done nil
+        org-archive-location "%s_archive::* Archived Tasks"
+        org-enforce-todo-dependencies t
+        org-track-ordered-property-with-tag nil
+        ;; org-agenda-dim-blocked-tasks t
+        org-enforce-todo-checkbox-dependencies t
+        org-log-into-drawer t)
+
+  ;; from https://lists.gnu.org/archive/html/emacs-orgmode/2015-06/msg00266.html
+  (defun org-agenda-delete-empty-blocks ()
+    "Remove empty agenda blocks.
+  A block is identified as empty if there are fewer than 2
+  non-empty lines in the block (excluding the line with
+  `org-agenda-block-separator' characters)."
+    (when org-agenda-compact-blocks
+      (user-error "Cannot delete empty compact blocks"))
+    (setq buffer-read-only nil)
+    (save-excursion
+      (goto-char (point-min))
+      (let* ((blank-line-re "^\\s-*$")
+             (content-line-count (if (looking-at-p blank-line-re) 0 1))
+             (start-pos (point))
+             (block-re (format "%c\\{10,\\}" org-agenda-block-separator)))
+        (while (and (not (eobp)) (forward-line))
+          (cond
+           ((looking-at-p block-re)
+            (when (< content-line-count 2)
+              (delete-region start-pos (1+ (point-at-bol))))
+            (setq start-pos (point))
+            (forward-line)
+            (setq content-line-count (if (looking-at-p blank-line-re) 0 1)))
+           ((not (looking-at-p blank-line-re))
+            (setq content-line-count (1+ content-line-count)))))
+        (when (< content-line-count 2)
+          (delete-region start-pos (point-max)))
+        (goto-char (point-min))
+        ;; The above strategy can leave a separator line at the beginning
+        ;; of the buffer.
+        (when (looking-at-p block-re)
+          (delete-region (point) (1+ (point-at-eol))))))
+    (setq buffer-read-only t))
+  (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks))
 
 ;; lisp - SLY
 (use-package sly
@@ -828,6 +948,7 @@ the current frame."
 
     "c"  '(:ignore t :which-key "compile")
     "cl" #'sly-compile-and-load-file
+    "cc" #'sly-compile-defun
 
     "e"  '(:ignore t :which-key "eval")
     "ee" #'sly-eval-defun
@@ -836,8 +957,6 @@ the current frame."
     "h"  '(:ignore t :which-key "help")
     "hd" #'sly-describe-symbol
     "hs" #'hyperspec-lookup))
-
-(message "Time taken: %s" (emacs-init-time))
 
 ;; custom
 (custom-set-variables
@@ -855,7 +974,6 @@ the current frame."
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(safe-local-variable-values (quote ((TeX-command-extra-options . "-shell-escape"))))
- '(recentf-auto-cleanup (quote never))
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map
    (list
