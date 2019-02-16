@@ -533,8 +533,12 @@ CHAR and ARG are as in avy."
 ;; winum
 
 (use-package winum
-  :config
+  :defer t
+  :init
   (setq winum-auto-assign-0-to-minibuffer nil)
+  (add-hook 'emacs-startup-hook
+            (lambda () (winum-mode)))
+  :config
   (set-face-attribute 'winum-face nil :weight 'bold :inverse-video t)
   (spc-leader-define-key
    "0" 'winum-select-window-0-or-10
@@ -551,9 +555,7 @@ CHAR and ARG are as in avy."
   ;; adapted from spacemacs
   (push '(("\\(.*\\) 0" . "winum-select-window-0-or-10") . ("\\1 0..9" . "window 0..9"))
         which-key-replacement-alist)
-  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist)
-
-  (winum-mode))
+  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist))
 
 ;; scratch-el
 (use-package scratch
