@@ -883,19 +883,36 @@ CHAR and ARG are as in avy."
 
   (setq org-agenda-files '("~/Dropbox/org")
         org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(i)" "|" "DONE(d)")
+        '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(p)" "|" "DONE(d)")
           (sequence "WAITING(w@)" "HOLD(h@)"))
         org-agenda-custom-commands
         '((" " "Block agenda"
+           ;; ((agenda "" ((org-agenda-span 'day)))
            ((tags "REFILE"
                   ((org-agenda-overriding-header "To refile")))
-            (todo "INPROGRESS"
+            (tags "-university/INPROGRESS"
                   ((org-agenda-overriding-header "In progress")))
-            (todo "NEXT"
+            (tags "-university/NEXT"
                   ((org-agenda-overriding-header "Next tasks")))
-            (agenda "" nil)
-            (todo "WAITING|HOLD"
-                  ((org-agenda-overriding-header "Waiting/hold tasks"))))))
+            (tags "-university/WAITING"
+                  ((org-agenda-overriding-header "Waiting tasks")))
+            (tags "-university/TODO"
+                  ((org-agenda-overriding-header "Other TODOs")))
+            (tags "-university/HOLD"
+                  ((org-agenda-overriding-header "Hold tasks")))))
+            ;; (agenda "" nil)))
+          ("u" "University"
+           ;; ((tags-todo "university&SCHEDULED<\"<today>\"|university&DEADLINE<\"<today>\""
+           ;;             ((org-agenda-overriding-header "Overdue")))
+           ((tags-todo "+ALLTAGS={university}+DEADLINE=\"\"+SCHEDULED=\"\"/!-INPROGRESS"
+                       ((org-agenda-overriding-header "No due date")))
+            (tags-todo "+university/INPROGRESS"
+                       ((org-agenda-overriding-header "In progress")))
+            (agenda ""
+                    ((org-agenda-span 14)
+                     (org-agenda-entry-types '(:deadline :scheduled))
+                     ;; (org-agenda-time-grid nil)
+                     (org-deadline-warning-days 0))))))
         org-agenda-show-outline-path t
         org-refile-targets
         '((nil :maxlevel . 9)
