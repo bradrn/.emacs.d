@@ -964,6 +964,18 @@ CHAR and ARG are as in avy."
           (delete-region (point) (1+ (point-at-eol))))))
     (setq buffer-read-only t))
   (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks))
+(use-package evil-org
+  :ensure t
+  :after (org evil)
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme)))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys)
+  (evil-define-key 'motion org-agenda-mode-map
+    "X" #'org-agenda-columns))
 
 ;; lisp - SLY
 (use-package sly
