@@ -431,6 +431,8 @@
    "b"   '(:ignore t :which-key "buffers")
    "bb"  #'helm-buffers-list
    "bd"  #'kill-this-buffer
+   "bi"  #'ibuffer
+   "bs"  #'start-server-if-not-running
 
    "c"   #'evil-ex-nohighlight
 
@@ -455,6 +457,7 @@
    "itsd" (lambda () (interactive) (helm-themes--load-theme "solarized-dark"))
    "itsl" (lambda () (interactive) (helm-themes--load-theme "solarized-light"))
    "itt" #'helm-themes
+   "iw"  #'whitespace-mode
    "ic"  '(:ignore t :which-key "customise")
    "icg" #'customize-group
    "icf" #'customize-face
@@ -462,11 +465,15 @@
    "il"  '(:ignore t :which-key "calc")
    "ilq" #'quick-calc
    "ilc" #'calc
+   "is"  '(:ignore t :which-key "flyspell")
+   "iss" #'flyspell-mode
+   "isx" #'flyspell-buffer
 
    "g"   #'magit-status
 
    "j"   '(:ignore t :which-key "jump")
    "ji"  #'helm-semantic-or-imenu
+   "jw"  #'subword-mode
 
    "k"   #'kill-compilation
 
@@ -765,6 +772,7 @@ CHAR and ARG are as in avy."
    "pc"  '(:ignore t :which-key "clearout")
    "pcb" #'preview-clearout-buffer
    "pcp" #'preview-clearout-at-point)
+  (evil-define-key 'insert LaTeX-mode-map (kbd "<C-return>") 'LaTeX-insert-item)
 
   ;; Rebindings for TeX-font - lifted from spacemacs
   (defun latex/font-bold         () (interactive) (TeX-font nil ?\C-b))
@@ -866,6 +874,7 @@ CHAR and ARG are as in avy."
     "ss" #'org-schedule
     "sd" #'org-deadline)
   (mode-leader-define-key org-agenda-mode-map
+    "c" #'org-agenda-columns
     "o" #'org-agenda-open-link
     "t" #'org-agenda-todo
     "s" '(:ignore t :which-key "scheduling")
