@@ -63,6 +63,7 @@
 ;; server - from https://stackoverflow.com/a/5571983/7345298
 (defun start-server-if-not-running ()
   "Start the Emacs server if it is not already running."
+  (interactive)
   (load "server")
   (unless (server-running-p) (server-start)))
 
