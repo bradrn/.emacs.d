@@ -256,9 +256,10 @@
 (use-package company
   :commands global-company-mode
   :init
-  (add-hook 'after-init-hook #'global-company-mode)
   (setq company-idle-delay 0.1
         company-dabbrev-downcase nil)
+  (add-hook 'after-init-hook #'global-company-mode)
+  (add-hook 'LaTeX-mode-hook (lambda () (company-mode -1)))
   :config
   ;; from spacemacs
   (define-key company-active-map (kbd "C-j") #'company-select-next)
