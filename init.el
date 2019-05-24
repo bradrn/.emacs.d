@@ -128,6 +128,8 @@
   :init
   (setq solarized-use-variable-pitch nil
         solarized-scale-org-headlines nil))
+(use-package gruvbox-theme
+  :defer)
 ;; (load-theme 'doom-one t)
 
 ;; hl-todo
@@ -457,6 +459,7 @@
    "itle" (lambda () (interactive) (helm-themes--load-theme "leuven"))
    "itsd" (lambda () (interactive) (helm-themes--load-theme "solarized-dark"))
    "itsl" (lambda () (interactive) (helm-themes--load-theme "solarized-light"))
+   "itgs" (lambda () (interactive) (helm-themes--load-theme "gruvbox-light-soft"))
    "itt" #'helm-themes
    "iw"  #'whitespace-mode
    "ic"  '(:ignore t :which-key "customise")
