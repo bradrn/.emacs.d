@@ -803,18 +803,8 @@ CHAR and ARG are as in avy."
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-f") #'latex/font-sans-serif)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-w") #'latex/font-current)
 
-  ;; from https://stackoverflow.com/a/3466855/7345298
-  (defun LaTeX-maybe-math ()
-    "If in math mode, act as a prefix key for `LaTeX-math-keymap'.
-  Otherwise act as `self-insert-command'."
-    (interactive)
-    (if (texmathp)
-        (let* ((events (let ((overriding-local-map LaTeX-math-keymap))
-                         (read-key-sequence "math: ")))
-               (binding (lookup-key LaTeX-math-keymap events)))
-          (call-interactively binding))
-      (call-interactively 'self-insert-command)))
-  (define-key TeX-mode-map "`" 'LaTeX-maybe-math)
+  (custom-set-variables '(LaTeX-math-abbrev-prefix "M-n"))
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 
   (setq font-latex-fontify-sectioning 'color
         font-latex-fontify-script     nil)
