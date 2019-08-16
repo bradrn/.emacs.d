@@ -866,7 +866,6 @@ CHAR and ARG are as in avy."
     "iak" #'org-capture)
   :config
 
-  (evil-define-key 'emacs 'org-agenda-mode-map "\\" #'evil-execute-in-god-state)
   (mode-leader-define-key org-mode-map
     "e" #'org-export-dispatch
     "i" #'org-insert-item
