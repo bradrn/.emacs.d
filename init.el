@@ -619,6 +619,13 @@ CHAR and ARG are as in avy."
   (spc-leader-define-key
    "ig" #'highlight-indent-guides-mode))
 
+;; idle-highlight-mode
+(use-package idle-highlight-mode
+  :defer
+  :init
+  (spc-leader-define-key
+    "ih" #'idle-highlight-mode))
+
 ;; move-text
 (use-package move-text
   :after evil-unimpaired
