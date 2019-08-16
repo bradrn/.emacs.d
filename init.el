@@ -436,6 +436,8 @@
    "bd"  #'kill-this-buffer
    "bi"  #'ibuffer
    "bs"  #'start-server-if-not-running
+   "bci" #'clone-indirect-buffer
+   "bco" #'clone-indirect-buffer-other-window
 
    "c"   #'evil-ex-nohighlight
 
