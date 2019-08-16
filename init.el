@@ -265,7 +265,8 @@
   ;; from spacemacs
   (define-key company-active-map (kbd "C-j") #'company-select-next)
   (define-key company-active-map (kbd "C-k") #'company-select-previous)
-  (define-key company-active-map (kbd "C-l") #'company-complete-selection))
+  (define-key company-active-map (kbd "C-l") #'company-complete-selection)
+  (spc-leader-define-key "im" #'company-mode))
 (use-package helm-company
   :after (company helm)
   :commands helm-company
