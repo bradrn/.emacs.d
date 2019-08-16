@@ -891,7 +891,6 @@ CHAR and ARG are as in avy."
           (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)"))
         org-agenda-custom-commands
         '((" " "Block agenda"
-           ;; ((agenda "" ((org-agenda-span 'day)))
            ((tags "REFILE"
                   ((org-agenda-overriding-header "To refile")))
             (tags "-university/INPROGRESS"
@@ -904,19 +903,19 @@ CHAR and ARG are as in avy."
                   ((org-agenda-overriding-header "Other TODOs")))
             (tags "-university/HOLD"
                   ((org-agenda-overriding-header "Hold tasks")))))
-            ;; (agenda "" nil)))
           ("u" "University"
-           ;; ((tags-todo "university&SCHEDULED<\"<today>\"|university&DEADLINE<\"<today>\""
-           ;;             ((org-agenda-overriding-header "Overdue")))
-           ((tags-todo "+ALLTAGS={university}+DEADLINE=\"\"+SCHEDULED=\"\"/!-INPROGRESS"
-                       ((org-agenda-overriding-header "No due date")))
-            (tags-todo "+university/INPROGRESS"
+           ((tags-todo "+university/INPROGRESS"
                        ((org-agenda-overriding-header "In progress")))
+            (tags "+university/NEXT"
+                  ((org-agenda-overriding-header "Next tasks")))
+            (tags-todo "+university+assignment+DEADLINE<\"<+1m>\"/!TODO"
+
+                       ((org-agenda-overriding-header "Assignments")))
             (agenda ""
                     ((org-agenda-span 14)
                      (org-agenda-entry-types '(:deadline :scheduled))
-                     ;; (org-agenda-time-grid nil)
-                     (org-deadline-warning-days 0))))))
+                     (org-deadline-warning-days 0))))
+           ((org-agenda-overriding-columns-format "%25ITEM %25DEADLINE"))))
         org-agenda-show-outline-path t
         org-refile-targets
         '((nil :maxlevel . 9)
