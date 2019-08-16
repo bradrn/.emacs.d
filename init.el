@@ -243,7 +243,6 @@
 ;; yasnippet
 (use-package yasnippet
   :after evil
-  :defer 4
   :config
   (yas-global-mode))
 (use-package yasnippet-snippets :after yasnippet)
