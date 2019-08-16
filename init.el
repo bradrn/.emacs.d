@@ -712,7 +712,9 @@ CHAR and ARG are as in avy."
   :init
   (mode-leader-define-key haskell-mode-map
    "xx" #'hasky-extensions
-   "xd" #'hasky-extensions-browse-docs))
+   "xd" #'hasky-extensions-browse-docs)
+  :config
+  (add-to-list 'hasky-extensions "OverloadedLabels" t))
 (use-package hasky-stack
   :commands hasky-stack-execute
   :init
