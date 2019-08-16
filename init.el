@@ -862,8 +862,8 @@ CHAR and ARG are as in avy."
   (spc-leader-define-key
     "ia" '(:ignore t :which-key "org-agenda")
     "iaa" #'org-agenda
-    "iac" #'org-capture
-    "iak" #'org-cycle-agenda-files)
+    "iac" #'org-cycle-agenda-files
+    "iak" #'org-capture)
   :config
 
   (evil-define-key 'emacs 'org-agenda-mode-map "\\" #'evil-execute-in-god-state)
