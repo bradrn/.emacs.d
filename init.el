@@ -888,7 +888,7 @@ CHAR and ARG are as in avy."
   (setq org-agenda-files '("~/Dropbox/org")
         org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(p)" "|" "DONE(d)")
-          (sequence "WAITING(w@)" "HOLD(h@)"))
+          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)"))
         org-agenda-custom-commands
         '((" " "Block agenda"
            ;; ((agenda "" ((org-agenda-span 'day)))
