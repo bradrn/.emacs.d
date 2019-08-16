@@ -787,7 +787,6 @@ CHAR and ARG are as in avy."
    "pc"  '(:ignore t :which-key "clearout")
    "pcb" #'preview-clearout-buffer
    "pcp" #'preview-clearout-at-point)
-  (evil-define-key 'insert LaTeX-mode-map (kbd "<C-return>") 'LaTeX-insert-item)
 
   ;; Rebindings for TeX-font - lifted from spacemacs
   (defun latex/font-bold         () (interactive) (TeX-font nil ?\C-b))
