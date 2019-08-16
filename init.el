@@ -230,7 +230,7 @@
 
 ;; magit
 (use-package magit
-  :defer 4
+  :defer
   :config
   (evil-define-key 'normal with-editor-mode-map
     (kbd "KK") 'with-editor-finish
