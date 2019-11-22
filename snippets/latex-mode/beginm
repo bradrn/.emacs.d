@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: beginm
+# key: beginm
+# --
+\begin{${1:p}matrix}$0\end{$1matrix}
