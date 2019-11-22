@@ -742,6 +742,17 @@ CHAR and ARG are as in avy."
     "cy" #'haskell-run-yesod-devel
     "x"  #'switch-between-hamlet-julius))
 
+;; (use-package tidal
+;;   :defer
+;;   :init
+;;   (setq tidal-interpreter "stack"
+;;         tidal-interpreter-arguments '("ghci" "--package" "tidal")
+;;         tidal-boot-script-path
+;;         (concat (substring
+;;                  (shell-command-to-string "stack exec --package tidal -- bash -c \"ghc-pkg describe $(ghc-pkg latest tidal) | grep data-dir | cut -f2 -d' '\"")
+;;                  0 -1)
+;;                 "/BootTidal.hs")))
+
 ;; LaTeX - partly lifted from spacemacs
 (use-package tex
   :ensure auctex
