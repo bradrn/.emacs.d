@@ -721,7 +721,9 @@ CHAR and ARG are as in avy."
   :commands hasky-stack-execute
   :init
   (mode-leader-define-key haskell-mode-map
-   "s" #'hasky-stack-execute))
+   "s" #'hasky-stack-execute)
+  :config
+  (magit-define-popup-option 'hasky-stack-build-popup ?C "Color" "--color=" #'read-from-minibuffer "--color=never"))
 
 (use-package shakespeare-mode
   :defer
