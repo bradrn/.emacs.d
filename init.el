@@ -283,7 +283,7 @@
 
 ;; rainbow-delimiters & parinfer
 (use-package rainbow-delimiters
-  :config
+  :init
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 (use-package parinfer
   :ensure t
