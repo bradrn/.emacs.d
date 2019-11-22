@@ -430,6 +430,7 @@
    "$"   #'set-selective-display-current-column
    "!"   #'shell-command
    "&"   #'async-shell-command
+   "'"   #'shell
 
    "b"   '(:ignore t :which-key "buffers")
    "bb"  #'helm-buffers-list
