@@ -922,12 +922,12 @@ CHAR and ARG are as in avy."
                        ((org-agenda-overriding-header "In progress")))
             (tags "+university/NEXT"
                   ((org-agenda-overriding-header "Next tasks")))
-            (tags-todo "+university+assignment+DEADLINE<\"<+1m>\"/!TODO"
-
+            (tags-todo "+university+exam+DEADLINE<\"<+1m>\"/!"
+                       ((org-agenda-overriding-header "Exams")))
+            (tags-todo "+university+assignment+DEADLINE<\"<+3w>\"/!TODO"
                        ((org-agenda-overriding-header "Assignments")))
             (agenda ""
                     ((org-agenda-span 14)
-                     (org-agenda-entry-types '(:deadline :scheduled))
                      (org-deadline-warning-days 0))))
            ((org-agenda-overriding-columns-format "%25ITEM %25DEADLINE"))))
         org-agenda-show-outline-path t
