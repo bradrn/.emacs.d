@@ -296,7 +296,8 @@
           smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
           smart-yank))   ; Yank behavior depend on mode.
   (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-  (add-hook 'lisp-mode-hook       #'parinfer-mode))
+  (add-hook 'lisp-mode-hook       #'parinfer-mode)
+  (add-hook 'extempore-mode-hook  #'parinfer-mode))
 
 ;; flycheck
 (use-package flycheck
@@ -981,6 +982,21 @@ CHAR and ARG are as in avy."
           (delete-region (point) (1+ (point-at-eol))))))
     (setq buffer-read-only t))
   (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks))
+
+;; extempore
+(use-package extempore-mode
+  :after evil
+  :defer
+  :init
+  (setq extempore-use-pretty-lambdas nil
+        extempore-path "c:/Users/bradn/Documents/Music/Extempore/Extempore-0.7.0-win10/Extempore-0.7.0-win10/extempore/")
+  :config
+  (mode-leader-define-key extempore-mode-map
+    "K" #'extempore-send-definition
+    "r" #'extempore-send-region
+    "z" #'switch-to-extempore
+    "SPC" #'extempore-connect-or-disconnect)
+  (evil-define-key '(normal insert) extempore-mode-map (kbd "C-SPC") #'extempore-send-definition))
 
 ;; lisp - SLY
 (use-package sly
