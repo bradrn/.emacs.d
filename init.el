@@ -305,6 +305,7 @@
   :commands global-flycheck-mode
   :init
   (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (add-hook 'prog-mode-hook #'flycheck-mode))
 ;; (use-package flycheck-inline
 ;;   :after flycheck
@@ -645,20 +646,23 @@ CHAR and ARG are as in avy."
   (interactive)
   (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
     (async-shell-command "stack exec -- yesod devel")))
-(use-package intero
-  :commands intero-mode
-  :preface
-  ;; from spacemacs
-  (defun haskell-intero-display-repl (&optional prompt-options)
-    (interactive "P")
-    (let ((buffer (intero-repl-buffer prompt-options)))
-      (unless (get-buffer-window buffer 'visible)
-        (display-buffer buffer))))
 
-  (defun haskell-intero-pop-to-repl (&optional prompt-options)
-    (interactive "P")
-    (pop-to-buffer (intero-repl-buffer prompt-options)))
-
+(use-package dante
+  :load-path "~/.emacs.d/dante"
+  :demand t
+  :after haskell-mode
+  :commands 'dante-mode
+  :init
+  (add-hook 'haskell-mode-hook 'flycheck-mode)
+  (add-hook 'haskell-mode-hook 'dante-mode)
+  (setq-default dante-repl-command-line '("stack" "ghci"))
+  :config
+  (add-hook 'dante-mode-hook
+   '(lambda () (flycheck-add-next-checker 'haskell-dante
+                '(warning . haskell-hlint))))
+  (add-hook 'dante-mode-hook
+            (lambda ()
+              (setq-local company-idle-delay 0.5)))
   ;; fix indent
   (setq-default haskell-indentation-layout-offset     4
                 haskell-indentation-left-offset       4
@@ -666,45 +670,13 @@ CHAR and ARG are as in avy."
                 haskell-indentation-where-post-offset 4
                 haskell-indentation-where-pre-offset  4)
 
-  :init
-  ;; from spacemacs haskell layer docs (slightly modified)
-  (defun haskell-indentation-advice ()
-    (when (and (< 1 (line-number-at-pos))
-               (save-excursion
-                 (forward-line -1)
-                 (let ((prev-line (s-trim (buffer-substring (line-beginning-position) (line-end-position)))))
-                   (or (string= "" prev-line)
-                       (string-prefix-p "import" prev-line)))))
-      (delete-region (line-beginning-position) (point))))
-  (advice-add #'haskell-indentation-newline-and-indent :after 'haskell-indentation-advice)
-  (advice-add #'haskell-indentation-indent-line        :after 'haskell-indentation-advice)
-  (add-hook 'haskell-mode-hook #'intero-mode)
-
-  :config
   (defun haskell-hoogle-lookup-from-local-wrapper ()
     (interactive)
     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
     (haskell-hoogle-lookup-from-local))
-  (defun haskell-run-glade (file)
-    (interactive "fGlade file: ")
-    (async-shell-command (concat "stack exec -- glade " file)))
   (mode-leader-define-key haskell-mode-map
-   "d"  #'intero-goto-definition
-   "c"  '(:ignore t :which-key "commands")
-   "cg" #'haskell-run-glade
-   "cy" #'haskell-run-yesod-devel
-   "ig" #'haskell-mode-generate-tags
-   "ii" #'intero-info
-   "ir" #'intero-restart
-   "is" #'intero-apply-suggestions
-   "it" #'intero-targets
-   "r"  '(:ignore t :which-key "repl")
-   "rl" #'intero-repl-load
-   "rs" #'haskell-intero-display-repl
-   "rp" #'haskell-intero-pop-to-repl
-   "t"  #'intero-type-at
-   "hh" #'hoogle
-   "hH" #'haskell-hoogle-lookup-from-local-wrapper))
+    "hh" #'hoogle
+    "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
 (use-package company-cabal
   :after (company intero)
