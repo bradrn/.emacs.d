@@ -251,7 +251,7 @@
 (use-package helm-c-yasnippet
   :after (yasnippet helm)
   :init
-  (eval-after-load 'general
+  (eval-after-load 'general-leaders
     (spc-leader-define-key
         "x" 'helm-yas-complete)))
 
@@ -426,6 +426,8 @@
    :states '(normal visual insert emacs)
    :prefix "K"
    :non-normal-prefix "C-0")
+  ;; make our own feature; use with eval-after-load to be able to call the -leader-define-key functions
+  (provide 'general-leaders)
 
   (spc-leader-define-key
    "SPC" #'helm-M-x
