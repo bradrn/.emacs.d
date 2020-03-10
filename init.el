@@ -1055,4 +1055,5 @@ CHAR and ARG are as in avy."
  '(fixed-pitch ((t nil)))
  '(font-latex-script-char-face ((t nil)))
  '(linum ((t (:height 100))))
+ '(org-agenda-date-today ((t (:inherit org-agenda-date :background "light gray" :slant italic :weight bold))))
  '(preview-reference-face ((t (:height 1.5)))))
