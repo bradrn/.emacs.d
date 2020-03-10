@@ -448,7 +448,8 @@
 
    "c"   #'evil-ex-nohighlight
 
-   "e"   #'flycheck-list-errors-toggle
+   "ee"   #'flycheck-list-errors-toggle
+   "ec"   #'flycheck-buffer
 
    "f"   '(:ignore t :which-key "files")
    "ff"  #'helm-find-files
