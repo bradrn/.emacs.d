@@ -926,6 +926,7 @@ CHAR and ARG are as in avy."
         '((nil :maxlevel . 9)
           (org-agenda-files :maxlevel . 9))
         org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil  ; for helm, see https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
         org-refile-allow-creating-parent-nodes 'confirm
         org-capture-templates
         '(("t" "todo" entry (file "~/Dropbox/org/refile.org")
