@@ -161,6 +161,7 @@
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
   (evil-set-initial-state 'flycheck-error-list-mode 'emacs)
+  (evil-set-initial-state 'dired-mode 'emacs)
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
 
