@@ -105,6 +105,28 @@
       scroll-margin 3
       scroll-conservatively 101)
 
+;; open Hoogle URLs with Qutebrowser
+(setq browse-url-qute-arguments nil)
+(setq browse-url-qute-program '"c:/Program Files/qutebrowser/qutebrowser.exe")
+(defun browse-url-qute (url &optional _new-window)
+  "Ask the Qutebrowser WWW browser to load URL.
+Default to the URL around or before point.  The strings in
+variable `browse-url-qute-arguments' are also passed to
+Qutebrowser.
+The optional argument NEW-WINDOW is not used."
+  (interactive (browse-url-interactive-arg "URL: "))
+  (setq url (browse-url-encode-url url))
+  (let* ((process-environment (browse-url-process-environment)))
+    (apply 'start-process
+	   (concat "qutebrowser " url) nil
+	   browse-url-qute-program
+	   (append
+	    browse-url-qute-arguments
+	    (list url)))))
+(setq browse-url-browser-function
+      '(("hoogle" . browse-url-qute)
+        ("." . browse-url-default-browser)))
+
 ;; line numbers
 (use-package linum-relative
   :defer t
