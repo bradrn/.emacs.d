@@ -173,7 +173,7 @@ The optional argument NEW-WINDOW is not used."
 
 ;; evil
 (use-package evil
-  :defer .1
+  ;; :defer .1
   :init
   (setq-default evil-move-beyond-eol t
                 evil-ex-substitute-global t
@@ -198,7 +198,10 @@ The optional argument NEW-WINDOW is not used."
     :move-point nil
     "Delete trailing whitespace in the region."
     (delete-trailing-whitespace beg end))
-  (evil-define-key '(normal visual) 'global "g$" 'evil-delete-trailing-whitespace))
+  (evil-define-key '(normal visual) 'global "g$" 'evil-delete-trailing-whitespace)
+
+  ;; setup for nerd-commenter
+  (define-key evil-normal-state-map "gc" #'evilnc-comment-operator))
 (use-package evil-escape
   :after evil
   :init
@@ -218,8 +221,7 @@ The optional argument NEW-WINDOW is not used."
   (evil-snipe-mode 1))
 (use-package evil-nerd-commenter
   :after evil
-  :config
-  (define-key evil-normal-state-map "gc" #'evilnc-comment-operator))
+  :commands evilnc-comment-operator)
 (use-package evil-exchange
   :after evil
   :config
