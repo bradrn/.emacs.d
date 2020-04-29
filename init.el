@@ -947,12 +947,26 @@ CHAR and ARG are as in avy."
       "gg" #'evil-goto-first-line
       "gr" #'org-agenda-redo-all))
 
+  ;; adapted from https://emacs.stackexchange.com/a/14734/20375
+  (defun org-agenda-skip-if-blocked ()
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+      (if (org-entry-blocked-p) next-headline)))
   (setq org-agenda-files '("~/Dropbox/org")
+        ;; meaning:
+        ;; TODO, NEXT, INPROGRESS, DONE are self-explanatory
+        ;; WAITING is for tasks which are waiting for some issue to be resolved
+        ;; HOLD is for tasks which are waiting indefinitely
+        ;; CANCELLED is for tasks for which there is no intention of completion
+        ;; UNANSWERED is for questions which haven’t been asked yet
+        ;; RESOLVED is for questions which have been asked and answered
+        ;; ASKED is for questions which have been asked but not answered
         org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(p)" "|" "DONE(d)")
-          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)"))
+          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)")
+          (sequence "UNANSWERED(u)" "|" "RESOLVED(r@/@)")
+          (sequence "ASKED(k)" "|"))
         org-agenda-custom-commands
-        '((" " "Block agenda"
+        '(("p" "Block agenda"
            ((tags "REFILE"
                   ((org-agenda-overriding-header "To refile")))
             (tags "-university/INPROGRESS"
@@ -966,18 +980,52 @@ CHAR and ARG are as in avy."
             (tags "-university/HOLD"
                   ((org-agenda-overriding-header "Hold tasks")))))
           ("u" "University"
-           ((tags-todo "+university/INPROGRESS"
-                       ((org-agenda-overriding-header "In progress")))
-            (tags "+university/NEXT"
-                  ((org-agenda-overriding-header "Next tasks")))
+           ((tags "REFILE"
+                  ((org-agenda-overriding-header "To refile")))
+            ;; (tags-todo "+university+assignment+SCHEDULED<=\"<now>\"/!TODO"
+            ;;            ((org-agenda-overriding-header "Scheduled assignments")))
+            (tags-todo "+university+assignment+SCHEDULED=\"\"+DEADLINE<\"<+3w>\"|+university+assignment+deadline=\"\"|+university+assignment+SCHEDULED<=\"<now>\"/!TODO|NEXT"
+                       ((org-agenda-overriding-header "Assignments")))
+            ;; (tags "+university/NEXT"
+            ;;       ((org-agenda-overriding-header "Next tasks")))
+            (tags "+university-lecture-assignment/!TODO"
+                  ((org-agenda-overriding-header "TODO tasks")
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
             (tags-todo "+university+exam+DEADLINE<\"<+1m>\"/!"
                        ((org-agenda-overriding-header "Exams")))
-            (tags-todo "+university+assignment+DEADLINE<\"<+3w>\"/!TODO"
-                       ((org-agenda-overriding-header "Assignments")))
+            (tags "+university+lecture/!TODO|INPROGRESS"
+                  ((org-agenda-overriding-header "Unwatched lectures")
+                   ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))
+                   ;; (org-agenda-skip-function '(org-agenda-skip-if-blocked))
+                   (org-agenda-dim-blocked-tasks 'invisible)))
             (agenda ""
                     ((org-agenda-span 14)
-                     (org-deadline-warning-days 0))))
-           ((org-agenda-overriding-columns-format "%25ITEM %25DEADLINE"))))
+                     (org-deadline-warning-days 0)
+                     (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("HOLD")))
+                     (org-agenda-before-sorting-filter-function
+                      (lambda (line)
+                        (unless (and (string-match "Sched\\." line)
+                                     (equal "INPROGRESS" (get-text-property 0 'todo-state line)))
+                          line)))))
+            (tags-todo "+university/INPROGRESS"
+                       ((org-agenda-overriding-header "In progress")))
+            (tags "+university/HOLD|WAITING"
+                  ((org-agenda-overriding-header "On hold")
+                   (org-agenda-sorting-strategy '(todo-state-up))))))
+          ;; ((org-agenda-overriding-columns-format "%25ITEM %25DEADLINE"))
+          ("q" "Questions"
+           ((tags "+university/!UNANSWERED|WAITING"
+                  ((org-agenda-overriding-header "Unanswered questions (University)")))
+            (tags "-university/!UNANSWERED|WAITING"
+                  ((org-agenda-overriding-header "Unanswered questions (Non-university)")))
+            (tags "+university/RESOLVED"
+                  ((org-agenda-overriding-header "Resolved questions (University)")))
+            (tags "-university/RESOLVED"
+                  ((org-agenda-overriding-header "Resolved questions (Non-university)")))
+            (tags "+university/!ASKED"
+                  ((org-agenda-overriding-header "Unresolved questions (University)")))
+            (tags "-university/!ASKED"
+                  ((org-agenda-overriding-header "Resolved questions (Non-university)"))))))
         org-agenda-show-outline-path t
         org-refile-targets
         '((nil :maxlevel . 9)
@@ -987,14 +1035,48 @@ CHAR and ARG are as in avy."
         org-refile-allow-creating-parent-nodes 'confirm
         org-capture-templates
         '(("t" "todo" entry (file "~/Dropbox/org/refile.org")
-           "* TODO %^{Description}"))
+           "* TODO %?")
+          ("e" "event" entry (file "~/Dropbox/org/refile.org")
+           "* %?\n  %^T")
+          ("q" "question" entry (file "~/Dropbox/org/refile.org")
+           "* UNANSWERED %?"))
         org-archive-mark-done nil
         org-archive-location "%s_archive::* Archived Tasks"
         org-enforce-todo-dependencies t
         org-track-ordered-property-with-tag nil
-        ;; org-agenda-dim-blocked-tasks t
+        org-agenda-dim-blocked-tasks t
         org-enforce-todo-checkbox-dependencies t
         org-log-into-drawer t)
+
+  ;; (defun format-org-breadcrumbs (sep max-item-length max-output-length brds)
+  ;;   (let* ((parts (split-string brds sep))
+  ;;          (cdrs (s-join sep (mapcar (lambda (s) (s-truncate max-item-length s "..")) (cdr parts))))
+  ;;          (cdrs-length (min (length cdrs) (- max-output-length (1+ (length (car parts)))))))
+  ;;     (concat
+  ;;      (s-truncate cdrs-length cdrs "..")
+  ;;      (s-repeat (- max-output-length (+ (length (car parts)) cdrs-length)) " ")
+  ;;      (car parts))))
+
+  (defun format-org-breadcrumbs (sep max-item-length max-output-length brds)
+    (let ((parts (split-string brds sep)))
+      (s-truncate max-output-length
+                  (s-join sep
+                          (mapcar (lambda (s) (s-truncate max-item-length s "..")) parts))
+                  "¬")))
+
+  (defun formatted-breadcrumbs (m n)
+    (format "%%-%d%S" n
+            `(let ((breadcrumbs (org-with-point-at (org-get-at-bol 'org-marker) (org-display-outline-path nil nil "→" t))))
+               (if (or (equal breadcrumbs "") (equal breadcrumbs nil))
+                   ""
+                 (format-org-breadcrumbs "→" ,m ,n
+                                         (concat breadcrumbs ""
+                                                 (get-text-property 0 'extra-space breadcrumbs)))))))
+  (setq org-agenda-prefix-format
+        `((todo . " %i %-12:c")
+          (tags . ,(concat " " (formatted-breadcrumbs 6 21) " %i %-12:c"))
+          (agenda . ,(concat " " (formatted-breadcrumbs 6 21) " %i %-12:c%?-12t% s"))
+          (search . " %i %-12:c")))
 
   ;; from https://lists.gnu.org/archive/html/emacs-orgmode/2015-06/msg00266.html
   (defun org-agenda-delete-empty-blocks ()
