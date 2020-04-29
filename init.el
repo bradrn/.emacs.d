@@ -36,6 +36,9 @@
 (setq-default indent-tabs-mode nil)
 (setq tab-width 4)
 
+;; scratch buffer is fundamental
+(setq initial-major-mode 'fundamental-mode)
+
 (setq package-enable-at-startup nil) ; tells emacs not to load any packages before starting up
 ;; the following lines tell emacs where on the internet to look up
 ;; for new packages.
