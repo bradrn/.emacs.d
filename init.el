@@ -30,7 +30,6 @@
 (setq recentf-auto-cleanup 'never)
 (recentf-mode 1)
 (setq recentf-max-menu-items 50)
-(run-with-idle-timer 2 nil #'recentf-cleanup)
 
 ;; spaces not tabs
 (setq-default indent-tabs-mode nil)
