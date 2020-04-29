@@ -22,6 +22,7 @@
 (set-language-environment "UTF-8")
 (setq default-fill-column 80)                                 ; toggle wrapping text at the 80th character
 (setq-default inhibit-compacting-font-caches t)               ; dont compact large fonts
+(setq backup-by-copying t)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
