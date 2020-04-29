@@ -911,14 +911,17 @@ CHAR and ARG are as in avy."
     "r" #'org-reveal
     "s" '(:ignore t :which-key "scheduling")
     "ss" #'org-schedule
-    "sd" #'org-deadline)
-  (mode-leader-define-key org-agenda-mode-map
-    "c" #'org-agenda-columns
-    "o" #'org-agenda-open-link
-    "t" #'org-agenda-todo
-    "s" '(:ignore t :which-key "scheduling")
-    "ss" #'org-agenda-schedule
-    "sd" #'org-agenda-deadline)
+    "sd" #'org-deadline
+    "s." #'org-time-stamp
+    "g" #'org-set-tags
+    "*" #'toggle-org-hide-stars)
+  ;; (mode-leader-define-key org-agenda-mode-map
+  ;;   "c" #'org-agenda-columns
+  ;;   "o" #'org-agenda-open-link
+  ;;   "t" #'org-agenda-todo
+  ;;   "s" '(:ignore t :which-key "scheduling")
+  ;;   "ss" #'org-agenda-schedule
+  ;;   "sd" #'org-agenda-deadline)
 
   (use-package evil-org
     :ensure t
@@ -930,9 +933,19 @@ CHAR and ARG are as in avy."
               (lambda ()
                 (evil-org-set-key-theme)))
     (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys)
-    (evil-define-key 'motion org-agenda-mode-map
-      "X" #'org-agenda-columns))
+    ;; (evil-org-agenda-set-keys)
+    ;; (evil-define-key 'motion org-agenda-mode-map
+    ;;   "X" #'org-agenda-columns)
+    (evil-define-key 'emacs org-agenda-mode-map
+      "j" #'org-agenda-next-line
+      "k" #'org-agenda-previous-line
+      "J" #'org-agenda-next-item
+      "K" #'org-agenda-previous-item
+      "c" #'org-agenda-capture
+      "x" #'org-agenda-execute
+      "G" #'evil-goto-line
+      "gg" #'evil-goto-first-line
+      "gr" #'org-agenda-redo-all))
 
   (setq org-agenda-files '("~/Dropbox/org")
         org-todo-keywords
