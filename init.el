@@ -808,6 +808,7 @@ CHAR and ARG are as in avy."
    "c"   #'LaTeX-close-environment
    "i"   #'LaTeX-insert-item
    "s"   #'LaTeX-section
+   "k"   #'TeX-kill-job
    "q"   #'TeX-next-error
    "\\"  #'TeX-electric-macro
 
