@@ -359,7 +359,8 @@ The optional argument NEW-WINDOW is not used."
 
 ;; helm
 (use-package helm
-  :defer .1
+  ;; :defer .1
+  :defer 2
   :config
   (helm-mode 1)
   (global-set-key (kbd "M-x") #'helm-M-x)
