@@ -829,14 +829,17 @@ CHAR and ARG are as in avy."
   (defun latex/font-small-caps   () (interactive) (TeX-font nil ?\C-c))
   (defun latex/font-sans-serif   () (interactive) (TeX-font nil ?\C-f))
 
-  (defvar latex-current-insert-command "textit" "The command inserted by C-w.")
+  (defvar latex-current-insert-command nil "The command inserted by C-w.")
   (defun latex/font-current (arg)
     (interactive "*P")
     (if arg
         (progn
           (call-interactively 'TeX-insert-macro)
           (setq latex-current-insert-command TeX-default-macro))
-      (TeX-insert-macro latex-current-insert-command)))
+      (if latex-current-insert-command
+          (TeX-insert-macro latex-current-insert-command)
+        (call-interactively 'TeX-insert-macro)
+        (setq latex-current-insert-command TeX-default-macro))))
 
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-b") #'latex/font-bold)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-t") #'latex/font-code)
