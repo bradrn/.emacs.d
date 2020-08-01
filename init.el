@@ -313,23 +313,55 @@ The optional argument NEW-WINDOW is not used."
   (add-hook 'prog-mode-hook #'origami-mode)
   (add-hook 'LaTeX-mode-hook #'origami-mode))
 
-;; rainbow-delimiters & parinfer
+;; rainbow-delimiters
 (use-package rainbow-delimiters
   :init
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-(use-package parinfer
-  :ensure t
-  :bind (("C-," . parinfer-toggle-mode))
+(use-package lispy
+  :defer
   :init
-  (setq parinfer-extensions
-        '(defaults       ; should be included.
-          pretty-parens  ; different paren styles for different modes.
-          evil           ; If you use Evil.
-          smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-          smart-yank))   ; Yank behavior depend on mode.
-  (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-  (add-hook 'lisp-mode-hook       #'parinfer-mode)
-  (add-hook 'extempore-mode-hook  #'parinfer-mode))
+  (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+  (add-hook 'lisp-mode-hook       (lambda () (lispy-mode 1)))
+  (add-hook 'lispy-mode-hook #'lispyville-mode)
+  :config
+  (setq lispy-close-quotes-at-end-p t))
+(use-package lispyville
+  :after (lispy yasnippet)
+  :commands lispyville-mode
+  :init
+  (with-eval-after-load 'evil
+    (let ((pos (memq 'evil-mode-line-tag mode-line-format)))
+      (setcdr pos (cons
+                   '(:eval (when (featurep 'lispyville)
+                             (lispyville-mode-line-string "l-special" "")))
+                   (cdr pos)))))
+  :config
+  (lispyville-set-key-theme
+   '(operators
+     c-w
+     text-objects
+     ;; atom-movement
+     additional-movement
+     commentary
+     slurp/barf-cp
+     wrap
+     additional
+     additional-insert
+     escape)))
+
+;; (use-package parinfer
+;;   :ensure t
+;;   :bind (("C-," . parinfer-toggle-mode))
+;;   :init
+;;   (setq parinfer-extensions
+;;         '(defaults       ; should be included.
+;;           pretty-parens  ; different paren styles for different modes.
+;;           evil           ; If you use Evil.
+;;           smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+;;           smart-yank))   ; Yank behavior depend on mode.
+;;   (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+;;   (add-hook 'lisp-mode-hook       #'parinfer-mode)
+;;   (add-hook 'extempore-mode-hook  #'parinfer-mode))
 
 ;; flycheck
 (use-package flycheck
