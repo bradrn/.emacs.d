@@ -1132,18 +1132,19 @@ CHAR and ARG are as in avy."
 
 ;; extempore
 (use-package extempore-mode
-  :after evil
   :defer
   :init
   (setq extempore-use-pretty-lambdas nil
-        extempore-path "c:/Users/bradn/Documents/Music/Extempore/Extempore-0.7.0-win10/Extempore-0.7.0-win10/extempore/")
+        extempore-path "c:/Users/bradn/Documents/Music/Extempore/extempore-v0.8.6-lens-windows-latest/extempore/")
   :config
   (mode-leader-define-key extempore-mode-map
     "K" #'extempore-send-definition
     "r" #'extempore-send-region
+    "x" #'extempore-send-last-sexp
     "z" #'switch-to-extempore
-    "SPC" #'extempore-connect-or-disconnect)
-  (evil-define-key '(normal insert) extempore-mode-map (kbd "C-SPC") #'extempore-send-definition))
+    "j" #'extempore-connect)
+  (evil-define-key '(normal insert) extempore-mode-map (kbd "C-SPC") #'extempore-send-definition)
+  (add-hook 'extempore-mode-hook (lambda () (lispy-mode 1))))
 
 ;; lisp - SLY
 (use-package sly
