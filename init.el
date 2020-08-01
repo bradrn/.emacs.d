@@ -625,7 +625,7 @@ CHAR and ARG are as in avy."
   :commands scratch
   :init
   (spc-leader-define-key
-   "s" #'scratch))
+   "bs" #'scratch))
 
 ;; try
 (use-package try
