@@ -272,16 +272,17 @@ The optional argument NEW-WINDOW is not used."
 
 ;; yasnippet
 (use-package yasnippet
-  :after evil
-  :config
-  (yas-global-mode))
+  :commands yas-minor-mode
+  :init
+  ;; don’t use yas-global-mode - it takes too much time at startup
+  ;; instead only enable it in modes where I use it:
+  (add-hook 'LaTeX-mode-hook #'yas-minor-mode)
+  (add-hook 'haskell-mode-hook #'yas-minor-mode)
+  (add-hook 'yas-minor-mode-hook #'yas-reload-all))
 (use-package yasnippet-snippets :after yasnippet)
 (use-package helm-c-yasnippet
   :after (yasnippet helm)
-  :init
-  (eval-after-load 'general-leaders
-    (spc-leader-define-key
-        "x" 'helm-yas-complete)))
+  :commands helm-yas-complete)
 
 ;; company
 (use-package company
@@ -458,92 +459,101 @@ The optional argument NEW-WINDOW is not used."
   (provide 'general-leaders)
 
   (spc-leader-define-key
-   "SPC" #'helm-M-x
-   "TAB" #'switch-to-previous-buffer
-   "RET" #'evil-execute-in-emacs-state
-   "$"   #'set-selective-display-current-column
-   "!"   #'shell-command
-   "&"   #'async-shell-command
-   "'"   #'shell
+    "SPC" #'helm-M-x
+    "TAB" #'switch-to-previous-buffer
+    "RET" #'evil-execute-in-emacs-state
+    "$"   #'set-selective-display-current-column
+    "!"   #'shell-command
+    "&"   #'async-shell-command
+    "'"   #'shell
 
-   "b"   '(:ignore t :which-key "buffers")
-   "bb"  #'helm-buffers-list
-   "bd"  #'kill-this-buffer
-   "bi"  #'ibuffer
-   "bs"  #'start-server-if-not-running
-   "bci" #'clone-indirect-buffer
-   "bco" #'clone-indirect-buffer-other-window
+    "b"   '(:ignore t :which-key "buffers")
+    "bb"  #'helm-buffers-list
+    "bd"  #'kill-this-buffer
+    "bi"  #'ibuffer
+    "bci" #'clone-indirect-buffer
+    "bco" #'clone-indirect-buffer-other-window
 
-   "c"   #'evil-ex-nohighlight
+    "c"   #'evil-ex-nohighlight
 
-   "ee"   #'flycheck-list-errors-toggle
-   "ec"   #'flycheck-buffer
+    "ee"   #'flycheck-list-errors-toggle
+    "ec"   #'flycheck-buffer
 
-   "f"   '(:ignore t :which-key "files")
-   "ff"  #'helm-find-files
-   "fi"  #'find-user-init-file
-   "fr"  #'helm-recentf
-   "fs"  #'save-buffer
-   "ft"  #'helm-etags-select
-   "fx"  #'delete-file
+    "f"   '(:ignore t :which-key "files")
+    "ff"  #'helm-find-files
+    "fi"  #'find-user-init-file
+    "fr"  #'helm-recentf
+    "fs"  #'save-buffer
+    "ft"  #'helm-etags-select
+    "fx"  #'delete-file
 
-   "h"   #'help-command
+    "h"   #'help-command
 
-   "i"   '(:ignore t :which-key "UI")
-   "if"  #'fci-mode
-   "iu"  #'undo-tree-visualize
-   "it"  '(:ignore t :which-key "themes")
-   "itdo" (lambda () (interactive) (helm-themes--load-theme "doom-one"))
-   "itle" (lambda () (interactive) (helm-themes--load-theme "leuven"))
-   "itsd" (lambda () (interactive) (helm-themes--load-theme "solarized-dark"))
-   "itsl" (lambda () (interactive) (helm-themes--load-theme "solarized-light"))
-   "itgs" (lambda () (interactive) (helm-themes--load-theme "gruvbox-light-soft"))
-   "itt" #'helm-themes
-   "iw"  #'whitespace-mode
-   "ic"  '(:ignore t :which-key "customise")
-   "icg" #'customize-group
-   "icf" #'customize-face
-   "icv" #'customize-variable
-   "il"  '(:ignore t :which-key "calc")
-   "ilq" #'quick-calc
-   "ilc" #'calc
-   "is"  '(:ignore t :which-key "flyspell")
-   "iss" #'flyspell-mode
-   "isx" #'flyspell-buffer
+    "i"   '(:ignore t :which-key "UI")
+    "if"  #'fci-mode
+    "iu"  #'undo-tree-visualize
+    "it"  '(:ignore t :which-key "themes")
+    "itdo" (lambda () (interactive) (helm-themes--load-theme "doom-one"))
+    "itle" (lambda () (interactive) (helm-themes--load-theme "leuven"))
+    "itsd" (lambda () (interactive) (helm-themes--load-theme "solarized-dark"))
+    "itsl" (lambda () (interactive) (helm-themes--load-theme "solarized-light"))
+    "itgs" (lambda () (interactive) (helm-themes--load-theme "gruvbox-light-soft"))
+    "itt" #'helm-themes
+    "iw"  #'whitespace-mode
+    "ic"  '(:ignore t :which-key "customise")
+    "icg" #'customize-group
+    "icf" #'customize-face
+    "icv" #'customize-variable
+    "il"  '(:ignore t :which-key "calc")
+    "ilq" #'quick-calc
+    "ilc" #'calc
+    "is"  '(:ignore t :which-key "flyspell")
+    "iss" #'flyspell-mode
+    "isx" #'flyspell-buffer
+    "ip"  #'show-paren-mode
 
-   "g"   #'magit-status
+    "g"   #'magit-status
 
-   "j"   '(:ignore t :which-key "jump")
-   "ji"  #'helm-semantic-or-imenu
-   "jw"  #'subword-mode
+    "j"   '(:ignore t :which-key "jump")
+    "ji"  #'helm-semantic-or-imenu
+    "jw"  #'subword-mode
 
-   "k"   #'kill-compilation
+    "k"   #'kill-compilation
 
-   "n"   '(:ignore t :which-key "numbers")
-   "n+"  #'evil-numbers/inc-at-pt
-   "n-"  #'evil-numbers/dec-at-pt
+    "n"   '(:ignore t :which-key "numbers")
+    "n+"  #'evil-numbers/inc-at-pt
+    "n-"  #'evil-numbers/dec-at-pt
 
-   "r"   #'revert-buffer
-   "u"   #'universal-argument
+    "r"   #'revert-buffer
 
-   "-"   #'negative-argument
+    "s"   '(:ignore t :which-key "server")
+    "ss"  #'start-server-if-not-running
+    "sx"  #'kill-emacs
+    "sn"  #'server-edit
 
-   "w"   '(:ignore t :which-key "window")
-   "wf"  #'make-frame
-   "wh"  #'evil-window-left
-   "wj"  #'evil-window-down
-   "wk"  #'evil-window-up
-   "wo"  #'delete-other-windows
-   "wx"  #'ace-delete-window
-   "wl"  #'evil-window-right
-   "wq"  #'delete-window
-   "wH"  #'evil-window-move-far-left
-   "wL"  #'evil-window-move-far-right
-   "wJ"  #'evil-window-move-very-bottom
-   "wK"  #'evil-window-move-very-top
-   "wQ"  #'kill-buffer-and-window
-   "w-"  #'split-window-below
-   "w/"  #'split-window-right))
+    "u"   #'universal-argument
+
+    "-"   #'negative-argument
+
+    "w"   '(:ignore t :which-key "window")
+    "wf"  #'make-frame
+    "wh"  #'evil-window-left
+    "wj"  #'evil-window-down
+    "wk"  #'evil-window-up
+    "wo"  #'delete-other-windows
+    "wx"  #'ace-delete-window
+    "wz"  #'delete-frame
+    "wl"  #'evil-window-right
+    "wq"  #'delete-window
+    "wH"  #'evil-window-move-far-left
+    "wL"  #'evil-window-move-far-right
+    "wJ"  #'evil-window-move-very-bottom
+    "wK"  #'evil-window-move-very-top
+    "wQ"  #'kill-buffer-and-window
+    "w-"  #'split-window-below
+    "w/"  #'split-window-right
+
+    "x"   #'helm-yas-complete))
 
 ;; keybindings for elisp
 (mode-leader-define-key emacs-lisp-mode-map
