@@ -1044,6 +1044,7 @@ CHAR and ARG are as in avy."
             (tags "-university/!ASKED"
                   ((org-agenda-overriding-header "Resolved questions (Non-university)"))))))
         org-agenda-show-outline-path t
+        org-agenda-breadcrumbs-separator "→"
         org-refile-targets
         '((nil :maxlevel . 9)
           (org-agenda-files :maxlevel . 9))
@@ -1083,16 +1084,16 @@ CHAR and ARG are as in avy."
 
   (defun formatted-breadcrumbs (m n)
     (format "%%-%d%S" n
-            `(let ((breadcrumbs (org-with-point-at (org-get-at-bol 'org-marker) (org-display-outline-path nil nil "→" t))))
+            `(let ((breadcrumbs (org-with-point-at (org-get-at-bol 'org-marker) (org-display-outline-path nil nil org-agenda-breadcrumbs-separator t))))
                (if (or (equal breadcrumbs "") (equal breadcrumbs nil))
                    ""
-                 (format-org-breadcrumbs "→" ,m ,n
+                 (format-org-breadcrumbs org-agenda-breadcrumbs-separator ,m ,n
                                          (concat breadcrumbs ""
                                                  (get-text-property 0 'extra-space breadcrumbs)))))))
   (setq org-agenda-prefix-format
-        `((todo . " %i %-12:c")
-          (tags . ,(concat " " (formatted-breadcrumbs 6 21) " %i %-12:c"))
-          (agenda . ,(concat " " (formatted-breadcrumbs 6 21) " %i %-12:c%?-12t% s"))
+        `((todo . ,(concat " " (formatted-breadcrumbs 6 35) " %i %-12:c"))
+          (tags . ,(concat " " (formatted-breadcrumbs 6 35) " %i %-12:c"))
+          (agenda . ,(concat " " (formatted-breadcrumbs 10 25) " %i %-12:c%?-12t% s"))
           (search . " %i %-12:c")))
 
   ;; from https://lists.gnu.org/archive/html/emacs-orgmode/2015-06/msg00266.html
