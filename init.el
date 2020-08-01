@@ -856,9 +856,9 @@ CHAR and ARG are as in avy."
             (lambda ()
               (flyspell-mode)
               (flyspell-buffer)))
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (start-server-if-not-running)))
+  ;; (add-hook 'LaTeX-mode-hook
+  ;;           (lambda ()
+  ;;             (start-server-if-not-running)))
 
   ;; adapted from https://lists.nongnu.org/archive/html/auctex/2009-11/msg00016.html
   (evil-define-key 'insert TeX-mode-map (kbd "C-\\") 'TeX-electric-macro)
