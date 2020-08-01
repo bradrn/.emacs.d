@@ -290,7 +290,8 @@ The optional argument NEW-WINDOW is not used."
   :init
   (setq company-idle-delay 0.1
         company-dabbrev-downcase nil)
-  (add-hook 'after-init-hook #'global-company-mode)
+  (add-hook 'prog-mode-hook #'(lambda () (global-company-mode 1)))
+  (add-hook 'comint-mode-hook #'(lambda () (global-company-mode 1)))
   (add-hook 'LaTeX-mode-hook (lambda () (company-mode -1)))
   :config
   ;; from spacemacs
