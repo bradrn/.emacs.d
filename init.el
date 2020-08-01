@@ -690,10 +690,11 @@ CHAR and ARG are as in avy."
   (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
     (async-shell-command "stack exec -- yesod devel")))
 
+(use-package attrap
+  :after dante)
 (use-package dante
-  :load-path "~/.emacs.d/dante"
-  :demand t
-  :after haskell-mode
+  ;; :demand t
+  ;; :after haskell-mode
   :commands 'dante-mode
   :init
   (add-hook 'haskell-mode-hook 'flycheck-mode)
