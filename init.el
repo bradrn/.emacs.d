@@ -910,15 +910,38 @@ CHAR and ARG are as in avy."
                       :error))))
 
 (use-package org
+  ;; :ensure t
+  ;; :pin org
   :defer
   :init
   (spc-leader-define-key
-    "ia" '(:ignore t :which-key "org-agenda")
-    "iaa" #'org-agenda
-    "iac" #'org-cycle-agenda-files
-    "iak" #'org-capture)
+    "o" '(:ignore t :which-key "org-agenda")
+    "oa" #'org-agenda
+    "ob" #'org-switchb
+    "oc" #'org-cycle-agenda-files
+    "ok" #'org-capture
+    "os" #'org-save-all-org-buffers)
   :config
 
+  ;; org-protocol
+  (require 'org-protocol)
+
+  (defun org-protocol-capture-notemplate (info)
+    (raise-frame)
+    (org-capture)
+    (message "Item captured.")
+    ;; Make sure we do not return a string, as `server-visit-files',
+    ;; through `server-edit', would interpret it as a file name.
+    nil)
+  (add-to-list 'org-protocol-protocol-alist
+               '("org-capture-notemplate" :protocol "capturent" :function org-protocol-capture-notemplate :kill-client t))
+
+  (defun toggle-org-hide-stars ()
+    (interactive)
+    (setq-local org-hide-leading-stars (not org-hide-leading-stars))
+    ;; restart font-lock-mode
+    (font-lock-mode nil)
+    (font-lock-mode t))
   (mode-leader-define-key org-mode-map
     "e" #'org-export-dispatch
     "i" #'org-insert-item
@@ -930,7 +953,7 @@ CHAR and ARG are as in avy."
     "ss" #'org-schedule
     "sd" #'org-deadline
     "s." #'org-time-stamp
-    "g" #'org-set-tags
+    "g" #'org-set-tags-command
     "*" #'toggle-org-hide-stars)
   ;; (mode-leader-define-key org-agenda-mode-map
   ;;   "c" #'org-agenda-columns
@@ -962,7 +985,10 @@ CHAR and ARG are as in avy."
       "x" #'org-agenda-execute
       "G" #'evil-goto-line
       "gg" #'evil-goto-first-line
-      "gr" #'org-agenda-redo-all))
+      "gr" #'org-agenda-redo-all)
+    (if (fboundp #'server-edit)
+        (evil-define-key 'emacs org-agenda-mode-map
+          "Q" #'delete-frame)))
 
   ;; adapted from https://emacs.stackexchange.com/a/14734/20375
   (defun org-agenda-skip-if-blocked ()
@@ -980,8 +1006,8 @@ CHAR and ARG are as in avy."
         org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(p)" "|" "DONE(d)")
           (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)")
-          (sequence "UNANSWERED(u)" "|" "RESOLVED(r@/@)")
-          (sequence "ASKED(k)" "|"))
+          (sequence "UNANSWERED(u)" "ASKNEXT(a)" "|" "RESOLVED(r@/@)")
+          (sequence "QINACTIVE(v)" "|" "NOTASKING(k@)"))
         org-agenda-custom-commands
         '(("p" "Block agenda"
            ((tags "REFILE"
@@ -1001,22 +1027,24 @@ CHAR and ARG are as in avy."
                   ((org-agenda-overriding-header "To refile")))
             ;; (tags-todo "+university+assignment+SCHEDULED<=\"<now>\"/!TODO"
             ;;            ((org-agenda-overriding-header "Scheduled assignments")))
-            (tags-todo "+university+assignment+SCHEDULED=\"\"+DEADLINE<\"<+3w>\"|+university+assignment+deadline=\"\"|+university+assignment+SCHEDULED<=\"<now>\"/!TODO|NEXT"
+            (tags-todo "+university+assignment+SCHEDULED=\"\"+DEADLINE<\"<+3w>\"|+university+assignment+deadline=\"\"|+university+assignment+SCHEDULED<=\"<now>\"/!TODO|NEXT|INPROGRESS|WAITING"
                        ((org-agenda-overriding-header "Assignments")))
-            ;; (tags "+university/NEXT"
-            ;;       ((org-agenda-overriding-header "Next tasks")))
+            (tags "+university/NEXT"
+                  ((org-agenda-overriding-header "Next tasks")))
             (tags "+university-lecture-assignment/!TODO"
                   ((org-agenda-overriding-header "TODO tasks")
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-            (tags-todo "+university+exam+DEADLINE<\"<+1m>\"/!"
+            (tags "+university+exam+TIMESTAMP<\"<+3w>\""
                        ((org-agenda-overriding-header "Exams")))
-            (tags "+university+lecture/!TODO|INPROGRESS"
+            (tags "+university+lecture/!"
                   ((org-agenda-overriding-header "Unwatched lectures")
                    ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))
                    ;; (org-agenda-skip-function '(org-agenda-skip-if-blocked))
                    (org-agenda-dim-blocked-tasks 'invisible)))
             (agenda ""
                     ((org-agenda-span 14)
+                     ;; (org-agenda-start-day "-1d")
+                     ;; (org-agenda-start-on-weekday nil)
                      (org-deadline-warning-days 0)
                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("HOLD")))
                      (org-agenda-before-sorting-filter-function
@@ -1031,7 +1059,9 @@ CHAR and ARG are as in avy."
                    (org-agenda-sorting-strategy '(todo-state-up))))))
           ;; ((org-agenda-overriding-columns-format "%25ITEM %25DEADLINE"))
           ("q" "Questions"
-           ((tags "+university/!UNANSWERED|WAITING"
+           ((todo "ASKNEXT"
+                  ((org-agenda-overriding-header "Ask next opportunity")))
+            (tags "+university/!UNANSWERED|WAITING"
                   ((org-agenda-overriding-header "Unanswered questions (University)")))
             (tags "-university/!UNANSWERED|WAITING"
                   ((org-agenda-overriding-header "Unanswered questions (Non-university)")))
@@ -1042,14 +1072,16 @@ CHAR and ARG are as in avy."
             (tags "+university/!ASKED"
                   ((org-agenda-overriding-header "Unresolved questions (University)")))
             (tags "-university/!ASKED"
-                  ((org-agenda-overriding-header "Resolved questions (Non-university)"))))))
+                  ((org-agenda-overriding-header "Resolved questions (Non-university)")))
+            (todo "QINACTIVE|NOTASKING"
+                  ((org-agenda-overriding-header "Inactive questions (all)"))))))
         org-agenda-show-outline-path t
         org-agenda-breadcrumbs-separator "→"
         org-refile-targets
         '((nil :maxlevel . 9)
           (org-agenda-files :maxlevel . 9))
         org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil  ; for helm, see https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
+        org-outline-path-complete-in-steps nil ; for helm, see https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
         org-refile-allow-creating-parent-nodes 'confirm
         org-capture-templates
         '(("t" "todo" entry (file "~/Dropbox/org/refile.org")
