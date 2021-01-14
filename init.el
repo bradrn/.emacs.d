@@ -678,6 +678,8 @@ CHAR and ARG are as in avy."
   :config
   (projectile-mode +1)
   (setq projectile-completion-system 'helm)
+  (setq projectile-indexing-method 'hybrid)
+  (setq projectile-git-submodule-command nil)
         ;; projectile-globally-ignored-file-suffixes
         ;; (append '("~")
                 ;; projectile-globally-ignored-file-suffixes))
