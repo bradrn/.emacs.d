@@ -834,7 +834,7 @@ CHAR and ARG are as in avy."
         TeX-source-correlate-start-server nil
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil
-        preview-gs-command "c:/Program Files (x86)/gs/gs9.22/bin/gswin32c.exe"
+        preview-gs-command "c:/Program Files/gs/gs9.53.3/bin/gswin64c.exe"
         preview-auto-reveal t)
   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
