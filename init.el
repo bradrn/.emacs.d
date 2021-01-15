@@ -683,11 +683,6 @@ CHAR and ARG are as in avy."
         ;; projectile-globally-ignored-file-suffixes
         ;; (append '("~")
                 ;; projectile-globally-ignored-file-suffixes))
-  (projectile-register-project-type 'haskell-stack '("stack.yaml")
-                                    :compile "stack build"
-                                    :run "stack run"
-                                    :test "stack build --test"
-                                    :test-suffix "Spec")
   (spc-leader-define-key
       "p" 'projectile-command-map))
 
