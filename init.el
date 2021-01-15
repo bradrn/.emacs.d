@@ -909,6 +909,8 @@ CHAR and ARG are as in avy."
   ;; adapted from https://lists.nongnu.org/archive/html/auctex/2009-11/msg00016.html
   (evil-define-key 'insert TeX-mode-map (kbd "C-\\") 'TeX-electric-macro)
 
+  (add-to-list 'TeX-tree-roots "c:/Users/bradn/AppData/Roaming/MiKTeX/2.9/")
+
   ;; from https://tex.stackexchange.com/questions/286028/inverse-search-with-emacs-auctex-and-sumatrapdf-on-windows-10
   (setq TeX-PDF-mode t)
   (setq TeX-source-correlate-mode t)
