@@ -800,6 +800,17 @@ CHAR and ARG are as in avy."
 ;;                  0 -1)
 ;;                 "/BootTidal.hs")))
 
+;; html
+
+(use-package emmet-mode
+  :defer t
+  :init
+  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+  (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+  :config
+  (define-key emmet-mode-keymap (kbd "TAB") #'emmet-expand-line)
+  )
+
 ;; LaTeX - partly lifted from spacemacs
 (use-package tex
   :ensure auctex
