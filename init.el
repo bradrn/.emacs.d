@@ -1054,8 +1054,10 @@ CHAR and ARG are as in avy."
         org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(p)" "|" "DONE(d)")
           (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)")
-          (sequence "UNANSWERED(u)" "ASKNEXT(a)" "|" "RESOLVED(r@/@)")
-          (sequence "QINACTIVE(v)" "|" "NOTASKING(k@)"))
+          (sequence "UNANSWERED(u)" "|" "RESOLVED(r@/@)")
+          ;; (sequence "UNANSWERED(u)" "ASKNEXT(a)" "|" "RESOLVED(r@/@)")
+          (sequence "QINACTIVE(v)" "|" "NOTASKING(k@)")
+          (sequence "UNREAD(x)" "|" "READ(z)"))
         org-agenda-custom-commands
         '(("p" "Block agenda"
            ((tags "REFILE"
@@ -1075,20 +1077,24 @@ CHAR and ARG are as in avy."
                   ((org-agenda-overriding-header "To refile")))
             ;; (tags-todo "+university+assignment+SCHEDULED<=\"<now>\"/!TODO"
             ;;            ((org-agenda-overriding-header "Scheduled assignments")))
-            (tags-todo "+university+assignment+SCHEDULED=\"\"+DEADLINE<\"<+3w>\"|+university+assignment+deadline=\"\"|+university+assignment+SCHEDULED<=\"<now>\"/!TODO|NEXT|INPROGRESS|WAITING"
-                       ((org-agenda-overriding-header "Assignments")))
             (tags "+university/NEXT"
                   ((org-agenda-overriding-header "Next tasks")))
-            (tags "+university-lecture-assignment/!TODO"
-                  ((org-agenda-overriding-header "TODO tasks")
-                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
             (tags "+university+exam+TIMESTAMP<\"<+3w>\""
-                       ((org-agenda-overriding-header "Exams")))
+                  ((org-agenda-overriding-header "Exams")))
             (tags "+university+lecture/!"
                   ((org-agenda-overriding-header "Unwatched lectures")
                    ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))
                    ;; (org-agenda-skip-function '(org-agenda-skip-if-blocked))
                    (org-agenda-dim-blocked-tasks 'invisible)))
+            ;; (tags-todo "+university-lecture-assignment+DEADLINE<\"<+2w>\"/!"
+            (tags-todo "+university-lecture+DEADLINE<\"<now>\"/!"
+                       ((org-agenda-overriding-header "Overdue things")))
+            (tags-todo "+university-lecture+DEADLINE<\"<+2w>\"/!"
+                       ((org-agenda-overriding-header "Deadlines")
+                        (org-agenda-sorting-strategy '(deadline-up))))
+            (tags-todo "+university+assignment+SCHEDULED=\"\"+DEADLINE<\"<+3w>\"|+university+assignment+deadline=\"\"|+university+assignment+SCHEDULED<=\"<now>\"/!TODO|NEXT|INPROGRESS|WAITING"
+                       ((org-agenda-overriding-header "Assignments")
+                        (org-agenda-sorting-strategy '(deadline-up))))
             (agenda ""
                     ((org-agenda-span 14)
                      ;; (org-agenda-start-day "-1d")
@@ -1102,13 +1108,16 @@ CHAR and ARG are as in avy."
                           line)))))
             (tags-todo "+university/INPROGRESS"
                        ((org-agenda-overriding-header "In progress")))
+            (tags "+university-lecture-assignment/!TODO"
+                  ((org-agenda-overriding-header "TODO tasks")
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
             (tags "+university/HOLD|WAITING"
                   ((org-agenda-overriding-header "On hold")
                    (org-agenda-sorting-strategy '(todo-state-up))))))
           ;; ((org-agenda-overriding-columns-format "%25ITEM %25DEADLINE"))
           ("q" "Questions"
-           ((todo "ASKNEXT"
-                  ((org-agenda-overriding-header "Ask next opportunity")))
+           (;; (todo "ASKNEXT"
+            ;;       ((org-agenda-overriding-header "Ask next opportunity")))
             (tags "+university/!UNANSWERED|WAITING"
                   ((org-agenda-overriding-header "Unanswered questions (University)")))
             (tags "-university/!UNANSWERED|WAITING"
@@ -1144,7 +1153,8 @@ CHAR and ARG are as in avy."
         org-track-ordered-property-with-tag nil
         org-agenda-dim-blocked-tasks t
         org-enforce-todo-checkbox-dependencies t
-        org-log-into-drawer t)
+        org-log-into-drawer t
+        org-startup-folded t)
 
   ;; (defun format-org-breadcrumbs (sep max-item-length max-output-length brds)
   ;;   (let* ((parts (split-string brds sep))
@@ -1171,8 +1181,8 @@ CHAR and ARG are as in avy."
                                          (concat breadcrumbs ""
                                                  (get-text-property 0 'extra-space breadcrumbs)))))))
   (setq org-agenda-prefix-format
-        `((todo . ,(concat " " (formatted-breadcrumbs 6 35) " %i %-12:c"))
-          (tags . ,(concat " " (formatted-breadcrumbs 6 35) " %i %-12:c"))
+        `((todo . ,(concat " " (formatted-breadcrumbs 10 25) " %i %-12:c"))
+          (tags . ,(concat " " (formatted-breadcrumbs 10 25) " %i %-12:c"))
           (agenda . ,(concat " " (formatted-breadcrumbs 10 25) " %i %-12:c%?-12t% s"))
           (search . " %i %-12:c")))
 
