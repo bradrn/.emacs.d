@@ -731,30 +731,109 @@ CHAR and ARG are as in avy."
   (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
     (async-shell-command "stack exec -- yesod devel")))
 
-(use-package attrap
-  :after dante)
-(use-package dante
-  ;; :demand t
-  ;; :after haskell-mode
-  :commands 'dante-mode
+;; (use-package attrap
+;;   :after dante)
+;; (use-package dante
+;;   ;; :demand t
+;;   ;; :after haskell-mode
+;;   :commands 'dante-mode
+;;   :init
+;;   (add-hook 'haskell-mode-hook 'flycheck-mode)
+;;   (add-hook 'haskell-mode-hook 'dante-mode)
+;;   ;; (setq-default dante-repl-command-line '("stack" "ghci"))
+;;   :config
+;;   (add-hook 'dante-mode-hook
+;;    '(lambda () (flycheck-add-next-checker 'haskell-dante
+;;                 '(warning . haskell-hlint))))
+;;   (add-hook 'dante-mode-hook
+;;             (lambda ()
+;;               (setq-local company-idle-delay 0.5)))
+;;   ;; fix indent
+;;   (setq-default haskell-indentation-layout-offset     4
+;;                 haskell-indentation-left-offset       4
+;;                 haskell-indentation-starter-offset    4
+;;                 haskell-indentation-where-post-offset 4
+;;                 haskell-indentation-where-pre-offset  4)
+
+;;   (defun haskell-hoogle-lookup-from-local-wrapper ()
+;;     (interactive)
+;;     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
+;;     (haskell-hoogle-lookup-from-local))
+;;   (mode-leader-define-key haskell-mode-map
+;;     "hh" #'hoogle
+;;     "hH" #'haskell-hoogle-lookup-from-local-wrapper))
+
+(use-package lsp-mode
+  :hook
+  ((haskell-mode . lsp)
+   (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp
   :init
-  (add-hook 'haskell-mode-hook 'flycheck-mode)
-  (add-hook 'haskell-mode-hook 'dante-mode)
-  (setq-default dante-repl-command-line '("stack" "ghci"))
+  (setq-default lsp-modeline-diagnostics-enable nil)
   :config
-  (add-hook 'dante-mode-hook
-   '(lambda () (flycheck-add-next-checker 'haskell-dante
-                '(warning . haskell-hlint))))
-  (add-hook 'dante-mode-hook
-            (lambda ()
-              (setq-local company-idle-delay 0.5)))
+  ;; mostly copied from Spacemacs
+  (spc-leader-define-key
+    "l" '(:ignore t :which-key "lsp")
+    ;; format
+    "l=" '(:ignore t :which-key "format")
+    "l=b" #'lsp-format-buffer
+    "l=r" #'lsp-format-region
+    "l=o" #'lsp-organize-imports
+    ;; code actions
+    "la" #'lsp-execute-code-action
+    ;; goto
+    ;; N.B. implementation and references covered by xref bindings / lsp provider...
+    "lg" '(:ignore t :which-key "goto")
+    "lgt" #'lsp-find-type-definition
+    "lgd" #'lsp-find-definition
+    "lgM" #'lsp-ui-imenu
+    ;; help
+    "lh" '(:ignore t :which-key "help")
+    "lhh" #'lsp-describe-thing-at-point
+    ;; backend
+    "lb" '(:ignore t :which-key "backend")
+    "lbd" #'lsp-describe-session
+    "lbr" #'lsp-workspace-restart
+    "lbs" #'lsp-workspace-shutdown
+    "lbv" #'lsp-version
+    ;; refactor
+    "lr" '(:ignore t :which-key "refactor")
+    "lrr" #'lsp-rename
+    ;; toggles
+    "lT" '(:ignore t :which-key "toggle")
+    "lTd" #'lsp-ui-doc-mode
+    "lTs" #'lsp-ui-sideline-mode
+    "lTF" '(:which-key "doc-include-signature" :def (lambda () (interactive) (setq lsp-ui-doc-include-signature (not lsp-ui-doc-include-signature))))
+    "lTS" '(:which-key "sideline-show-symbol" :def (lambda () (interactive) (setq lsp-ui-sideline-show-symbol (not lsp-ui-sideline-show-symbol))))
+    "lTI" '(:which-key "sideline-ignore-duplicate" :def (lambda () (interactive) (setq lsp-ui-sideline-ignore-duplicate (not lsp-ui-sideline-ignore-duplicate))))
+    "lTl" #'lsp-lens-mode
+    ;; ;; folders
+    ;; "F" "folder"
+    ;; "Fs" #'lsp-workspace-folders-open
+    ;; "Fr" #'lsp-workspace-folders-remove
+    ;; "Fa" #'lsp-workspace-folders-add
+    ;; text/code
+    "lx" '(:ignore t :which-key "text/code")
+    "lxh" #'lsp-document-highlight
+    "lxl" #'lsp-lens-show
+    "lxL" #'lsp-lens-hide))
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :init
+  (setq lsp-ui-sideline-actions-icon nil
+        lsp-ui-sideline-show-diagnostics nil))
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; (use-package company-lsp :commands company-lsp)
+(use-package lsp-haskell
+  :defer
+  :init
   ;; fix indent
   (setq-default haskell-indentation-layout-offset     4
                 haskell-indentation-left-offset       4
                 haskell-indentation-starter-offset    4
                 haskell-indentation-where-post-offset 4
                 haskell-indentation-where-pre-offset  4)
-
+  :config
   (defun haskell-hoogle-lookup-from-local-wrapper ()
     (interactive)
     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
