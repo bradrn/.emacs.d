@@ -282,9 +282,12 @@ The optional argument NEW-WINDOW is not used."
   (add-hook 'haskell-mode-hook #'yas-minor-mode)
   (add-hook 'yas-minor-mode-hook #'yas-reload-all))
 (use-package yasnippet-snippets :after yasnippet)
-(use-package helm-c-yasnippet
-  :after (yasnippet helm)
-  :commands helm-yas-complete)
+;; (use-package helm-c-yasnippet
+;;   :after (yasnippet helm)
+;;   :commands helm-yas-complete)
+(use-package ivy-yasnippet
+  :after (yasnippet ivy)
+  :commands ivy-yasnippet)
 
 ;; company
 (use-package company
@@ -300,13 +303,16 @@ The optional argument NEW-WINDOW is not used."
   (define-key company-active-map (kbd "C-j") #'company-select-next)
   (define-key company-active-map (kbd "C-k") #'company-select-previous)
   (define-key company-active-map (kbd "C-l") #'company-complete-selection)
+  (with-eval-after-load 'counsel
+    (define-key company-mode-map   (kbd "C-:") #'counsel-company)
+    (define-key company-active-map (kbd "C-:") #'counsel-company))
   (spc-leader-define-key "im" #'company-mode))
-(use-package helm-company
-  :after (company helm)
-  :commands helm-company
-  :init
-  (define-key company-mode-map   (kbd "C-:") #'helm-company)
-  (define-key company-active-map (kbd "C-:") #'helm-company))
+;; (use-package helm-company
+;;   :after (company helm)
+;;   :commands helm-company
+;;   :init
+;;   (define-key company-mode-map   (kbd "C-:") #'helm-company)
+;;   (define-key company-active-map (kbd "C-:") #'helm-company))
 
 ;; origami
 (use-package origami
@@ -401,51 +407,99 @@ The optional argument NEW-WINDOW is not used."
 (setq ispell-dictionary "british")
 (setq-default ispell-program-name "c:/cygwin64/bin/aspell.exe")
 
-;; helm
-(use-package helm
-  ;; :defer .1
-  :defer 2
+;; ivy
+(use-package ivy
   :config
-  (helm-mode 1)
-  (global-set-key (kbd "M-x") #'helm-M-x)
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers nil)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-wrap t)
+  (setq ivy-height 20)
+  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+  (assq-delete-all 'org-refile ivy-initial-inputs-alist)
+  (assq-delete-all 'org-agenda-refile ivy-initial-inputs-alist)
+  (assq-delete-all 'org-capture-refile ivy-initial-inputs-alist)
+  (add-to-list 'ivy-initial-inputs-alist '(TeX-electric-macro . "^"))
 
-  (add-hook 'helm-major-mode-hook
-            (lambda ()
-              (setq auto-composition-mode nil)))
+  (define-key ivy-minibuffer-map (kbd "C-j") #'ivy-next-line)
+  (define-key ivy-minibuffer-map (kbd "C-k") #'ivy-previous-line)
+  (define-key ivy-switch-buffer-map (kbd "C-k") #'ivy-previous-line)
+  (define-key ivy-minibuffer-map (kbd "C-l") #'ivy-alt-done)
+  (define-key ivy-minibuffer-map (kbd "<C-return>") #'ivy-immediate-done))
 
-  ;; always display helm at bottom - adapted from spacemacs
-  (setq helm-display-function
-        (lambda (buffer &optional resume)
-          (let ((display-buffer-alist
-                 (list '("*.*Helm.*Help.**")
-                       '("*.*helm.**"
-                         (display-buffer-in-side-window)
-                         (inhabit-same-window . t)
-                         (side . bottom)        ; the important line!!
-                         (window-width . 0.6)
-                         (window-height . 0.4)))))
-            (helm-default-display-buffer buffer))))
+(use-package counsel
+  :after ivy
 
-  (setq helm-split-window-inside-p t)
-
-  ;; from https://github.com/syl20bnr/spacemacs/blob/c7a103a772d808101d7635ec10f292ab9202d9ee/layers/%2Bspacemacs/spacemacs-completion/funcs.el#L78
-  (define-key helm-map (kbd "C-j") #'helm-next-line)
-  (define-key helm-map (kbd "C-k") #'helm-previous-line)
-  (define-key helm-map (kbd "C-h") #'helm-next-source)
-  (define-key helm-map (kbd "C-S-h") #'describe-key)
-  (define-key helm-map (kbd "C-l") (kbd "RET"))
-  (with-eval-after-load 'helm-files
-    (dolist (keymap (list helm-find-files-map helm-read-file-map))
-      (define-key keymap (kbd "C-l") #'helm-execute-persistent-action)
-      (define-key keymap (kbd "C-h") #'helm-find-files-up-one-level)
-      ;; rebind `describe-key' for convenience
-      (define-key keymap (kbd "C-S-h") #'describe-key))))
-(use-package helm-flx
   :config
-  (setq helm-flx-for-helm-find-files nil)
-  (helm-flx-mode))
-(use-package helm-themes
-  :commands (helm-themes helm-themes--load-theme))
+  (global-set-key (kbd "M-x") #'counsel-M-x)
+  (define-key counsel-find-file-map (kbd "C-h") #'counsel-up-directory)
+
+  ;; from https://oremacs.com/2015/06/23/counsel-load-theme/
+  (defun counsel--load-theme-action (x)
+    "Disable current themes and load theme X."
+    (condition-case nil
+        (progn
+          (mapc #'disable-theme custom-enabled-themes)
+          (load-theme (intern x))
+          (when (fboundp 'powerline-reset)
+            (powerline-reset)))
+      (error "Problem loading theme %s" x)))
+
+  (defun counsel-load-theme ()
+    "Forward to `load-theme'.
+  Usable with `ivy-resume', `ivy-next-line-and-call' and
+  `ivy-previous-line-and-call'."
+    (interactive)
+    (ivy-read "Load custom theme: "
+              (mapcar 'symbol-name
+                      (custom-available-themes))
+              :action #'counsel--load-theme-action)))
+
+;; ;; helm
+;; (use-package helm
+;;   ;; :defer .1
+;;   :defer 2
+;;   :config
+;;   (helm-mode 1)
+;;   (global-set-key (kbd "M-x") #'helm-M-x)
+
+;;   (add-hook 'helm-major-mode-hook
+;;             (lambda ()
+;;               (setq auto-composition-mode nil)))
+
+;;   ;; always display helm at bottom - adapted from spacemacs
+;;   (setq helm-display-function
+;;         (lambda (buffer &optional resume)
+;;           (let ((display-buffer-alist
+;;                  (list '("*.*Helm.*Help.**")
+;;                        '("*.*helm.**"
+;;                          (display-buffer-in-side-window)
+;;                          (inhabit-same-window . t)
+;;                          (side . bottom)        ; the important line!!
+;;                          (window-width . 0.6)
+;;                          (window-height . 0.4)))))
+;;             (helm-default-display-buffer buffer))))
+
+;;   (setq helm-split-window-inside-p t)
+
+;;   ;; from https://github.com/syl20bnr/spacemacs/blob/c7a103a772d808101d7635ec10f292ab9202d9ee/layers/%2Bspacemacs/spacemacs-completion/funcs.el#L78
+;;   (define-key helm-map (kbd "C-j") #'helm-next-line)
+;;   (define-key helm-map (kbd "C-k") #'helm-previous-line)
+;;   (define-key helm-map (kbd "C-h") #'helm-next-source)
+;;   (define-key helm-map (kbd "C-S-h") #'describe-key)
+;;   (define-key helm-map (kbd "C-l") (kbd "RET"))
+;;   (with-eval-after-load 'helm-files
+;;     (dolist (keymap (list helm-find-files-map helm-read-file-map))
+;;       (define-key keymap (kbd "C-l") #'helm-execute-persistent-action)
+;;       (define-key keymap (kbd "C-h") #'helm-find-files-up-one-level)
+;;       ;; rebind `describe-key' for convenience
+;;       (define-key keymap (kbd "C-S-h") #'describe-key))))
+;; (use-package helm-flx
+;;   :config
+;;   (setq helm-flx-for-helm-find-files nil)
+;;   (helm-flx-mode))
+;; (use-package helm-themes
+;;   :commands (helm-themes helm-themes--load-theme))
 
 ;; helpful
 (use-package helpful
@@ -500,11 +554,9 @@ The optional argument NEW-WINDOW is not used."
    :states '(normal visual insert emacs)
    :prefix "K"
    :non-normal-prefix "C-0")
-  ;; make our own feature; use with eval-after-load to be able to call the -leader-define-key functions
-  (provide 'general-leaders)
 
   (spc-leader-define-key
-    "SPC" #'helm-M-x
+    "SPC" #'counsel-M-x
     "TAB" #'switch-to-previous-buffer
     "RET" #'evil-execute-in-emacs-state
     "$"   #'set-selective-display-current-column
@@ -513,7 +565,7 @@ The optional argument NEW-WINDOW is not used."
     "'"   #'shell
 
     "b"   '(:ignore t :which-key "buffers")
-    "bb"  #'helm-buffers-list
+    "bb"  #'ivy-switch-buffer
     "bd"  #'kill-this-buffer
     "bi"  #'ibuffer
     "bci" #'clone-indirect-buffer
@@ -525,11 +577,11 @@ The optional argument NEW-WINDOW is not used."
     "ec"   #'flycheck-buffer
 
     "f"   '(:ignore t :which-key "files")
-    "ff"  #'helm-find-files
+    "ff"  #'counsel-find-file
     "fi"  #'find-user-init-file
-    "fr"  #'helm-recentf
+    "fr"  #'counsel-recentf
     "fs"  #'save-buffer
-    "ft"  #'helm-etags-select
+    ;; "ft"  #'helm-etags-select
     "fx"  #'delete-file
 
     "h"   #'help-command
@@ -538,12 +590,12 @@ The optional argument NEW-WINDOW is not used."
     "if"  #'fci-mode
     "iu"  #'undo-tree-visualize
     "it"  '(:ignore t :which-key "themes")
-    "itdo" (lambda () (interactive) (helm-themes--load-theme "doom-one"))
-    "itle" (lambda () (interactive) (helm-themes--load-theme "leuven"))
-    "itsd" (lambda () (interactive) (helm-themes--load-theme "solarized-dark"))
-    "itsl" (lambda () (interactive) (helm-themes--load-theme "solarized-light"))
-    "itgs" (lambda () (interactive) (helm-themes--load-theme "gruvbox-light-soft"))
-    "itt" #'helm-themes
+    "itdo" (lambda () (interactive) (counsel--load-theme-action "doom-one"))
+    "itle" (lambda () (interactive) (counsel--load-theme-action "leuven"))
+    "itsd" (lambda () (interactive) (counsel--load-theme-action "solarized-dark"))
+    "itsl" (lambda () (interactive) (counsel--load-theme-action "solarized-light"))
+    "itgs" (lambda () (interactive) (counsel--load-theme-action "gruvbox-light-soft"))
+    "itt" #'counsel-load-theme
     "iw"  #'whitespace-mode
     "ic"  '(:ignore t :which-key "customise")
     "icg" #'customize-group
@@ -560,7 +612,7 @@ The optional argument NEW-WINDOW is not used."
     "g"   #'magit-status
 
     "j"   '(:ignore t :which-key "jump")
-    "ji"  #'helm-semantic-or-imenu
+    ;; "ji"  #'helm-semantic-or-imenu
     "jw"  #'subword-mode
 
     "k"   #'kill-compilation
@@ -598,7 +650,7 @@ The optional argument NEW-WINDOW is not used."
     "w-"  #'split-window-below
     "w/"  #'split-window-right
 
-    "x"   #'helm-yas-complete))
+    "x"   #'ivy-yasnippet))
 
 ;; keybindings for elisp
 (mode-leader-define-key emacs-lisp-mode-map
@@ -688,7 +740,7 @@ CHAR and ARG are as in avy."
       "pl" #'autoload-projectile)
   :config
   (projectile-mode +1)
-  (setq projectile-completion-system 'helm)
+  (setq projectile-completion-system 'ivy)
   (setq projectile-indexing-method 'hybrid)
   (setq projectile-git-submodule-command nil)
         ;; projectile-globally-ignored-file-suffixes
