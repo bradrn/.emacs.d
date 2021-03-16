@@ -8,14 +8,8 @@
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)))
 
-;; from https://github.com/nilcons/emacs-use-package-fast/tree/a9cc00c5713a2a85d65399731abc4349b46756b4#a-trick-less-gc-during-startup
-(setq gc-cons-threshold 64000000)
-(add-hook 'after-init-hook
-          (lambda ()
-            ;; restore after startup
-            (setq gc-cons-threshold 800000)))
-
 ;; some saner defaults
+(setq gc-cons-threshold 100000000)
 (setq vc-make-backup-files t)                                 ; make backups file even when in version controlled dir
 (setq backup-directory-alist `(("." . "~/.emacs.d/backups"))) ; which directory to put backups file
 (setq inhibit-startup-screen t)                               ; inhibit useless and old-school startup screen
@@ -23,6 +17,7 @@
 (setq default-fill-column 80)                                 ; toggle wrapping text at the 80th character
 (setq-default inhibit-compacting-font-caches t)               ; dont compact large fonts
 (setq backup-by-copying t)
+(setq read-process-output-max (* 1024 1024))                  ; increase amount of data read from process - recommended by lsp docs
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
