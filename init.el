@@ -929,6 +929,12 @@ CHAR and ARG are as in avy."
   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
 
+  ;; reftex
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t
+        reftex-use-fonts t
+        reftex-insert-label-flags '("s" "sfte"))
+
   :config
   (mode-leader-define-key LaTeX-mode-map
    "a"   #'TeX-command-run-all
@@ -950,7 +956,13 @@ CHAR and ARG are as in avy."
    "pr"  #'preview-region
    "pc"  '(:ignore t :which-key "clearout")
    "pcb" #'preview-clearout-buffer
-   "pcp" #'preview-clearout-at-point)
+   "pcp" #'preview-clearout-at-point
+
+   "r"   '(:ignore t :which-key "reftex")
+   "rc"  #'reftex-citation
+   "rl"  #'reftex-label
+   "rr"  #'reftex-reference
+   "rv"  #'reftex-view-crossref)
 
   ;; Rebindings for TeX-font - lifted from spacemacs
   (defun latex/font-bold         () (interactive) (TeX-font nil ?\C-b))
