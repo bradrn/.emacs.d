@@ -371,7 +371,16 @@ The optional argument NEW-WINDOW is not used."
   :init
   (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (setq flycheck-navigation-minimum-level 'error)
   (add-hook 'prog-mode-hook #'flycheck-mode))
+  ;; :config
+  ;; (setq flycheck-error-list-format
+  ;;       `[("File" 6)
+  ;;         ("Line" 5 flycheck-error-list-entry-< :right-align t)
+  ;;         ("Col" 3 nil :right-align t)
+  ;;         ("Level" 8 flycheck-error-list-entry-level-<)
+  ;;         ("ID" 6 t)
+  ;;         (,(flycheck-error-list-make-last-column "Message" 'Checker) 0 t)])
 ;; (use-package flycheck-inline
 ;;   :after flycheck
 ;;   :config
