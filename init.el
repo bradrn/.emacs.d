@@ -73,6 +73,7 @@
 ;; save undo history
 (setq undo-tree-auto-save-history t
       undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+(global-undo-tree-mode 1)
 
 ;; use #' - from http://endlessparentheses.com/get-in-the-habit-of-using-sharp-quote.html
 (defun elisp-insert-sharp ()
@@ -176,7 +177,10 @@ The optional argument NEW-WINDOW is not used."
                 evil-want-C-u-scroll t
                 evil-want-C-d-scroll t
                 evil-want-C-i-jump t
-                evil-want-minibuffer t)
+                evil-want-minibuffer t
+                evil-want-keybinding nil
+                evil-want-integration t
+                evil-undo-system 'undo-tree)
   :config
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
@@ -252,6 +256,11 @@ The optional argument NEW-WINDOW is not used."
 (use-package evil-numbers
   :after evil)
 
+(use-package evil-collection
+  :after evil
+  :config
+  (with-eval-after-load 'magit (evil-collection-magit-setup)))
+
 ;; magit
 (use-package magit
   :defer
@@ -262,7 +271,6 @@ The optional argument NEW-WINDOW is not used."
     (kbd "KC") 'with-editor-cancel
     (kbd "Kc") 'with-editor-cancel)
   (add-hook 'git-commit-setup-hook 'evil-insert-state))
-(use-package evil-magit :after magit)
 
 ;; yasnippet
 (use-package yasnippet
