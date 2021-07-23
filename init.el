@@ -197,6 +197,11 @@ The optional argument NEW-WINDOW is not used."
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
 
+  (define-key evil-normal-state-map "j" 'evil-next-visual-line)
+  (define-key evil-normal-state-map "k" 'evil-previous-visual-line)
+  (define-key evil-visual-state-map "j" 'evil-next-visual-line)
+  (define-key evil-visual-state-map "k" 'evil-previous-visual-line)
+
   ;; don't need digraphs, but DO need to input C-k!
   (define-key evil-insert-state-map (kbd "C-k") nil)
 
