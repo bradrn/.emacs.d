@@ -1395,6 +1395,16 @@ CHAR and ARG are as in avy."
     (setq buffer-read-only t))
   (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks))
 
+;; markdown
+
+(use-package markdown-mode
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :config
+  (setq markdown-gfm-use-electric-backquote nil))
+
 ;; extempore
 (use-package extempore-mode
   :defer
