@@ -1175,7 +1175,8 @@ CHAR and ARG are as in avy."
     "sd" #'org-deadline
     "s." #'org-time-stamp
     "g" #'org-set-tags-command
-    "*" #'toggle-org-hide-stars)
+    "*" #'toggle-org-hide-stars
+    "," #'org-insert-structure-template)
   ;; (mode-leader-define-key org-agenda-mode-map
   ;;   "c" #'org-agenda-columns
   ;;   "o" #'org-agenda-open-link
