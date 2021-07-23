@@ -141,17 +141,10 @@ The optional argument NEW-WINDOW is not used."
       '(("hoogle" . browse-url-qute)
         ("." . browse-url-default-browser)))
 
-;; line numbers
-(use-package linum-relative
-  :defer t
-  :init
-  (add-hook 'emacs-startup-hook
-            (lambda () (linum-relative-mode)))
-  :config
-  (global-linum-mode t)
-  (column-number-mode t)  ; this is as good a place as any to put this
-  (setq linum-relative-current-symbol ""))
-
+;; line numbers - see https://emacs.stackexchange.com/a/50136/20375
+(global-linum-mode -1)
+(setq display-line-numbers-type 'visual)
+(global-display-line-numbers-mode)
 
 ;; theme
 (use-package doom-themes
