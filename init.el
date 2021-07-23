@@ -99,6 +99,21 @@
                  '(font . "Ubuntu Mono 12")
                '(font . "Consolas 10")))
 
+(use-package unicode-fonts
+  :preface
+
+  ;; see https://github.com/rolandwalker/unicode-fonts/issues/3#issuecomment-93392177
+  (defun my-hook-unicode-fonts-setup (frame)
+  "Run unicode-fonts-setup, then remove the hook."
+  (progn
+      (select-frame frame)
+      (unicode-fonts-setup)
+      (message "Removing unicode-fonts-setup to after-make-frame-functions hook")
+      (remove-hook 'after-make-frame-functions 'my-hook-unicode-fonts-setup)))
+
+  :init
+  (add-hook 'after-make-frame-functions 'my-hook-unicode-fonts-setup nil))
+
 ;; smooth scrolling
 (setq scroll-preserve-screen-position t
       scroll-margin 3
