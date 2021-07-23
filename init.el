@@ -891,7 +891,8 @@ CHAR and ARG are as in avy."
   :commands lsp-ui-mode
   :init
   (setq lsp-ui-sideline-actions-icon nil
-        lsp-ui-sideline-show-diagnostics nil))
+        lsp-ui-sideline-show-diagnostics nil
+        lsp-ui-peek-always-show t))
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
 ;; (use-package company-lsp :commands company-lsp)
 (use-package lsp-haskell
