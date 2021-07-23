@@ -756,6 +756,7 @@ CHAR and ARG are as in avy."
   (setq projectile-completion-system 'ivy)
   (setq projectile-indexing-method 'hybrid)
   (setq projectile-git-submodule-command nil)
+  (setq projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0")
         ;; projectile-globally-ignored-file-suffixes
         ;; (append '("~")
                 ;; projectile-globally-ignored-file-suffixes))
