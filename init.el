@@ -90,9 +90,6 @@
 ;; https://emacs.stackexchange.com/a/3008
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; disambiguate C-i and TAB
-(define-key input-decode-map [?\C-i] [C-i])
-
 ;; font
 (add-to-list 'default-frame-alist
              (if (eq system-type 'gnu/linux)
@@ -190,6 +187,9 @@ The optional argument NEW-WINDOW is not used."
                 evil-want-integration t
                 evil-undo-system 'undo-tree)
   :config
+  ;; disambiguate C-i and TAB
+  (define-key input-decode-map [?\C-i] [C-i])
+
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
   (evil-set-initial-state 'flycheck-error-list-mode 'emacs)
@@ -1058,7 +1058,7 @@ CHAR and ARG are as in avy."
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-b") #'latex/font-bold)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-t") #'latex/font-code)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-e") #'latex/font-emphasis)
-  (evil-define-key '(insert visual) TeX-mode-map (kbd "<C-i>") #'latex/font-italic)
+  (evil-define-key '(insert visual) TeX-mode-map (kbd "C-i") #'latex/font-italic)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-s") #'latex/font-small-caps)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-f") #'latex/font-sans-serif)
   (evil-define-key '(insert visual) TeX-mode-map (kbd "C-w") #'latex/font-current)
