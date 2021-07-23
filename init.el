@@ -862,6 +862,10 @@ CHAR and ARG are as in avy."
     "lbr" #'lsp-workspace-restart
     "lbs" #'lsp-workspace-shutdown
     "lbv" #'lsp-version
+    ;; peek
+    "lp" '(:ignore t :which-key "peek")
+    "lpd" #'lsp-ui-peek-find-definitions
+    "lpr" #'lsp-ui-peek-find-references
     ;; refactor
     "lr" '(:ignore t :which-key "refactor")
     "lrr" #'lsp-rename
