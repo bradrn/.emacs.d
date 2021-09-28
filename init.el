@@ -306,7 +306,7 @@ The optional argument NEW-WINDOW is not used."
 (use-package company
   :commands global-company-mode
   :init
-  (setq company-idle-delay 0.2
+  (setq company-idle-delay 0.3
         company-dabbrev-downcase nil)
   (add-hook 'prog-mode-hook #'(lambda () (company-mode 1)))
   (add-hook 'comint-mode-hook #'(lambda () (company-mode 1)))
