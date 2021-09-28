@@ -293,6 +293,7 @@ The optional argument NEW-WINDOW is not used."
   ;; instead only enable it in modes where I use it:
   (add-hook 'LaTeX-mode-hook #'yas-minor-mode)
   (add-hook 'haskell-mode-hook #'yas-minor-mode)
+  (add-hook 'rustic-mode-hook #'yas-minor-mode)
   (add-hook 'yas-minor-mode-hook #'yas-reload-all))
 (use-package yasnippet-snippets :after yasnippet)
 ;; (use-package helm-c-yasnippet
@@ -961,6 +962,18 @@ CHAR and ARG are as in avy."
 ;;                  0 -1)
 ;;                 "/BootTidal.hs")))
 
+;; rust
+
+(use-package rustic
+  :defer
+  :config
+  (setq rustic-format-on-save nil)
+
+  (mode-leader-define-key rustic-mode-map
+    "b" #'rustic-cargo-build
+    "f" #'rustic-cargo-fmt
+    "r" #'rustic-cargo-run))
+
 ;; python - anaconda
 (use-package python
   :defer
@@ -1532,6 +1545,57 @@ CHAR and ARG are as in avy."
     "h"  '(:ignore t :which-key "help")
     "hd" #'sly-describe-symbol
     "hs" #'hyperspec-lookup))
+
+;; forth
+(use-package gforth
+  :mode (("\\.fs\\'" . forth-mode)
+         ("\\.fb\\'" . forth-block-mode))
+  :load-path "c:/Program Files (x86)/gforth")
+
+;; Coq - Proof General and Company
+;; based on https://github.com/tchajed/spacemacs-coq/blob/785bf0d5e702df2bd6b5c63935c1b8bf8d279b18/packages.el
+;; (use-package proof-general
+;;   :mode ("\\.v\\'" . coq-mode)
+;;   :defer t
+;;   :init
+;;   (mode-leader-define-key coq-mode-map
+;;     ;; Basic proof management
+;;     "]" 'proof-assert-next-command-interactive
+;;     "[" 'proof-undo-last-successful-command
+;;     "." 'proof-goto-point
+;;     ;; Layout
+;;     "ll" 'proof-layout-windows
+;;     "lc" 'pg-response-clear-displays
+;;     "lp" 'proof-prf
+;;     ;; Prover Interaction
+;;     "px" 'proof-shell-exit
+;;     "pc" 'proof-interrupt-process
+;;     "pr" 'proof-retract-buffer
+;;     "pb" 'proof-process-buffer
+;;     ;; Prover queries ('ask prover')
+;;     "af" 'proof-find-theorems
+;;     "ap" 'coq-Print
+;;     "ac" 'coq-Check
+;;     "ab" 'coq-About
+;;     "aip" 'coq-Print-with-implicits
+;;     "aic" 'coq-Check-show-implicits
+;;     "aib" 'coq-About-with-implicits
+;;     "anp" 'coq-Print-with-all
+;;     "anc" 'coq-Check-show-all
+;;     "anb" 'coq-About-with-all
+;;     ;; Moving the point (goto)
+;;     "g." 'proof-goto-end-of-locked
+;;     "ga" 'proof-goto-command-start
+;;     "ge" 'proof-goto-command-end
+;;     ;; Insertions
+;;     "ie" 'coq-end-Section
+;;     ;; Company-coq
+;;     "il" 'company-coq-lemma-from-goal
+;;     "im" 'company-coq-insert-match-construct))
+;; (use-package company-coq
+;;   :defer t
+;;   :init
+;;   (add-hook 'coq-mode-hook #'company-coq-mode))
 
 ;; custom
 (custom-set-variables
