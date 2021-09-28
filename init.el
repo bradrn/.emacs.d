@@ -914,7 +914,7 @@ CHAR and ARG are as in avy."
     "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
 (use-package company-cabal
-  :after (company intero)
+  :after (company lsp-haskell)
   :config
   (add-to-list 'company-backends 'company-cabal))
 (use-package hasky-extensions
