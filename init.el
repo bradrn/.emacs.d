@@ -1419,7 +1419,8 @@ CHAR and ARG are as in avy."
         org-agenda-dim-blocked-tasks t
         org-enforce-todo-checkbox-dependencies t
         org-log-into-drawer t
-        org-startup-folded t)
+        org-startup-folded t
+        org-adapt-indentation t)
 
   ;; (defun format-org-breadcrumbs (sep max-item-length max-output-length brds)
   ;;   (let* ((parts (split-string brds sep))
