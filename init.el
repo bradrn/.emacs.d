@@ -961,6 +961,85 @@ CHAR and ARG are as in avy."
 ;;                  0 -1)
 ;;                 "/BootTidal.hs")))
 
+;; python - anaconda
+(use-package python
+  :defer
+  :config
+  (defun python-start-or-switch-repl ()
+    (interactive)
+    (pop-to-buffer (process-buffer
+                    (or (python-shell-get-process)
+                        (run-python)))))
+
+  (setq python-shell-interpreter "ipython"
+        python-shell-interpreter-args "-i")
+
+  (defun python-run-current-file ()
+    (interactive)
+    ;; set universal argument to put compilation into comint mode
+    (let ((universal-argument t))
+      (compile (concat "python "
+                       (shell-quote-argument (file-name-nondirectory buffer-file-name)))
+               t)))
+
+  (mode-leader-define-key python-mode-map
+    "'" #'python-start-or-switch-repl
+    "r" #'python-run-current-file))
+
+(use-package anaconda-mode
+  :defer
+  :init
+  (add-hook 'python-mode-hook 'anaconda-mode)
+  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+
+(use-package company-anaconda
+  :after (company anaconda-mode)
+  :config
+  (add-to-list 'company-backends 'company-anaconda)
+  
+  (mode-leader-define-key python-mode-map
+    "c" '(:ignore t :which-key "anaconda")
+    "ca" #'conda-env-activate
+    "cd" #'conda-env-deactivate))
+
+(use-package conda
+  :defer
+  :init
+  (setq conda-anaconda-home "C:/Users/bradn/anaconda3/"
+        conda-env-home-directory "C:/Users/bradn/anaconda3/")
+  :config
+  (conda-env-initialize-interactive-shells)
+  (conda-env-initialize-eshell)
+
+  (defun conda-executable-find (command)
+    (let ((paths (shell-command-to-string (concat "conda run where " command))))
+      (car (s-lines paths))))
+
+  ;; override activation function
+  (defun conda-env-shell-init (process)
+  "Activate the current env in a newly opened shell PROCESS."
+  ;; TODO: maintain compatibility with an older Conda version. Do we
+  ;; check the Conda version and cache it?
+  ;; TODO: make sure the shell has been set up for `conda activate`!
+  ;; Do we need to `eval' the conda activation script every time?
+  (let* ((activate-command '("conda" "activate"))
+         (full-command (append activate-command `(,conda-env-current-name "\n")))
+         (command-string (combine-and-quote-strings full-command)))
+    (comint-send-string process "C:\\Users\\bradn\\anaconda3\\Scripts\\activate.bat C:\\Users\\bradn\\anaconda3\n")
+    (comint-send-string process command-string)))
+
+  (defun conda-setup-checkers (&rest args)
+    (interactive)
+    (setq flycheck-python-pylint-executable (conda-executable-find "pylint"))
+    (setq flycheck-python-flake8-executable (conda-executable-find "flake8"))
+    (flycheck-reset-enabled-checker 'python-pylint)
+    (flycheck-reset-enabled-checker 'python-flake8))
+
+  (dolist (func '(conda-env-activate conda-env-deactivate))
+    (advice-add func :after 'conda-setup-checkers))
+
+  (with-eval-after-load 'flycheck))
+
 ;; html
 
 (use-package emmet-mode
