@@ -308,9 +308,9 @@ The optional argument NEW-WINDOW is not used."
   :init
   (setq company-idle-delay 0.2
         company-dabbrev-downcase nil)
-  (add-hook 'prog-mode-hook #'(lambda () (global-company-mode 1)))
-  (add-hook 'comint-mode-hook #'(lambda () (global-company-mode 1)))
-  (add-hook 'LaTeX-mode-hook (lambda () (company-mode -1)))
+  (add-hook 'prog-mode-hook #'(lambda () (company-mode 1)))
+  (add-hook 'comint-mode-hook #'(lambda () (company-mode 1)))
+  ;; (add-hook 'LaTeX-mode-hook (lambda () (company-mode -1)))
   :config
   ;; from spacemacs
   (define-key company-active-map (kbd "C-j") #'company-select-next)
