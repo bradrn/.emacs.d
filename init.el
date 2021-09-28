@@ -1163,6 +1163,18 @@ CHAR and ARG are as in avy."
 
   (add-to-list 'TeX-tree-roots "c:/Users/bradn/AppData/Roaming/MiKTeX/2.9/")
 
+  ;; docs lookup is too slow, remove it from latex-mode
+  (setf (cdr (assoc 'texdoc TeX-doc-backend-alist)) ;
+      ;;'((plain-tex-mode latex-mode doctex-mode ams-tex-mode context-mode)
+        '((plain-tex-mode doctex-mode ams-tex-mode context-mode)
+          (lambda nil
+            (when
+                (executable-find "texdoc")
+              (TeX-search-files-by-type 'docs 'global t t)))
+          (lambda
+            (doc)
+            (call-process "texdoc" nil 0 nil "--view" doc))))
+
   ;; from https://tex.stackexchange.com/questions/286028/inverse-search-with-emacs-auctex-and-sumatrapdf-on-windows-10
   (setq TeX-PDF-mode t)
   (setq TeX-source-correlate-mode t)
