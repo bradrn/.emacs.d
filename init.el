@@ -1210,19 +1210,6 @@ CHAR and ARG are as in avy."
     "os" #'org-save-all-org-buffers)
   :config
 
-  ;; org-protocol
-  (require 'org-protocol)
-
-  (defun org-protocol-capture-notemplate (info)
-    (raise-frame)
-    (org-capture)
-    (message "Item captured.")
-    ;; Make sure we do not return a string, as `server-visit-files',
-    ;; through `server-edit', would interpret it as a file name.
-    nil)
-  (add-to-list 'org-protocol-protocol-alist
-               '("org-capture-notemplate" :protocol "capturent" :function org-protocol-capture-notemplate :kill-client t))
-
   (defun toggle-org-hide-stars ()
     (interactive)
     (setq-local org-hide-leading-stars (not org-hide-leading-stars))
@@ -1243,13 +1230,6 @@ CHAR and ARG are as in avy."
     "g" #'org-set-tags-command
     "*" #'toggle-org-hide-stars
     "," #'org-insert-structure-template)
-  ;; (mode-leader-define-key org-agenda-mode-map
-  ;;   "c" #'org-agenda-columns
-  ;;   "o" #'org-agenda-open-link
-  ;;   "t" #'org-agenda-todo
-  ;;   "s" '(:ignore t :which-key "scheduling")
-  ;;   "ss" #'org-agenda-schedule
-  ;;   "sd" #'org-agenda-deadline)
 
   (use-package evil-org
     :ensure t
@@ -1260,24 +1240,8 @@ CHAR and ARG are as in avy."
     (add-hook 'evil-org-mode-hook
               (lambda ()
                 (evil-org-set-key-theme)))
-    (require 'evil-org-agenda)
-    ;; (evil-org-agenda-set-keys)
-    ;; (evil-define-key 'motion org-agenda-mode-map
-    ;;   "X" #'org-agenda-columns)
-    (evil-define-key 'emacs org-agenda-mode-map
-      "j" #'org-agenda-next-line
-      "k" #'org-agenda-previous-line
-      "J" #'org-agenda-next-item
-      "K" #'org-agenda-previous-item
-      "c" #'org-agenda-capture
-      "x" #'org-agenda-execute
-      "G" #'evil-goto-line
-      "gg" #'evil-goto-first-line
-      "gr" #'org-agenda-redo-all)
-    (if (fboundp #'server-edit)
-        (evil-define-key 'emacs org-agenda-mode-map
-          "Q" #'delete-frame)))
-
+    (require 'evil-org-agenda))
+  
   ;; adapted from https://emacs.stackexchange.com/a/14734/20375
   (defun org-agenda-skip-if-blocked ()
     (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
@@ -1288,16 +1252,9 @@ CHAR and ARG are as in avy."
         ;; WAITING is for tasks which are waiting for some issue to be resolved
         ;; HOLD is for tasks which are waiting indefinitely
         ;; CANCELLED is for tasks for which there is no intention of completion
-        ;; UNANSWERED is for questions which haven’t been asked yet
-        ;; RESOLVED is for questions which have been asked and answered
-        ;; ASKED is for questions which have been asked but not answered
         org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(p)" "|" "DONE(d)")
-          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)")
-          (sequence "UNANSWERED(u)" "|" "RESOLVED(r@/@)")
-          ;; (sequence "UNANSWERED(u)" "ASKNEXT(a)" "|" "RESOLVED(r@/@)")
-          (sequence "QINACTIVE(v)" "|" "NOTASKING(k@)")
-          (sequence "UNREAD(x)" "|" "READ(z)"))
+          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)"))
         org-agenda-custom-commands
         '(("p" "Block agenda"
            ((tags "REFILE"
@@ -1312,66 +1269,6 @@ CHAR and ARG are as in avy."
                   ((org-agenda-overriding-header "Other TODOs")))
             (tags "-university/HOLD"
                   ((org-agenda-overriding-header "Hold tasks")))))
-          ("u" "University"
-           ((tags "REFILE"
-                  ((org-agenda-overriding-header "To refile")))
-            ;; (tags-todo "+university+assignment+SCHEDULED<=\"<now>\"/!TODO"
-            ;;            ((org-agenda-overriding-header "Scheduled assignments")))
-            (tags "+university/NEXT"
-                  ((org-agenda-overriding-header "Next tasks")))
-            (tags "+university+exam+TIMESTAMP<\"<+3w>\""
-                  ((org-agenda-overriding-header "Exams")))
-            (tags "+university+lecture/!"
-                  ((org-agenda-overriding-header "Unwatched lectures")
-                   ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))
-                   ;; (org-agenda-skip-function '(org-agenda-skip-if-blocked))
-                   (org-agenda-dim-blocked-tasks 'invisible)))
-            ;; (tags-todo "+university-lecture-assignment+DEADLINE<\"<+2w>\"/!"
-            (tags-todo "+university-lecture+DEADLINE<\"<now>\"/!"
-                       ((org-agenda-overriding-header "Overdue things")))
-            (tags-todo "+university-lecture+DEADLINE<\"<+2w>\"/!"
-                       ((org-agenda-overriding-header "Deadlines")
-                        (org-agenda-sorting-strategy '(deadline-up))))
-            (tags-todo "+university+assignment+SCHEDULED=\"\"+DEADLINE<\"<+3w>\"|+university+assignment+deadline=\"\"|+university+assignment+SCHEDULED<=\"<now>\"/!TODO|NEXT|INPROGRESS|WAITING"
-                       ((org-agenda-overriding-header "Assignments")
-                        (org-agenda-sorting-strategy '(deadline-up))))
-            (agenda ""
-                    ((org-agenda-span 14)
-                     ;; (org-agenda-start-day "-1d")
-                     ;; (org-agenda-start-on-weekday nil)
-                     (org-deadline-warning-days 0)
-                     (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("HOLD")))
-                     (org-agenda-before-sorting-filter-function
-                      (lambda (line)
-                        (unless (and (string-match "Sched\\." line)
-                                     (equal "INPROGRESS" (get-text-property 0 'todo-state line)))
-                          line)))))
-            (tags-todo "+university/INPROGRESS"
-                       ((org-agenda-overriding-header "In progress")))
-            (tags "+university-lecture-assignment/!TODO"
-                  ((org-agenda-overriding-header "TODO tasks")
-                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-            (tags "+university/HOLD|WAITING"
-                  ((org-agenda-overriding-header "On hold")
-                   (org-agenda-sorting-strategy '(todo-state-up))))))
-          ;; ((org-agenda-overriding-columns-format "%25ITEM %25DEADLINE"))
-          ("q" "Questions"
-           (;; (todo "ASKNEXT"
-            ;;       ((org-agenda-overriding-header "Ask next opportunity")))
-            (tags "+university/!UNANSWERED|WAITING"
-                  ((org-agenda-overriding-header "Unanswered questions (University)")))
-            (tags "-university/!UNANSWERED|WAITING"
-                  ((org-agenda-overriding-header "Unanswered questions (Non-university)")))
-            (tags "+university/RESOLVED"
-                  ((org-agenda-overriding-header "Resolved questions (University)")))
-            (tags "-university/RESOLVED"
-                  ((org-agenda-overriding-header "Resolved questions (Non-university)")))
-            (tags "+university/!ASKED"
-                  ((org-agenda-overriding-header "Unresolved questions (University)")))
-            (tags "-university/!ASKED"
-                  ((org-agenda-overriding-header "Resolved questions (Non-university)")))
-            (todo "QINACTIVE|NOTASKING"
-                  ((org-agenda-overriding-header "Inactive questions (all)"))))))
         org-agenda-show-outline-path t
         org-agenda-breadcrumbs-separator "→"
         org-refile-targets
@@ -1396,36 +1293,6 @@ CHAR and ARG are as in avy."
         org-log-into-drawer t
         org-startup-folded t
         org-adapt-indentation t)
-
-  ;; (defun format-org-breadcrumbs (sep max-item-length max-output-length brds)
-  ;;   (let* ((parts (split-string brds sep))
-  ;;          (cdrs (s-join sep (mapcar (lambda (s) (s-truncate max-item-length s "..")) (cdr parts))))
-  ;;          (cdrs-length (min (length cdrs) (- max-output-length (1+ (length (car parts)))))))
-  ;;     (concat
-  ;;      (s-truncate cdrs-length cdrs "..")
-  ;;      (s-repeat (- max-output-length (+ (length (car parts)) cdrs-length)) " ")
-  ;;      (car parts))))
-
-  (defun format-org-breadcrumbs (sep max-item-length max-output-length brds)
-    (let ((parts (split-string brds sep)))
-      (s-truncate max-output-length
-                  (s-join sep
-                          (mapcar (lambda (s) (s-truncate max-item-length s "..")) parts))
-                  "¬")))
-
-  (defun formatted-breadcrumbs (m n)
-    (format "%%-%d%S" n
-            `(let ((breadcrumbs (org-with-point-at (org-get-at-bol 'org-marker) (org-display-outline-path nil nil org-agenda-breadcrumbs-separator t))))
-               (if (or (equal breadcrumbs "") (equal breadcrumbs nil))
-                   ""
-                 (format-org-breadcrumbs org-agenda-breadcrumbs-separator ,m ,n
-                                         (concat breadcrumbs ""
-                                                 (get-text-property 0 'extra-space breadcrumbs)))))))
-  (setq org-agenda-prefix-format
-        `((todo . ,(concat " " (formatted-breadcrumbs 10 25) " %i %-12:c"))
-          (tags . ,(concat " " (formatted-breadcrumbs 10 25) " %i %-12:c"))
-          (agenda . ,(concat " " (formatted-breadcrumbs 10 25) " %i %-12:c%?-12t% s"))
-          (search . " %i %-12:c")))
 
   ;; from https://lists.gnu.org/archive/html/emacs-orgmode/2015-06/msg00266.html
   (defun org-agenda-delete-empty-blocks ()
