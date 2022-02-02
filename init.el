@@ -742,6 +742,12 @@ CHAR and ARG are as in avy."
   :config
   (evil-unimpaired-define-pair "e" '(move-text-up . move-text-down)))
 
+;; editorconfig
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
+
 ;; s
 (use-package s)
 
