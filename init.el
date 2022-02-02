@@ -797,7 +797,8 @@ CHAR and ARG are as in avy."
    (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
   :init
-  (setq-default lsp-modeline-diagnostics-enable nil)
+  (setq-default lsp-modeline-diagnostics-enable nil
+                lsp-progress-function 'ignore)
   :config
   ;; mostly copied from Spacemacs
   (spc-leader-define-key
