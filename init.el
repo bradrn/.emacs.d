@@ -1268,7 +1268,7 @@ CHAR and ARG are as in avy."
             (tags "-university/TODO"
                   ((org-agenda-overriding-header "Other TODOs")))
             (tags "-university/HOLD"
-                  ((org-agenda-overriding-header "Hold tasks")))))
+                  ((org-agenda-overriding-header "Hold tasks"))))))
         org-agenda-show-outline-path t
         org-agenda-breadcrumbs-separator "→"
         org-refile-targets
