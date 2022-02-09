@@ -1372,8 +1372,9 @@ CHAR and ARG are as in avy."
     "eh" #'sly-eval-last-expression
 
     "h"  '(:ignore t :which-key "help")
-    "hd" #'sly-describe-symbol
-    "hs" #'hyperspec-lookup))
+    "ha" #'sly-apropos
+    "hd" #'hyperspec-lookup
+    "hs" #'sly-describe-symbol))
 
 ;; forth
 (use-package gforth
