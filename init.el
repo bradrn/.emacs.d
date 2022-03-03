@@ -69,6 +69,7 @@
 
 ;; parentheses
 (electric-pair-mode 1)
+(show-paren-mode 1)
 
 ;; save undo history
 (setq undo-tree-auto-save-history t
