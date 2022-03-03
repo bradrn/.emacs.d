@@ -1207,7 +1207,6 @@ CHAR and ARG are as in avy."
     "oa" #'org-agenda
     "ob" #'org-switchb
     "oc" #'org-cycle-agenda-files
-    "ok" #'org-capture
     "os" #'org-save-all-org-buffers)
   :config
 
@@ -1258,9 +1257,7 @@ CHAR and ARG are as in avy."
           (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)"))
         org-agenda-custom-commands
         '(("p" "Block agenda"
-           ((tags "REFILE"
-                  ((org-agenda-overriding-header "To refile")))
-            (tags "-university/INPROGRESS"
+           ((tags "-university/INPROGRESS"
                   ((org-agenda-overriding-header "In progress")))
             (tags "-university/NEXT"
                   ((org-agenda-overriding-header "Next tasks")))
@@ -1272,19 +1269,7 @@ CHAR and ARG are as in avy."
                   ((org-agenda-overriding-header "Hold tasks"))))))
         org-agenda-show-outline-path t
         org-agenda-breadcrumbs-separator "→"
-        org-refile-targets
-        '((nil :maxlevel . 9)
-          (org-agenda-files :maxlevel . 9))
-        org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil ; for helm, see https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
-        org-refile-allow-creating-parent-nodes 'confirm
-        org-capture-templates
-        '(("t" "todo" entry (file "~/Dropbox/org/refile.org")
-           "* TODO %?")
-          ("e" "event" entry (file "~/Dropbox/org/refile.org")
-           "* %?\n  %^T")
-          ("q" "question" entry (file "~/Dropbox/org/refile.org")
-           "* UNANSWERED %?"))
         org-archive-mark-done nil
         org-archive-location "%s_archive::* Archived Tasks"
         org-enforce-todo-dependencies t
