@@ -1279,6 +1279,26 @@ CHAR and ARG are as in avy."
               (lambda ()
                 (evil-org-set-key-theme)))
     (require 'evil-org-agenda))
+
+  (use-package zotxt
+    :config
+    ;; modified so everything is inserted on one line
+    (with-eval-after-load 'zotxt
+      (defun org-zotxt-insert-reference-links-to-items (items)
+        "Insert links to Zotero ITEMS in buffer."
+        (mapc (lambda (item)
+                (org-zotxt-insert-reference-link-to-item item))
+              ;; (insert "\n")
+              ;; (forward-line 1))
+              items)))
+
+    (setq zotxt-default-bibliography-style "mkbehr-short"
+          org-zotxt-link-description-style :citekey)
+    (mode-leader-define-key org-mode-map
+      "zz" #'org-zotxt-mode
+      "zi" #'org-zotxt-insert-reference-link
+      "zu" #'org-zotxt-update-reference-link-at-point
+      "za" #'org-zotxt-open-attachment))
   
   ;; adapted from https://emacs.stackexchange.com/a/14734/20375
   (defun org-agenda-skip-if-blocked ()
