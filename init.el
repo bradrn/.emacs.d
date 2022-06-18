@@ -19,7 +19,7 @@
 (setq backup-by-copying t)
 (setq read-process-output-max (* 1024 1024))                  ; increase amount of data read from process - recommended by lsp docs
 
-(defalias 'yes-or-no-p 'y-or-n-p)
+(setq use-short-answers t)
 
 ;; recentf
 (setq recentf-auto-cleanup 'never)
