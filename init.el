@@ -196,6 +196,7 @@ The optional argument NEW-WINDOW is not used."
   (evil-set-initial-state 'sly-db-mode 'emacs)
   (evil-set-initial-state 'flycheck-error-list-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'Info-mode 'emacs)
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
 
