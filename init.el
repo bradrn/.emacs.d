@@ -157,6 +157,8 @@ The optional argument NEW-WINDOW is not used."
         solarized-scale-org-headlines nil))
 (use-package gruvbox-theme
   :defer)
+(use-package spacemacs-theme
+  :defer)
 ;; (load-theme 'doom-one t)
 
 ;; hl-todo
@@ -561,9 +563,12 @@ The optional argument NEW-WINDOW is not used."
     "it"  '(:ignore t :which-key "themes")
     "itdo" (lambda () (interactive) (counsel--load-theme-action "doom-one"))
     "itle" (lambda () (interactive) (counsel--load-theme-action "leuven"))
+    "itpd" (lambda () (interactive) (counsel--load-theme-action "spacemacs-dark"))
+    "itpl" (lambda () (interactive) (counsel--load-theme-action "spacemacs-light"))
     "itsd" (lambda () (interactive) (counsel--load-theme-action "solarized-dark"))
     "itsl" (lambda () (interactive) (counsel--load-theme-action "solarized-light"))
     "itgs" (lambda () (interactive) (counsel--load-theme-action "gruvbox-light-soft"))
+    "itx"  (lambda () (interactive) (mapc #'disable-theme custom-enabled-themes))
     "itt" #'counsel-load-theme
     "iw"  #'whitespace-mode
     "ic"  '(:ignore t :which-key "customise")
