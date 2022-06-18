@@ -582,6 +582,7 @@ The optional argument NEW-WINDOW is not used."
     "is"  '(:ignore t :which-key "flyspell")
     "iss" #'flyspell-mode
     "isx" #'flyspell-buffer
+    "ix"  #'toggle-truncate-lines
     "ip"  #'show-paren-mode
 
     "g"   #'magit-status
