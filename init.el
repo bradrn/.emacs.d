@@ -805,7 +805,8 @@ CHAR and ARG are as in avy."
   :commands lsp
   :init
   (setq-default lsp-modeline-diagnostics-enable nil
-                lsp-progress-function 'ignore)
+                lsp-progress-function 'ignore
+                lsp-lens-enable nil)
   :config
   ;; mostly copied from Spacemacs
   (spc-leader-define-key
