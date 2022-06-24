@@ -927,13 +927,6 @@ CHAR and ARG are as in avy."
    "xd" #'hasky-extensions-browse-docs)
   :config
   (add-to-list 'hasky-extensions "OverloadedLabels" t))
-(use-package hasky-stack
-  :commands hasky-stack-execute
-  :init
-  (mode-leader-define-key haskell-mode-map
-   "s" #'hasky-stack-execute)
-  :config
-  (magit-define-popup-switch 'hasky-stack-build-popup ?C "No color" "--color=never" t))
 
 (use-package shakespeare-mode
   :defer
