@@ -1206,31 +1206,8 @@ CHAR and ARG are as in avy."
     "iow" #'olivetti-set-width))
 
 ;; org
-(add-to-list 'package-pinned-packages '(org . "gnu"))
-(unless (package--user-installed-p 'org)
-  ;; taken from use-package’s use-package-ensure-elpa
-  (condition-case-unless-debug err
-      (progn
-        (when (assoc package (bound-and-true-p
-                              package-pinned-packages))
-          (package-read-all-archive-contents))
-        (if (assoc package package-archive-contents)
-            (package-install package)
-          (package-refresh-contents)
-          (when (assoc package (bound-and-true-p
-                                package-pinned-packages))
-            (package-read-all-archive-contents))
-          (package-install package))
-        t)
-    (error
-     (display-warning 'use-package
-                      (format "Failed to install %s: %s"
-                              name (error-message-string err))
-                      :error))))
 
 (use-package org
-  ;; :ensure t
-  ;; :pin org
   :defer
   :init
   (spc-leader-define-key
