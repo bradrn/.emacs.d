@@ -1228,7 +1228,8 @@ CHAR and ARG are as in avy."
     "e" #'org-export-dispatch
     "i" #'org-insert-item
     "t" #'org-todo
-    "w" #'org-refile
+    "w" #'org-table-toggle-column-width
+    "W" #'org-refile
     "K" #'org-ctrl-c-ctrl-c
     "r" #'org-reveal
     "s" '(:ignore t :which-key "scheduling")
