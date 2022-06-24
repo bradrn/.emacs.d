@@ -1295,7 +1295,29 @@ CHAR and ARG are as in avy."
             (tags "-university/TODO"
                   ((org-agenda-overriding-header "Other TODOs")))
             (tags "-university/HOLD"
-                  ((org-agenda-overriding-header "Hold tasks"))))))
+                  ((org-agenda-overriding-header "Hold tasks")))))
+          ("u" "University"
+           ((tags "+university/NEXT"
+                  ((org-agenda-overriding-header "Next tasks")))
+            (tags "+university+lecture/!"
+                  ((org-agenda-overriding-header "Unwatched lectures")))
+            (tags-todo "+university-lecture+DEADLINE<\"<+2w>\"/!"
+                       ((org-agenda-overriding-header "Deadlines")
+                        (org-agenda-sorting-strategy '(deadline-up))))
+            (tags-todo "+university+assignment+SCHEDULED=\"\"+DEADLINE<\"<+3w>\"|+university+assignment+deadline=\"\"|+university+assignment+SCHEDULED<=\"<now>\"/!TODO|NEXT|INPROGRESS|WAITING"
+                       ((org-agenda-overriding-header "Assignments")
+                        (org-agenda-sorting-strategy '(deadline-up))))
+            (agenda ""
+                    ((org-agenda-span 14)
+                     (org-deadline-warning-days 0)
+                     (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("HOLD")))
+                     (org-agenda-before-sorting-filter-function
+                      (lambda (line)
+                        (unless (and (string-match "Sched\\." line)
+                                     (equal "INPROGRESS" (get-text-property 0 'todo-state line)))
+                          line)))))
+            (tags-todo "+university/INPROGRESS"
+                       ((org-agenda-overriding-header "In progress"))))))
         org-agenda-show-outline-path t
         org-agenda-breadcrumbs-separator "→"
         org-outline-path-complete-in-steps nil ; for helm, see https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html
