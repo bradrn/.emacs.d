@@ -8,54 +8,78 @@
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)))
 
-;; some saner defaults
-(setq gc-cons-threshold 100000000)
-(setq vc-make-backup-files t)                                 ; make backups file even when in version controlled dir
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups"))) ; which directory to put backups file
-(setq inhibit-startup-screen t)                               ; inhibit useless and old-school startup screen
+;; basic config
+
+(defvar last-file-name-handler-alist file-name-handler-alist)
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6
+      file-name-handler-alist nil)
+
+(setq package-quickstart t)
+(setq vc-make-backup-files t)
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+(setq inhibit-startup-screen t)
 (set-language-environment "UTF-8")
-(setq default-fill-column 80)                                 ; toggle wrapping text at the 80th character
-(setq-default inhibit-compacting-font-caches t)               ; dont compact large fonts
+(setq-default inhibit-compacting-font-caches t)
 (setq backup-by-copying t)
-(setq read-process-output-max (* 1024 1024))                  ; increase amount of data read from process - recommended by lsp docs
-
+(setq read-process-output-max (* 1024 1024))
 (setq use-short-answers t)
-
-;; recentf
-(setq recentf-auto-cleanup 'never)
-(recentf-mode 1)
-(setq recentf-max-menu-items 50)
-
-;; spaces not tabs
-(setq-default indent-tabs-mode nil)
-(setq tab-width 4)
-
-;; scratch buffer is fundamental
 (setq initial-major-mode 'fundamental-mode)
 
-(setq package-enable-at-startup nil) ; tells emacs not to load any packages before starting up
-;; the following lines tell emacs where on the internet to look up
-;; for new packages.
-(setq package-archives '(("gnu"       . "http://elpa.gnu.org/packages/")
-                         ("melpa"     . "http://melpa.org/packages/")))
-(package-initialize) ; guess what this one does ?
 
-(defun package--save-selected-packages (&rest opt) nil)
+;; appearance
 
-;; use-package
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(require 'use-package)
-
-(setq use-package-always-ensure t)
-
-;; bars
+(add-to-list 'default-frame-alist '(fullscreen . maximized))  ; https://emacs.stackexchange.com/a/3008
+(setq-default indent-tabs-mode nil)
+(setq tab-width 4)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
+;; see https://emacs.stackexchange.com/a/50136/20375
+(global-linum-mode -1)
+(setq display-line-numbers-type 'visual)
+(global-display-line-numbers-mode)
+
+(add-to-list 'default-frame-alist
+             (if (eq system-type 'gnu/linux)
+                 '(font . "Ubuntu Mono 12")
+               '(font . "Consolas 10")))
+
+
+;; UI
+
+(electric-pair-mode 1)
+(show-paren-mode 1)
+
+(setq scroll-preserve-screen-position t
+      scroll-margin 3
+      scroll-conservatively 101)
+
+(setq recentf-auto-cleanup 'never
+      recentf-max-menu-items 50)
+(recentf-mode 1)
+
+(setq ispell-dictionary "british")
+(setq-default ispell-program-name "c:/cygwin64/bin/aspell.exe")
+
+;; utilities
+
+;; thanks http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/
+(defun find-user-init-file ()
+  "Edit the `user-init-file', in another window."
+  (interactive)
+  (find-file user-init-file))
+
+;; thanks https://emacs.stackexchange.com/a/18064/20375
+(defun switch-to-previous-buffer ()
+  (interactive)
+  (switch-to-buffer (other-buffer)))
+
+(defun set-selective-display-current-column ()
+  (interactive)
+  (set-selective-display
+   (if selective-display nil (1+ (current-column)))))
 
 ;; server - from https://stackoverflow.com/a/5571983/7345298
 (defun start-server-if-not-running ()
@@ -64,119 +88,25 @@
   (load "server")
   (unless (server-running-p) (server-start)))
 
-;; (run-with-idle-timer 1 nil #'start-server-if-not-running)
+;; packaging
 
-;; parentheses
-(electric-pair-mode 1)
-(show-paren-mode 1)
+(setq package-archives
+      '(("gnu"   . "http://elpa.gnu.org/packages/")
+        ("melpa" . "http://melpa.org/packages/")))
+(package-initialize)
 
-;; save undo history
-(setq undo-tree-auto-save-history t
-      undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
-(global-undo-tree-mode 1)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
 
-;; use #' - from http://endlessparentheses.com/get-in-the-habit-of-using-sharp-quote.html
-(defun elisp-insert-sharp ()
-  "Insert #' unless in a string or comment."
-  (interactive)
-  (call-interactively #'self-insert-command)
-  (let ((ppss (syntax-ppss)))
-    (unless (or (elt ppss 3)
-                (elt ppss 4)
-                (eq (char-after) ?'))
-      (insert "'"))))
-(define-key emacs-lisp-mode-map "#" #'elisp-insert-sharp)
+(use-package try :defer t)
 
-;; https://emacs.stackexchange.com/a/3008
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; font
-(add-to-list 'default-frame-alist
-             (if (eq system-type 'gnu/linux)
-                 '(font . "Ubuntu Mono 12")
-               '(font . "Consolas 10")))
+;; keybinds
 
-(use-package unicode-fonts
-  :preface
-
-  ;; see https://github.com/rolandwalker/unicode-fonts/issues/3#issuecomment-93392177
-  (defun my-hook-unicode-fonts-setup (frame)
-  "Run unicode-fonts-setup, then remove the hook."
-  (progn
-      (select-frame frame)
-      (unicode-fonts-setup)
-      (message "Removing unicode-fonts-setup to after-make-frame-functions hook")
-      (remove-hook 'after-make-frame-functions 'my-hook-unicode-fonts-setup)))
-
-  :init
-  (add-hook 'after-make-frame-functions 'my-hook-unicode-fonts-setup nil))
-
-;; smooth scrolling
-(setq scroll-preserve-screen-position t
-      scroll-margin 3
-      scroll-conservatively 101)
-
-;; open Hoogle URLs with Qutebrowser
-(setq browse-url-qute-arguments nil)
-(setq browse-url-qute-program '"c:/Program Files/qutebrowser/qutebrowser.exe")
-(defun browse-url-qute (url &optional _new-window)
-  "Ask the Qutebrowser WWW browser to load URL.
-Default to the URL around or before point.  The strings in
-variable `browse-url-qute-arguments' are also passed to
-Qutebrowser.
-The optional argument NEW-WINDOW is not used."
-  (interactive (browse-url-interactive-arg "URL: "))
-  (setq url (browse-url-encode-url url))
-  (let* ((process-environment (browse-url-process-environment)))
-    (apply 'start-process
-	   (concat "qutebrowser " url) nil
-	   browse-url-qute-program
-	   (append
-	    browse-url-qute-arguments
-	    (list url)))))
-(setq browse-url-browser-function
-      '(("hoogle" . browse-url-qute)
-        ("." . browse-url-default-browser)))
-
-;; line numbers - see https://emacs.stackexchange.com/a/50136/20375
-(global-linum-mode -1)
-(setq display-line-numbers-type 'visual)
-(global-display-line-numbers-mode)
-
-;; theme
-(use-package doom-themes
-  :defer t
-  :config
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (doom-themes-org-config))
-(use-package solarized-theme
-  :defer
-  :init
-  (setq solarized-use-variable-pitch nil
-        solarized-scale-org-headlines nil))
-(use-package gruvbox-theme
-  :defer)
-(use-package spacemacs-theme
-  :defer)
-;; (load-theme 'doom-one t)
-
-;; hl-todo
-(use-package hl-todo
-  :defer .1
-  :config
-  (global-hl-todo-mode))
-
-;; fill-column-indicator
-(use-package fill-column-indicator
-  :defer t
-  :config
-  (setq fci-always-use-textual-rule t
-        fci-rule-character 9474))
-
-;; evil
 (use-package evil
-  ;; :defer .1
   :init
   (setq-default evil-move-beyond-eol t
                 evil-ex-substitute-global t
@@ -218,199 +148,60 @@ The optional argument NEW-WINDOW is not used."
   ;; setup for nerd-commenter
   (define-key evil-normal-state-map "gc" #'evilnc-comment-operator))
 (use-package evil-escape
-  :after evil
+  :defer
+  :commands (evil-escape-pre-command-hook)
   :init
   (setq-default evil-escape-key-sequence "jw"
                 evil-escape-delay 0.2)
-  :config
-  (evil-escape-mode))
-(use-package evil-surround
-  :after evil
-  :config
-  (global-evil-surround-mode 1))
+  (add-hook 'pre-command-hook 'evil-escape-pre-command-hook))
+(use-package evil-exchange
+  :defer
+  :init
+  (setq evil-exchange-key "gx"
+        evil-exchange-cancel-key "gX")
+  (define-key evil-normal-state-map evil-exchange-key 'evil-exchange)
+  (define-key evil-visual-state-map evil-exchange-key 'evil-exchange)
+  (define-key evil-normal-state-map evil-exchange-cancel-key 'evil-exchange-cancel)
+  (define-key evil-visual-state-map evil-exchange-cancel-key 'evil-exchange-cancel))
+;; (use-package evil-indent-plus :config (evil-indent-plus-default-bindings))
+(use-package evil-lion
+  :defer
+  :init
+  (setq evil-lion-left-align-key "gl"
+        evil-lion-right-align-key "gL")
+  (define-key evil-normal-state-map evil-lion-left-align-key 'evil-lion-left)
+  (define-key evil-visual-state-map evil-lion-left-align-key 'evil-lion-left)
+  (define-key evil-normal-state-map evil-lion-right-align-key 'evil-lion-right)
+  (define-key evil-visual-state-map evil-lion-right-align-key 'evil-lion-right))
+(use-package evil-matchit
+  :defer
+  :init
+  (evil-set-command-property 'evilmi-jump-items :keep-visual t)
+  (define-key evil-normal-state-map "%" 'evilmi-jump-items)
+  (define-key evil-visual-state-map "%" 'evilmi-jump-items))
+(use-package evil-nerd-commenter :commands (evilnc-comment-operator))
+(use-package evil-numbers)
+(use-package evil-surround :config (global-evil-surround-mode 1))
 (use-package evil-snipe
-  :after evil
-  :config
+  :defer
+  :init
   (setq evil-snipe-scope 'buffer
         evil-snipe-smart-case t)
   (evil-snipe-mode 1))
-(use-package evil-nerd-commenter
-  :after evil
-  :commands evilnc-comment-operator)
-(use-package evil-exchange
-  :after evil
-  :config
-  (evil-exchange-install))
 (use-package evil-unimpaired
-  :after evil
   :load-path "~/.emacs.d/evil-unimpaired"
   :config
   (evil-unimpaired-mode t)
-  (evil-unimpaired-define-pair "q" '(flycheck-previous-error . flycheck-next-error)))
-;; (use-package evil-search-highlight-persist
-;;   :after evil
-;;   :config
-;;   (global-evil-search-highlight-persist t))
-(use-package evil-god-state
-  :after evil
-  :config
-  (evil-global-set-key 'normal "\\" 'evil-execute-in-god-state)
-  (add-hook 'evil-god-state-entry-hook (lambda () (setq cursor-type 'hollow)))
-  (add-hook 'evil-god-state-exit-hook (lambda () (setq cursor-type 'box))))
-(use-package evil-matchit
-  :after evil
-  :config
-  (global-evil-matchit-mode 1))
-(use-package evil-indent-plus
-  :after evil
-  :config
-  (evil-indent-plus-default-bindings))
-(use-package evil-lion
-  :after evil
-  :config
-  (evil-lion-mode))
-(use-package evil-numbers
-  :after evil)
-
+  (evil-unimpaired-define-pair "q" '(flycheck-previous-error . flycheck-next-error))
+  (use-package move-text
+    :defer
+    :init
+    (evil-unimpaired-define-pair "e" '(move-text-up . move-text-down))))
 (use-package evil-collection
-  :after evil
   :config
-  (with-eval-after-load 'magit (evil-collection-magit-setup)))
+  (with-eval-after-load 'magit
+    (evil-collection-magit-setup)))
 
-;; magit
-(use-package magit
-  :defer
-  :config
-  (evil-define-key 'normal with-editor-mode-map
-    (kbd "KK") 'with-editor-finish
-    (kbd "Kk") 'with-editor-finish
-    (kbd "KC") 'with-editor-cancel
-    (kbd "Kc") 'with-editor-cancel)
-  (add-hook 'git-commit-setup-hook 'evil-insert-state))
-
-;; yasnippet
-(use-package yasnippet
-  :commands yas-minor-mode
-  :init
-  ;; don’t use yas-global-mode - it takes too much time at startup
-  ;; instead only enable it in modes where I use it:
-  (add-hook 'LaTeX-mode-hook #'yas-minor-mode)
-  (add-hook 'haskell-mode-hook #'yas-minor-mode)
-  (add-hook 'rustic-mode-hook #'yas-minor-mode)
-  (add-hook 'yas-minor-mode-hook #'yas-reload-all))
-(use-package yasnippet-snippets :after yasnippet)
-;; (use-package helm-c-yasnippet
-;;   :after (yasnippet helm)
-;;   :commands helm-yas-complete)
-(use-package ivy-yasnippet
-  :after (yasnippet ivy)
-  :commands ivy-yasnippet)
-
-;; company
-(use-package company
-  :commands global-company-mode
-  :init
-  (setq company-idle-delay 0.4
-        company-dabbrev-downcase nil)
-  (add-hook 'prog-mode-hook #'(lambda () (company-mode 1)))
-  (add-hook 'comint-mode-hook #'(lambda () (company-mode 1)))
-  ;; (add-hook 'LaTeX-mode-hook (lambda () (company-mode -1)))
-  :config
-  ;; from spacemacs
-  (define-key company-active-map (kbd "C-j") #'company-select-next)
-  (define-key company-active-map (kbd "C-k") #'company-select-previous)
-  (define-key company-active-map (kbd "C-l") #'company-complete-selection)
-  (with-eval-after-load 'counsel
-    (define-key company-mode-map   (kbd "C-:") #'counsel-company)
-    (define-key company-active-map (kbd "C-:") #'counsel-company))
-  (spc-leader-define-key "im" #'company-mode))
-;; (use-package helm-company
-;;   :after (company helm)
-;;   :commands helm-company
-;;   :init
-;;   (define-key company-mode-map   (kbd "C-:") #'helm-company)
-;;   (define-key company-active-map (kbd "C-:") #'helm-company))
-
-;; origami
-(use-package origami
-  :defer
-  :init
-  (add-hook 'prog-mode-hook #'origami-mode)
-  (add-hook 'LaTeX-mode-hook #'origami-mode))
-
-;; rainbow-delimiters
-(use-package rainbow-delimiters
-  :init
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-(use-package lispy
-  :defer
-  :init
-  (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
-  (add-hook 'lisp-mode-hook       (lambda () (lispy-mode 1)))
-  (add-hook 'lispy-mode-hook #'lispyville-mode)
-  :config
-  (setq lispy-close-quotes-at-end-p t))
-(use-package lispyville
-  :after (lispy yasnippet)
-  :commands lispyville-mode
-  :init
-  (with-eval-after-load 'evil
-    (let ((pos (memq 'evil-mode-line-tag mode-line-format)))
-      (setcdr pos (cons
-                   '(:eval (when (featurep 'lispyville)
-                             (lispyville-mode-line-string "l-special" "")))
-                   (cdr pos)))))
-  :config
-  (lispyville-set-key-theme
-   '(operators
-     c-w
-     text-objects
-     ;; atom-movement
-     additional-movement
-     commentary
-     slurp/barf-cp
-     wrap
-     additional
-     additional-insert
-     escape)))
-
-;; flycheck
-(use-package flycheck
-  :commands global-flycheck-mode
-  :init
-  (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (setq flycheck-navigation-minimum-level 'error)
-  (add-hook 'prog-mode-hook #'flycheck-mode))
-  ;; :config
-  ;; (setq flycheck-error-list-format
-  ;;       `[("File" 6)
-  ;;         ("Line" 5 flycheck-error-list-entry-< :right-align t)
-  ;;         ("Col" 3 nil :right-align t)
-  ;;         ("Level" 8 flycheck-error-list-entry-level-<)
-  ;;         ("ID" 6 t)
-  ;;         (,(flycheck-error-list-make-last-column "Message" 'Checker) 0 t)])
-;; (use-package flycheck-inline
-;;   :after flycheck
-;;   :config
-;;   (flycheck-inline-mode)
-
-;;   (defun flycheck-inline-display-errors-unless-error-list (errors)
-;;     "Show messages of ERRORS unless the error list is visible.
-
-;; Like `flycheck-inline-display-errors', but only if the error
-;; list (see `flycheck-list-errors') is not visible in any window in
-;; the current frame."
-;;     (unless (flycheck-get-error-list-window 'current-frame)
-;;       (flycheck-inline-display-errors errors)))
-
-;;   (setq-default flycheck-display-errors-function #'flycheck-inline-display-errors-unless-error-list))
-
-;; flyspell
-(setq ispell-dictionary "british")
-(setq-default ispell-program-name "c:/cygwin64/bin/aspell.exe")
-
-;; ivy
 (use-package ivy
   :config
   (ivy-mode 1)
@@ -429,14 +220,10 @@ The optional argument NEW-WINDOW is not used."
   (define-key ivy-switch-buffer-map (kbd "C-k") #'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "C-l") #'ivy-alt-done)
   (define-key ivy-minibuffer-map (kbd "<C-return>") #'ivy-immediate-done))
-
 (use-package counsel
-  :after ivy
-
-  :config
+  :defer
+  :init
   (global-set-key (kbd "M-x") #'counsel-M-x)
-  (define-key counsel-find-file-map (kbd "C-h") #'counsel-up-directory)
-
   ;; from https://oremacs.com/2015/06/23/counsel-load-theme/
   (defun counsel--load-theme-action (x)
     "Disable current themes and load theme X."
@@ -447,7 +234,6 @@ The optional argument NEW-WINDOW is not used."
           (when (fboundp 'powerline-reset)
             (powerline-reset)))
       (error "Problem loading theme %s" x)))
-
   (defun counsel-load-theme ()
     "Forward to `load-theme'.
   Usable with `ivy-resume', `ivy-next-line-and-call' and
@@ -456,70 +242,9 @@ The optional argument NEW-WINDOW is not used."
     (ivy-read "Load custom theme: "
               (mapcar 'symbol-name
                       (custom-available-themes))
-              :action #'counsel--load-theme-action)))
-
-;; ;; helm
-;; (use-package helm
-;;   ;; :defer .1
-;;   :defer 2
-;;   :config
-;;   (helm-mode 1)
-;;   (global-set-key (kbd "M-x") #'helm-M-x)
-
-;;   (add-hook 'helm-major-mode-hook
-;;             (lambda ()
-;;               (setq auto-composition-mode nil)))
-
-;;   ;; always display helm at bottom - adapted from spacemacs
-;;   (setq helm-display-function
-;;         (lambda (buffer &optional resume)
-;;           (let ((display-buffer-alist
-;;                  (list '("*.*Helm.*Help.**")
-;;                        '("*.*helm.**"
-;;                          (display-buffer-in-side-window)
-;;                          (inhabit-same-window . t)
-;;                          (side . bottom)        ; the important line!!
-;;                          (window-width . 0.6)
-;;                          (window-height . 0.4)))))
-;;             (helm-default-display-buffer buffer))))
-
-;;   (setq helm-split-window-inside-p t)
-
-;;   ;; from https://github.com/syl20bnr/spacemacs/blob/c7a103a772d808101d7635ec10f292ab9202d9ee/layers/%2Bspacemacs/spacemacs-completion/funcs.el#L78
-;;   (define-key helm-map (kbd "C-j") #'helm-next-line)
-;;   (define-key helm-map (kbd "C-k") #'helm-previous-line)
-;;   (define-key helm-map (kbd "C-h") #'helm-next-source)
-;;   (define-key helm-map (kbd "C-S-h") #'describe-key)
-;;   (define-key helm-map (kbd "C-l") (kbd "RET"))
-;;   (with-eval-after-load 'helm-files
-;;     (dolist (keymap (list helm-find-files-map helm-read-file-map))
-;;       (define-key keymap (kbd "C-l") #'helm-execute-persistent-action)
-;;       (define-key keymap (kbd "C-h") #'helm-find-files-up-one-level)
-;;       ;; rebind `describe-key' for convenience
-;;       (define-key keymap (kbd "C-S-h") #'describe-key))))
-;; (use-package helm-flx
-;;   :config
-;;   (setq helm-flx-for-helm-find-files nil)
-;;   (helm-flx-mode))
-;; (use-package helm-themes
-;;   :commands (helm-themes helm-themes--load-theme))
-
-;; helpful
-(use-package helpful
-  :commands (helpful-callable helpful-variable helpful-key helpful-command)
-  :init
-  (global-set-key (kbd "C-h f") #'helpful-callable)
-  (global-set-key (kbd "C-h v") #'helpful-variable)
-  (global-set-key (kbd "C-h k") #'helpful-key)
-  (global-set-key (kbd "C-h c") #'helpful-command)
+              :action #'counsel--load-theme-action))
   :config
-  (evil-define-key 'normal helpful-mode-map "q" 'quit-window))
-
-;; thanks http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/
-(defun find-user-init-file ()
-  "Edit the `user-init-file', in another window."
-  (interactive)
-  (find-file user-init-file))
+  (define-key counsel-find-file-map (kbd "C-h") #'counsel-up-directory))
 
 (use-package which-key
   :config
@@ -527,36 +252,17 @@ The optional argument NEW-WINDOW is not used."
   (which-key-mode)
   (which-key-enable-god-mode-support))
 
-;; thanks https://emacs.stackexchange.com/a/18064/20375
-(defun switch-to-previous-buffer ()
-  (interactive)
-  (switch-to-buffer (other-buffer)))
-
-;; from https://github.com/flycheck/flycheck/issues/710#issue-98533622
-(defun flycheck-list-errors-toggle ()
-  "Toggle the error list for the current buffer."
-  (interactive)
-  (let ((flycheck-errors-window (get-buffer-window flycheck-error-list-buffer)))
-    (if (not (window-live-p flycheck-errors-window))
-        (call-interactively 'flycheck-list-errors)
-      (delete-window flycheck-errors-window))))
-
-(defun set-selective-display-current-column ()
-  (interactive)
-  (set-selective-display
-   (if selective-display nil (1+ (current-column)))))
-
 (use-package general
   :config
   (general-create-definer spc-leader-define-key
-   :states '(normal visual insert emacs)
-   :prefix "SPC"
-   :non-normal-prefix "C-SPC")
+    :states '(normal visual insert emacs)
+    :prefix "SPC"
+    :non-normal-prefix "C-SPC")
 
   (general-create-definer mode-leader-define-key
-   :states '(normal visual insert emacs)
-   :prefix "K"
-   :non-normal-prefix "C-0")
+    :states '(normal visual insert emacs)
+    :prefix "K"
+    :non-normal-prefix "C-0")
 
   (spc-leader-define-key
     "SPC" #'counsel-M-x
@@ -576,21 +282,17 @@ The optional argument NEW-WINDOW is not used."
 
     "c"   #'evil-ex-nohighlight
 
-    "ee"   #'flycheck-list-errors-toggle
-    "ec"   #'flycheck-buffer
-
     "f"   '(:ignore t :which-key "files")
     "ff"  #'counsel-find-file
     "fi"  #'find-user-init-file
     "fr"  #'counsel-recentf
     "fs"  #'save-buffer
-    ;; "ft"  #'helm-etags-select
+    "fw"  #'write-file
     "fx"  #'delete-file
 
     "h"   #'help-command
 
     "i"   '(:ignore t :which-key "UI")
-    "if"  #'fci-mode
     "iu"  #'undo-tree-visualize
     "it"  '(:ignore t :which-key "themes")
     "itdo" (lambda () (interactive) (counsel--load-theme-action "doom-one"))
@@ -610,16 +312,13 @@ The optional argument NEW-WINDOW is not used."
     "il"  '(:ignore t :which-key "calc")
     "ilq" #'quick-calc
     "ilc" #'calc
-    "is"  '(:ignore t :which-key "flyspell")
+    "is" '(:ignore t :which-key "flyspell")
     "iss" #'flyspell-mode
     "isx" #'flyspell-buffer
     "ix"  #'toggle-truncate-lines
     "ip"  #'show-paren-mode
 
-    "g"   #'magit-status
-
     "j"   '(:ignore t :which-key "jump")
-    ;; "ji"  #'helm-semantic-or-imenu
     "jw"  #'subword-mode
 
     "k"   #'kill-compilation
@@ -645,7 +344,6 @@ The optional argument NEW-WINDOW is not used."
     "wj"  #'evil-window-down
     "wk"  #'evil-window-up
     "wo"  #'delete-other-windows
-    "wx"  #'ace-delete-window
     "wz"  #'delete-frame
     "wl"  #'evil-window-right
     "wq"  #'delete-window
@@ -655,111 +353,87 @@ The optional argument NEW-WINDOW is not used."
     "wK"  #'evil-window-move-very-top
     "wQ"  #'kill-buffer-and-window
     "w-"  #'split-window-below
-    "w/"  #'split-window-right
+    "w/"  #'split-window-right)
 
-    "x"   #'ivy-yasnippet))
+  (evil-define-key 'normal with-editor-mode-map
+    (kbd "KK") 'with-editor-finish
+    (kbd "Kk") 'with-editor-finish
+    (kbd "KC") 'with-editor-cancel
+    (kbd "Kc") 'with-editor-cancel))
 
-;; keybindings for elisp
-(mode-leader-define-key emacs-lisp-mode-map
- "e"  '(:ignore t :which-key "eval")
- "ee" 'eval-defun
- "eh" 'eval-last-sexp
- "er" 'eval-region
- "ex" 'eval-expression
- "p"  '(:ignore t :which-key "eval with pp")
- "pe" 'pp-eval-last-sexp
- "px" 'pp-eval-expression
- "pm" 'pp-macroexpand-last-sexp)
-
-;; avy
-(defun avy-goto-char-forward-char (char &optional arg)
-  "Run `avy-goto-char', then move forward one character.
-CHAR and ARG are as in avy."
-  (interactive (list (read-char "char: " t)
-                     current-prefix-arg))
-  (avy-goto-char char arg)
-  (forward-char))
 (use-package avy
-  :defer t
-  :commands avy-goto-char-forward-char
+  :defer
   :init
+  (defun avy-goto-char-forward-char (char &optional arg)
+    "Run `avy-goto-char', then move forward one character.
+CHAR and ARG are as in avy."
+    (interactive (list (read-char "char: " t)
+                       current-prefix-arg))
+    (avy-goto-char char arg)
+    (forward-char))
   (spc-leader-define-key
-   "jj"  #'evil-avy-goto-char
-   "jJ"  #'evil-avy-goto-char-2
-   "jk"  #'avy-goto-char-forward-char
-   "jl"  #'avy-goto-line))
-
-;; define-word
-(use-package define-word
-    :defer t
-    :init
-    (spc-leader-define-key
-     "d" 'define-word-at-point))
-
-;; winum
+    "jj" #'evil-avy-goto-char
+    "jJ" #'evil-avy-goto-char-2
+    "jk" #'avy-goto-char-forward-char
+    "jl" #'avy-goto-line))
 
 (use-package winum
-  :defer t
   :init
   (setq winum-auto-assign-0-to-minibuffer nil)
-  (add-hook 'emacs-startup-hook
-            (lambda () (winum-mode)))
+  (add-hook 'emacs-startup-hook (lambda () (winum-mode)))
   :config
-  (set-face-attribute 'winum-face nil :weight 'bold :inverse-video t)
+
   (spc-leader-define-key
-   "0" 'winum-select-window-0-or-10
-   "1" 'winum-select-window-1
-   "2" 'winum-select-window-2
-   "3" 'winum-select-window-3
-   "4" 'winum-select-window-4
-   "5" 'winum-select-window-5
-   "6" 'winum-select-window-6
-   "7" 'winum-select-window-7
-   "8" 'winum-select-window-8
-   "9" 'winum-select-window-9)
+    "0" 'winum-select-window-0-or-10
+    "1" 'winum-select-window-1
+    "2" 'winum-select-window-2
+    "3" 'winum-select-window-3
+    "4" 'winum-select-window-4
+    "5" 'winum-select-window-5
+    "6" 'winum-select-window-6
+    "7" 'winum-select-window-7
+    "8" 'winum-select-window-8
+    "9" 'winum-select-window-9)
 
   ;; adapted from spacemacs
   (push '(("\\(.*\\) 0" . "winum-select-window-0-or-10") . ("\\1 0..9" . "window 0..9"))
         which-key-replacement-alist)
-  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist))
+  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist)
+  (set-face-attribute 'winum-face nil :weight 'bold :inverse-video t))
 
-;; scratch-el
-(use-package scratch
-  :commands scratch
-  :init
-  (spc-leader-define-key
-   "bs" #'scratch))
 
-;; try
-(use-package try
-  :commands try)
+;; appearance - external
 
-;; projectile
-(use-package projectile
+(use-package doom-themes
+  :defer
+  :config
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  (doom-themes-org-config))
+(use-package solarized-theme
   :defer
   :init
-  (defun autoload-projectile ()
-    (interactive)
-    (autoload-do-load #'projectile-switch-project))
-  (spc-leader-define-key
-      "pf" 'projectile-find-file
-      "pp" 'projectile-switch-project
-      "pl" #'autoload-projectile)
-  :config
-  (projectile-mode +1)
-  (setq projectile-completion-system 'ivy)
-  (setq projectile-indexing-method 'hybrid)
-  (setq projectile-git-submodule-command nil)
-  (setq projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0")
-        ;; projectile-globally-ignored-file-suffixes
-        ;; (append '("~")
-                ;; projectile-globally-ignored-file-suffixes))
-  (spc-leader-define-key
-      "p" 'projectile-command-map))
+  (setq solarized-use-variable-pitch nil
+        solarized-scale-org-headlines nil))
+(use-package gruvbox-theme :defer)
+(use-package spacemacs-theme :defer)
 
-;; highlight-indent-guides
+(use-package hl-todo :defer 3 :config (global-hl-todo-mode))
+
+(use-package fill-column-indicator
+  :defer
+  :init
+  (setq fci-always-use-textual-rule t
+        fci-rule-character 9474)
+  (spc-leader-define-key
+    "if" #'fci-mode))
+
+(use-package rainbow-delimiters
+  :init
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
 (use-package highlight-indent-guides
-  :commands highlight-indent-guides-mode
+  :defer t
   :init
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-auto-character-face-perc 10
@@ -767,67 +441,117 @@ CHAR and ARG are as in avy."
   (spc-leader-define-key
    "ig" #'highlight-indent-guides-mode))
 
-;; idle-highlight-mode
 (use-package idle-highlight-mode
   :defer
   :init
   (spc-leader-define-key
     "ih" #'idle-highlight-mode))
 
-;; move-text
-(use-package move-text
-  :after evil-unimpaired
-  :config
-  (evil-unimpaired-define-pair "e" '(move-text-up . move-text-down)))
 
-;; editorconfig
+;; UI
+
+(use-package undo-tree
+  :init
+  (setq undo-tree-auto-save-history t
+        undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+  :config
+  (global-undo-tree-mode 1))
+
+(use-package magit
+  :defer
+  :init
+  (spc-leader-define-key
+    "g" #'magit-status)
+  :config
+  (add-hook 'git-commit-setup-hook 'evil-insert-state))
+
+(use-package yasnippet
+  :defer t
+  :init
+  ;; don’t use yas-global-mode - it takes too much time at startup
+  ;; instead only enable it in modes where I use it:
+  (add-hook 'LaTeX-mode-hook #'yas-minor-mode)
+  (add-hook 'haskell-mode-hook #'yas-minor-mode)
+  (add-hook 'rustic-mode-hook #'yas-minor-mode)
+  (add-hook 'yas-minor-mode-hook #'yas-reload-all))
+(use-package yasnippet-snippets
+  :after yasnippet)
+(use-package ivy-yasnippet
+  :after yasnippet
+  :defer t
+  :init
+  (spc-leader-define-key
+    "x" #'ivy-yasnippet))
+
+(use-package company
+  :defer t
+  :init
+  (setq company-idle-delay 0.4
+        company-dabbrev-downcase nil)
+  (add-hook 'prog-mode-hook #'(lambda () (company-mode 1)))
+  (add-hook 'comint-mode-hook #'(lambda () (company-mode 1)))
+  :config
+  ;; from spacemacs
+  (define-key company-active-map (kbd "C-j") #'company-select-next)
+  (define-key company-active-map (kbd "C-k") #'company-select-previous)
+  (define-key company-active-map (kbd "C-l") #'company-complete-selection)
+  (define-key company-active-map (kbd "C-:") #'counsel-company)
+  (define-key company-mode-map   (kbd "C-:") #'counsel-company)
+  (spc-leader-define-key "im" #'company-mode))
+
+(use-package origami
+  :defer
+  :init
+  (add-hook 'prog-mode-hook #'origami-mode)
+  (add-hook 'LaTeX-mode-hook #'origami-mode))
+
+(use-package flycheck
+  :defer t
+  :init
+  (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (add-hook 'prog-mode-hook #'flycheck-mode)
+  (spc-leader-define-key
+    "ee" #'flycheck-list-errors
+    "ec" #'flycheck-buffer))
+
+(use-package projectile
+  :defer
+  :init
+  (setq projectile-completion-system 'ivy
+        projectile-indexing-method 'hybrid
+        projectile-git-submodule-command nil
+        projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0")
+  (spc-leader-define-key
+    "pf" 'projectile-find-file
+    "pp" 'projectile-switch-project
+    "pl" 'autoload-projectile)
+  :config
+  (projectile-mode +1)
+  (spc-leader-define-key
+    "p" 'projectile-command-map))
+
+(use-package scratch
+  :defer t
+  :init
+  (spc-leader-define-key
+   "bs" #'scratch))
+
+(use-package helpful
+  :defer t
+  :init
+  (global-set-key (kbd "C-h f") #'helpful-callable)
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key)
+  (global-set-key (kbd "C-h c") #'helpful-command)
+  :config
+  (evil-define-key 'normal helpful-mode-map "q" 'quit-window))
+
 (use-package editorconfig
-  :ensure t
   :config
   (editorconfig-mode 1))
 
-;; s
-(use-package s)
-
-(require 'cl)
-
-;; haskell
-(defun haskell-run-yesod-devel ()
-  (interactive)
-  (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
-    (async-shell-command "stack exec -- yesod devel")))
-
-;; (use-package attrap
-;;   :after dante)
-;; (use-package dante
-;;   ;; :demand t
-;;   ;; :after haskell-mode
-;;   :commands 'dante-mode
-;;   :init
-;;   (add-hook 'haskell-mode-hook 'flycheck-mode)
-;;   (add-hook 'haskell-mode-hook 'dante-mode)
-;;   ;; (setq-default dante-repl-command-line '("stack" "ghci"))
-;;   :config
-;;   (add-hook 'dante-mode-hook
-;;    '(lambda () (flycheck-add-next-checker 'haskell-dante
-;;                 '(warning . haskell-hlint))))
-;;   (add-hook 'dante-mode-hook
-;;             (lambda ()
-;;               (setq-local company-idle-delay 0.5)))
-;;   ;; fix indent
-;;   (setq-default haskell-indentation-layout-offset     4
-;;                 haskell-indentation-left-offset       4
-;;                 haskell-indentation-starter-offset    4
-;;                 haskell-indentation-where-post-offset 4
-;;                 haskell-indentation-where-pre-offset  4)
-
-;;   (defun haskell-hoogle-lookup-from-local-wrapper ()
-;;     (interactive)
-;;     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
-;;     (haskell-hoogle-lookup-from-local))
-;;   (mode-leader-define-key haskell-mode-map
-;;     "hh" #'hoogle
-;;     "hH" #'haskell-hoogle-lookup-from-local-wrapper))
+;; LSP, Haskell
 
 (use-package lsp-mode
   :hook
@@ -838,7 +562,6 @@ CHAR and ARG are as in avy."
   (setq-default lsp-modeline-diagnostics-enable nil
                 lsp-progress-function 'ignore
                 lsp-lens-enable nil)
-  :config
   ;; mostly copied from Spacemacs
   (spc-leader-define-key
     "l" '(:ignore t :which-key "lsp")
@@ -879,34 +602,29 @@ CHAR and ARG are as in avy."
     "lTS" '(:which-key "sideline-show-symbol" :def (lambda () (interactive) (setq lsp-ui-sideline-show-symbol (not lsp-ui-sideline-show-symbol))))
     "lTI" '(:which-key "sideline-ignore-duplicate" :def (lambda () (interactive) (setq lsp-ui-sideline-ignore-duplicate (not lsp-ui-sideline-ignore-duplicate))))
     "lTl" #'lsp-lens-mode
-    ;; ;; folders
-    ;; "F" "folder"
-    ;; "Fs" #'lsp-workspace-folders-open
-    ;; "Fr" #'lsp-workspace-folders-remove
-    ;; "Fa" #'lsp-workspace-folders-add
     ;; text/code
     "lx" '(:ignore t :which-key "text/code")
     "lxh" #'lsp-document-highlight
     "lxl" #'lsp-lens-show
     "lxL" #'lsp-lens-hide))
 (use-package lsp-ui
-  :commands lsp-ui-mode
+  :defer t
   :init
   (setq lsp-ui-sideline-actions-icon nil
         lsp-ui-sideline-show-diagnostics nil
         lsp-ui-peek-always-show t))
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; (use-package company-lsp :commands company-lsp)
+
+(use-package haskell-mode
+  :mode (("\\.hs\\(c\\|-boot\\)?\\'" . haskell-mode)))
 (use-package lsp-haskell
   :defer
   :init
   ;; fix indent
-  (setq-default haskell-indentation-layout-offset     4
-                haskell-indentation-left-offset       4
-                haskell-indentation-starter-offset    4
+  (setq-default haskell-indentation-layout-offset 4
+                haskell-indentation-left-offset 4
+                haskell-indentation-starter-offset 4
                 haskell-indentation-where-post-offset 4
-                haskell-indentation-where-pre-offset  4)
-  :config
+                haskell-indentation-where-pre-offset 4)
   (defun haskell-hoogle-lookup-from-local-wrapper ()
     (interactive)
     (unless (haskell-hoogle-server-live-p) (haskell-hoogle-start-server))
@@ -919,18 +637,19 @@ CHAR and ARG are as in avy."
   :after (company lsp-haskell)
   :config
   (add-to-list 'company-backends 'company-cabal))
-(use-package hasky-extensions
-  :commands (hasky-extensions hasky-extensions-browse-docs)
-  :init
-  (mode-leader-define-key haskell-mode-map
-   "xx" #'hasky-extensions
-   "xd" #'hasky-extensions-browse-docs)
-  :config
-  (add-to-list 'hasky-extensions "OverloadedLabels" t))
+
+;; (use-package hasky-extensions
+;;   :defer t
+;;   :init
+;;   (mode-leader-define-key haskell-mode-map
+;;    "xx" #'hasky-extensions
+;;    "xd" #'hasky-extensions-browse-docs)
+;;   :config
+;;   (add-to-list 'hasky-extensions "OverloadedLabels" t))
 
 (use-package shakespeare-mode
   :defer
-  :config
+  :init
   (add-hook 'shakespeare-hamlet-mode-hook
             (lambda ()
               (setq sgml-basic-offset 4)))
@@ -941,37 +660,29 @@ CHAR and ARG are as in avy."
       (pcase (file-name-extension buffer-file-name)
         ("hamlet" (find-file (concat sx "." "julius")))
         ("julius" (find-file (concat sx "." "hamlet"))))))
+  :config
   (mode-leader-define-key shakespeare-mode-map
     "cy" #'haskell-run-yesod-devel
     "x"  #'switch-between-hamlet-julius))
 
-;; (use-package tidal
-;;   :defer
-;;   :init
-;;   (setq tidal-interpreter "stack"
-;;         tidal-interpreter-arguments '("ghci" "--package" "tidal")
-;;         tidal-boot-script-path
-;;         (concat (substring
-;;                  (shell-command-to-string "stack exec --package tidal -- bash -c \"ghc-pkg describe $(ghc-pkg latest tidal) | grep data-dir | cut -f2 -d' '\"")
-;;                  0 -1)
-;;                 "/BootTidal.hs")))
 
-;; rust
+;; Rust
 
 (use-package rustic
   :defer
-  :config
+  :init
   (setq rustic-format-on-save nil)
-
+  :config
   (mode-leader-define-key rustic-mode-map
     "b" #'rustic-cargo-build
     "f" #'rustic-cargo-fmt
     "r" #'rustic-cargo-run))
 
-;; python - anaconda
+;; Python
+
 (use-package python
   :defer
-  :config
+  :init
   (defun python-start-or-switch-repl ()
     (interactive)
     (pop-to-buffer (process-buffer
@@ -988,77 +699,30 @@ CHAR and ARG are as in avy."
       (compile (concat "python "
                        (shell-quote-argument (file-name-nondirectory buffer-file-name)))
                t)))
-
+  :config
   (mode-leader-define-key python-mode-map
     "'" #'python-start-or-switch-repl
-    "r" #'python-run-current-file))
+    "r" #'python-run-current-file
+    "va" #'pyvenv-activate
+    "vd" #'pyvenv-deactivate
+    "vw" #'pyvenv-workon))
 
-(use-package anaconda-mode
-  :defer
-  :init
-  (add-hook 'python-mode-hook 'anaconda-mode)
-  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+(use-package pyvenv :defer)
 
-(use-package company-anaconda
-  :after (company anaconda-mode)
-  :config
-  (add-to-list 'company-backends 'company-anaconda)
-  
-  (mode-leader-define-key python-mode-map
-    "c" '(:ignore t :which-key "anaconda")
-    "ca" #'conda-env-activate
-    "cd" #'conda-env-deactivate))
 
-(use-package conda
-  :defer
-  :init
-  (setq conda-anaconda-home "C:/Users/bradn/anaconda3/"
-        conda-env-home-directory "C:/Users/bradn/anaconda3/")
-  :config
-  (conda-env-initialize-interactive-shells)
-  (conda-env-initialize-eshell)
-
-  (defun conda-executable-find (command)
-    (let ((paths (shell-command-to-string (concat "conda run where " command))))
-      (car (s-lines paths))))
-
-  ;; override activation function
-  (defun conda-env-shell-init (process)
-  "Activate the current env in a newly opened shell PROCESS."
-  ;; TODO: maintain compatibility with an older Conda version. Do we
-  ;; check the Conda version and cache it?
-  ;; TODO: make sure the shell has been set up for `conda activate`!
-  ;; Do we need to `eval' the conda activation script every time?
-  (let* ((activate-command '("conda" "activate"))
-         (full-command (append activate-command `(,conda-env-current-name "\n")))
-         (command-string (combine-and-quote-strings full-command)))
-    (comint-send-string process "C:\\Users\\bradn\\anaconda3\\Scripts\\activate.bat C:\\Users\\bradn\\anaconda3\n")
-    (comint-send-string process command-string)))
-
-  (defun conda-setup-checkers (&rest args)
-    (interactive)
-    (setq flycheck-python-pylint-executable (conda-executable-find "pylint"))
-    (setq flycheck-python-flake8-executable (conda-executable-find "flake8"))
-    (flycheck-reset-enabled-checker 'python-pylint)
-    (flycheck-reset-enabled-checker 'python-flake8))
-
-  (dolist (func '(conda-env-activate conda-env-deactivate))
-    (advice-add func :after 'conda-setup-checkers))
-
-  (with-eval-after-load 'flycheck))
-
-;; html
+;; HTML (Emmet)
 
 (use-package emmet-mode
   :defer t
   :init
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-  (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+  (add-hook 'css-mode-hook 'emmet-mode) ;; enable Emmet's css abbreviation.
   :config
-  (define-key emmet-mode-keymap (kbd "TAB") #'emmet-expand-line)
-  )
+  (define-key emmet-mode-keymap (kbd "TAB") #'emmet-expand-line))
 
-;; LaTeX - partly lifted from spacemacs
+
+;; LaTeX
+
 (use-package tex
   :ensure auctex
   :mode ("\\.tex\\'" . TeX-latex-mode)
@@ -1193,17 +857,6 @@ CHAR and ARG are as in avy."
   (assq-delete-all 'output-pdf TeX-view-program-selection)
   (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
 
-;; olivetti
-(use-package olivetti
-  :after general
-  :commands olivetti-mode
-  :init
-  (spc-leader-define-key
-    "io"  '(:ignore t :which-key "olivetti")
-    "ioo" #'olivetti-mode
-    "io[" #'olivetti-shrink
-    "io]" #'olivetti-expand
-    "iow" #'olivetti-set-width))
 
 ;; org
 
@@ -1225,6 +878,8 @@ CHAR and ARG are as in avy."
     (font-lock-mode nil)
     (font-lock-mode t))
   (mode-leader-define-key org-mode-map
+    "ci" #'org-clock-in
+    "co" #'org-clock-out
     "e" #'org-export-dispatch
     "i" #'org-insert-item
     "t" #'org-todo
@@ -1241,7 +896,6 @@ CHAR and ARG are as in avy."
     "," #'org-insert-structure-template)
 
   (use-package evil-org
-    :ensure t
     :init
     (require 'evil)
     :config
@@ -1254,17 +908,17 @@ CHAR and ARG are as in avy."
   (use-package zotxt
     :config
     ;; modified so everything is inserted on one line
-    (with-eval-after-load 'zotxt
-      (defun org-zotxt-insert-reference-links-to-items (items)
-        "Insert links to Zotero ITEMS in buffer."
-        (mapc (lambda (item)
-                (org-zotxt-insert-reference-link-to-item item))
-              ;; (insert "\n")
-              ;; (forward-line 1))
-              items)))
+    (defun org-zotxt-insert-reference-links-to-items (items)
+      "Insert links to Zotero ITEMS in buffer."
+      (mapc (lambda (item)
+              (org-zotxt-insert-reference-link-to-item item))
+            ;; (insert "\n")
+            ;; (forward-line 1))
+            items))
 
     (setq zotxt-default-bibliography-style "mkbehr-short"
-          org-zotxt-link-description-style :citekey)
+          org-zotxt-link-description-style :citekey
+          zotxt-default-search-method :title-creator-year)
     (mode-leader-define-key org-mode-map
       "zz" #'org-zotxt-mode
       "zi" #'org-zotxt-insert-reference-link
@@ -1366,33 +1020,60 @@ CHAR and ARG are as in avy."
     (setq buffer-read-only t))
   (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks))
 
-;; markdown
+
+;; Markdown
 
 (use-package markdown-mode
-  :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :config
+  :init
   (setq markdown-gfm-use-electric-backquote nil))
 
-;; extempore
-(use-package extempore-mode
-  :defer
-  :init
-  (setq extempore-use-pretty-lambdas nil
-        extempore-path "c:/Users/bradn/Documents/Music/Extempore/extempore-v0.8.6-lens-windows-latest/extempore/")
-  :config
-  (mode-leader-define-key extempore-mode-map
-    "K" #'extempore-send-definition
-    "r" #'extempore-send-region
-    "x" #'extempore-send-last-sexp
-    "z" #'switch-to-extempore
-    "j" #'extempore-connect)
-  (evil-define-key '(normal insert) extempore-mode-map (kbd "C-SPC") #'extempore-send-definition)
-  (add-hook 'extempore-mode-hook (lambda () (lispy-mode 1))))
 
-;; lisp - SLY
+;; LISP
+
+(mode-leader-define-key emacs-lisp-mode-map
+  "e"  '(:ignore t :which-key "eval")
+  "ee" 'eval-defun
+  "eh" 'eval-last-sexp
+  "er" 'eval-region
+  "ex" 'eval-expression
+  "p"  '(:ignore t :which-key "eval with pp")
+  "pe" 'pp-eval-last-sexp
+  "px" 'pp-eval-expression
+  "pm" 'pp-macroexpand-last-sexp)
+
+(use-package lispy
+  :defer t
+  :init
+  (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+  (add-hook 'lisp-mode-hook       (lambda () (lispy-mode 1)))
+  (add-hook 'lispy-mode-hook #'lispyville-mode)
+  :config
+  (setq lispy-close-quotes-at-end-p t))
+(use-package lispyville
+  :defer t
+  :init
+  (let ((pos (memq 'evil-mode-line-tag mode-line-format)))
+    (setcdr pos (cons
+                 '(:eval (when (featurep 'lispyville)
+                           (lispyville-mode-line-string "l-special" "")))
+                 (cdr pos))))
+  :config
+  (lispyville-set-key-theme
+   '(operators
+     c-w
+     text-objects
+     ;; atom-movement
+     additional-movement
+     commentary
+     slurp/barf-cp
+     wrap
+     additional
+     additional-insert
+     escape)))
+
 (use-package sly
   :defer
   :init
@@ -1413,95 +1094,114 @@ CHAR and ARG are as in avy."
     "hd" #'hyperspec-lookup
     "hs" #'sly-describe-symbol))
 
-;; forth
+
+;; Forth
+
 (use-package gforth
   :mode (("\\.fs\\'" . forth-mode)
          ("\\.fb\\'" . forth-block-mode))
   :load-path "c:/Program Files (x86)/gforth")
 
-;; Coq - Proof General and Company
+
+;; Coq
 ;; based on https://github.com/tchajed/spacemacs-coq/blob/785bf0d5e702df2bd6b5c63935c1b8bf8d279b18/packages.el
-;; (use-package proof-general
-;;   :mode ("\\.v\\'" . coq-mode)
-;;   :defer t
-;;   :init
-;;   (mode-leader-define-key coq-mode-map
-;;     ;; Basic proof management
-;;     "]" 'proof-assert-next-command-interactive
-;;     "[" 'proof-undo-last-successful-command
-;;     "." 'proof-goto-point
-;;     ;; Layout
-;;     "ll" 'proof-layout-windows
-;;     "lc" 'pg-response-clear-displays
-;;     "lp" 'proof-prf
-;;     ;; Prover Interaction
-;;     "px" 'proof-shell-exit
-;;     "pc" 'proof-interrupt-process
-;;     "pr" 'proof-retract-buffer
-;;     "pb" 'proof-process-buffer
-;;     ;; Prover queries ('ask prover')
-;;     "af" 'proof-find-theorems
-;;     "ap" 'coq-Print
-;;     "ac" 'coq-Check
-;;     "ab" 'coq-About
-;;     "aip" 'coq-Print-with-implicits
-;;     "aic" 'coq-Check-show-implicits
-;;     "aib" 'coq-About-with-implicits
-;;     "anp" 'coq-Print-with-all
-;;     "anc" 'coq-Check-show-all
-;;     "anb" 'coq-About-with-all
-;;     ;; Moving the point (goto)
-;;     "g." 'proof-goto-end-of-locked
-;;     "ga" 'proof-goto-command-start
-;;     "ge" 'proof-goto-command-end
-;;     ;; Insertions
-;;     "ie" 'coq-end-Section
-;;     ;; Company-coq
-;;     "il" 'company-coq-lemma-from-goal
-;;     "im" 'company-coq-insert-match-construct))
-;; (use-package company-coq
-;;   :defer t
-;;   :init
-;;   (add-hook 'coq-mode-hook #'company-coq-mode))
+
+(use-package proof-general
+  :mode ("\\.v\\'" . coq-mode)
+  :defer t
+  :init
+  (setq proof-splash-enable nil
+        proof-electric-terminator-enable t
+        proof-next-command-insert-space nil
+        coq-one-command-per-line nil)
+  (mode-leader-define-key coq-mode-map
+    ;; Basic proof management
+    "]" 'proof-assert-next-command-interactive
+    "[" 'proof-undo-last-successful-command
+    "." 'proof-goto-point
+    "K" 'proof-goto-point
+    ;; Layout
+    "ll" 'proof-layout-windows
+    "lc" 'pg-response-clear-displays
+    "lp" 'proof-prf
+    ;; Prover Interaction
+    "px" 'proof-shell-exit
+    "pc" 'proof-interrupt-process
+    "pr" 'proof-retract-buffer
+    "pb" 'proof-process-buffer
+    ;; Prover queries ('ask prover')
+    "af" 'proof-find-theorems
+    "ap" 'coq-Print
+    "ac" 'coq-Check
+    "ab" 'coq-About
+    "as" 'coq-Search
+    "aip" 'coq-Print-with-implicits
+    "aic" 'coq-Check-show-implicits
+    "aib" 'coq-About-with-implicits
+    "anp" 'coq-Print-with-all
+    "anc" 'coq-Check-show-all
+    "anb" 'coq-About-with-all
+    ;; Moving the point (goto)
+    "g." 'proof-goto-end-of-locked
+    "ga" 'proof-goto-command-start
+    "ge" 'proof-goto-command-end
+    ;; Insertions
+    "ie" 'coq-end-Section
+    ;; Company-coq
+    "il" 'company-coq-lemma-from-goal
+    "im" 'company-coq-insert-match-construct))
+(use-package company-coq
+  :defer t
+  :init
+  (add-hook 'coq-mode-hook #'company-coq-mode)
+  (setq company-coq-disabled-features
+        '(spinner prettify-symbols))
+  :config
+  ;; redo syntactic font-lock to parse block comments properly
+  (defun company-coq-syntactic-face-function/nospace (state)
+    "Determine which face to use based on parsing state STATE."
+    (let ((comment-opener-pos (nth 8 state)))
+      (cl-flet ((looking-at-quoted
+                 (pattern)
+                 (looking-at-p (regexp-quote pattern))))
+        (when comment-opener-pos
+          (save-excursion
+            (goto-char comment-opener-pos)
+            (cond
+             ((looking-at-quoted "(*!") 'company-coq-comment-h3-face)
+             ((looking-at-quoted "(*+") 'company-coq-comment-h2-face)
+             ((looking-at-quoted "(*** ") 'company-coq-comment-h1-face)
+             ((looking-at-quoted "(**") 'font-lock-doc-face) ; diff!
+             ))))))
+  (company-coq-do-in-coq-buffers
+    (remove-function (local 'font-lock-syntactic-face-function)
+                     #'company-coq-syntactic-face-function)
+    (add-function :before-until (local 'font-lock-syntactic-face-function)
+                  #'company-coq-syntactic-face-function/nospace)))
+
+
+;; reset garbage collection
+
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1
+      file-name-handler-alist last-file-name-handler-alist)
 
 ;; custom
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#1B2229" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#DFDFDF"])
+ '(LaTeX-math-abbrev-prefix "M-n")
  '(custom-safe-themes
-   (quote
-    ("b54826e5d9978d59f9e0a169bbd4739dd927eead3ef65f56786621b53c031a7c" "ecba61c2239fbef776a72b65295b88e5534e458dfe3e6d7d9f9cb353448a569e" "6b2636879127bf6124ce541b1b2824800afc49c6ccd65439d6eb987dbf200c36" default)))
- '(fci-rule-color "#5B6268")
- '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
- '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
- '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
- '(safe-local-variable-values (quote ((TeX-command-extra-options . "-shell-escape"))))
- '(vc-annotate-background "#282c34")
- '(vc-annotate-color-map
-   (list
-    (cons 20 "#98be65")
-    (cons 40 "#b4be6c")
-    (cons 60 "#d0be73")
-    (cons 80 "#ECBE7B")
-    (cons 100 "#e6ab6a")
-    (cons 120 "#e09859")
-    (cons 140 "#da8548")
-    (cons 160 "#d38079")
-    (cons 180 "#cc7cab")
-    (cons 200 "#c678dd")
-    (cons 220 "#d974b7")
-    (cons 240 "#ec7091")
-    (cons 260 "#ff6c6b")
-    (cons 280 "#cf6162")
-    (cons 300 "#9f585a")
-    (cons 320 "#6f4e52")
-    (cons 340 "#5B6268")
-    (cons 360 "#5B6268")))
- '(vc-annotate-very-old-color nil))
+   '("4c56af497ddf0e30f65a7232a8ee21b3d62a8c332c6b268c81e9ea99b11da0d3" "4eb6fa2ee436e943b168a0cd8eab11afc0752aebb5d974bba2b2ddc8910fca8f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" default))
+ '(package-selected-packages
+   '(jupyter pyvenv company-coq proof-general sly lispyville lispy zotxt evil-org auctex emmet-mode rustic shakespeare-mode yasnippet-snippets winum which-key use-package undo-tree try spacemacs-theme solarized-theme scratch rainbow-delimiters projectile origami move-text magit lsp-ui lsp-haskell ivy-yasnippet idle-highlight-mode hl-todo highlight-indent-guides helpful gruvbox-theme general flycheck fill-column-indicator evil-surround evil-snipe evil-numbers evil-nerd-commenter evil-matchit evil-lion evil-exchange evil-escape evil-collection editorconfig doom-themes counsel company-cabal avy))
+ '(safe-local-variable-values
+   '((TeX-engine . xelatex)
+     (backup-inhibited . t)
+     (backup-by-copying . t))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
