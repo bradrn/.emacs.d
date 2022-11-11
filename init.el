@@ -518,10 +518,11 @@ CHAR and ARG are as in avy."
 (use-package projectile
   :defer
   :init
-  (setq projectile-completion-system 'ivy
-        projectile-indexing-method 'hybrid
-        projectile-git-submodule-command nil
-        projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0")
+  (setq projectile-completion-system 'ivy)
+  (if (eq system-type 'windows-nt)
+      (setq projectile-indexing-method 'hybrid
+            projectile-git-submodule-command nil
+            projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0"))
   (spc-leader-define-key
     "pf" 'projectile-find-file
     "pp" 'projectile-switch-project
