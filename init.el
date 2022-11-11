@@ -1180,6 +1180,16 @@ CHAR and ARG are as in avy."
     (add-function :before-until (local 'font-lock-syntactic-face-function)
                   #'company-coq-syntactic-face-function/nospace)))
 
+;; direnv
+(if (eq system-type 'gnu/linux)
+    (use-package envrc
+      :config
+      (envrc-global-mode)
+      (spc-leader-define-key
+        "d" '(:ignore t :which-key "direnv")
+        "dr" #'envrc-reload
+        "da" #'envrc-allow
+        "dd" #'envrc-deny)))
 
 ;; reset garbage collection
 
