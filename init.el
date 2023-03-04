@@ -61,7 +61,10 @@
 (recentf-mode 1)
 
 (setq ispell-dictionary "british")
-(setq-default ispell-program-name "c:/cygwin64/bin/aspell.exe")
+(setq-default ispell-program-name
+              (if (eq system-type 'windows-nt)
+                  "c:/cygwin64/bin/aspell.exe"
+                "/usr/bin/aspell"))
 
 ;; utilities
 
@@ -518,10 +521,11 @@ CHAR and ARG are as in avy."
 (use-package projectile
   :defer
   :init
-  (setq projectile-completion-system 'ivy
-        projectile-indexing-method 'hybrid
-        projectile-git-submodule-command nil
-        projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0")
+  (setq projectile-completion-system 'ivy)
+  (if (eq system-type 'windows-nt)
+      (setq projectile-indexing-method 'hybrid
+            projectile-git-submodule-command nil
+            projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0"))
   (spc-leader-define-key
     "pf" 'projectile-find-file
     "pp" 'projectile-switch-project
@@ -745,7 +749,7 @@ CHAR and ARG are as in avy."
         TeX-source-correlate-start-server nil
         ;; Don't insert line-break at inline math
         LaTeX-fill-break-at-separators nil
-        preview-gs-command "c:/Program Files/gs/gs9.53.3/bin/gswin64c.exe"
+        ;; preview-gs-command "c:/Program Files/gs/gs9.53.3/bin/gswin64c.exe"
         preview-auto-reveal t)
   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
@@ -832,7 +836,8 @@ CHAR and ARG are as in avy."
   ;; adapted from https://lists.nongnu.org/archive/html/auctex/2009-11/msg00016.html
   (evil-define-key 'insert TeX-mode-map (kbd "C-\\") 'TeX-electric-macro)
 
-  (add-to-list 'TeX-tree-roots "c:/Users/bradn/AppData/Roaming/MiKTeX/2.9/")
+  (if (eq system-type 'windows-nt)
+      (add-to-list 'TeX-tree-roots "c:/Users/bradn/AppData/Roaming/MiKTeX/2.9/"))
 
   ;; docs lookup is too slow, remove it from latex-mode
   (setf (cdr (assoc 'texdoc TeX-doc-backend-alist)) ;
@@ -851,11 +856,15 @@ CHAR and ARG are as in avy."
   (setq TeX-source-correlate-mode t)
   (setq TeX-source-correlate-method 'synctex)
   (setq TeX-view-program-list
-        '(("Sumatra PDF" ("\"C:/Users/bradn/AppData/Local/SumatraPDF/SumatraPDF.exe\" -reuse-instance" (mode-io-correlate " -forward-search \"%b\" %n ") " %o"))))
+        '(("Sumatra PDF" ("\"C:/Users/bradn/AppData/Local/SumatraPDF/SumatraPDF.exe\" -reuse-instance" (mode-io-correlate " -forward-search \"%b\" %n ") " %o"))
+          ("Okular" "okular --unique %o#src:%n%b")))
   ;; (add-to-list 'TeX-expand-list '("%(cntxcom)" (lambda () "c:/context/bin/context1.bat")))
 
   (assq-delete-all 'output-pdf TeX-view-program-selection)
-  (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF")))
+  (add-to-list 'TeX-view-program-selection
+               (if (eq system-type 'windows-nt)
+                   '(output-pdf "Sumatra PDF")
+                 '(output-pdf "Okular"))))
 
 
 ;; org
