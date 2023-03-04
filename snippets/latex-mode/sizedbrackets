@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: sizedbrackets
+# key: bigl
+# --
+
+\\${1:big}l${2:\(}$0\\$1r${3:\)}

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: mbrackets
+# key: mlr
+# --
+
+\mleft${1:\(}$0\mright${2:\)}
