@@ -24,7 +24,8 @@
 (setq backup-by-copying t)
 (setq read-process-output-max (* 1024 1024))
 (setq use-short-answers t)
-(setq initial-major-mode 'fundamental-mode)
+(setq initial-major-mode 'fundamental-mode
+      initial-scratch-message nil)
 
 
 ;; appearance
