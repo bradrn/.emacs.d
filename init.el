@@ -941,7 +941,7 @@ CHAR and ARG are as in avy."
   (defun org-agenda-skip-if-blocked ()
     (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
       (if (org-entry-blocked-p) next-headline)))
-  (setq org-agenda-files '("~/Documents/org")
+  (setq org-agenda-files '("~/org")
         ;; meaning:
         ;; TODO, NEXT, INPROGRESS, DONE are self-explanatory
         ;; WAITING is for tasks which are waiting for some issue to be resolved
