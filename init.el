@@ -88,6 +88,7 @@
   (interactive)
   (load "server")
   (unless (server-running-p) (server-start)))
+(start-server-if-not-running)
 
 ;; packaging
 
