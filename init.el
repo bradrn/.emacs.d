@@ -295,6 +295,7 @@
     "h"   #'help-command
 
     "i"   '(:ignore t :which-key "UI")
+    "ib"  #'browse-url-at-point
     "iu"  #'undo-tree-visualize
     "it"  '(:ignore t :which-key "themes")
     "itdo" (lambda () (interactive) (counsel--load-theme-action "doom-one"))
@@ -319,6 +320,7 @@
     "isx" #'flyspell-buffer
     "ix"  #'toggle-truncate-lines
     "ip"  #'show-paren-mode
+    "in"  #'set-frame-font
 
     "j"   '(:ignore t :which-key "jump")
     "jw"  #'subword-mode
