@@ -38,7 +38,7 @@
 (scroll-bar-mode -1)
 
 ;; see https://emacs.stackexchange.com/a/50136/20375
-(global-linum-mode -1)
+; (global-linum-mode -1)
 (setq display-line-numbers-type 'visual)
 (global-display-line-numbers-mode)
 
