@@ -728,6 +728,28 @@ CHAR and ARG are as in avy."
 
 ;; LaTeX
 
+(with-eval-after-load 'flyspell
+  ;; (setq flyspell-tex-command-regexp
+  ;;       "\\(\\(begin\\|end\\)[ \t]*{\\|\\(\\(auto\\)?cites?[a-z*]*\\|label\\|ref\\|eqref\\|usepackage\\|documentclass\\)[ \t]*\\(\\[[^]]*\\]\\)?{[^{}]*\\)")
+
+  (put 'latex-mode 'flyspell-mode-predicate 'my-tex-mode-flyspell-verify))
+(defun my-tex-mode-flyspell-verify ()
+  (and
+   (not (save-excursion
+          (re-search-backward "^[ \t]*%%%[ \t]+Local" nil t)))
+   (not (save-excursion
+          (let ((this (point))
+                (eol (line-end-position))
+                (has-match nil)
+                (re "\\\\\\(\\(auto\\)?cite\\|label\\|ref\\|abbr\\){[^}]*}\\|\\\\\\(\\(auto\\)?cites\\)\\({[^}]*}\\)+"))
+            (beginning-of-line)
+            (while (re-search-forward re eol t)
+              (setq has-match
+                    (or has-match
+                        (and (>= this (match-beginning 0))
+                             (<= this (match-end 0))))))
+            has-match)))))
+
 (use-package tex
   :ensure auctex
   :mode ("\\.tex\\'" . TeX-latex-mode)
