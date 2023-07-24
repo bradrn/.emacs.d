@@ -785,32 +785,32 @@ CHAR and ARG are as in avy."
 
   :config
   (mode-leader-define-key LaTeX-mode-map
-   "a"   #'TeX-command-run-all
-   "b"   #'LaTeX-build
-   "v"   #'TeX-view
-   "h"   #'TeX-doc
-   "l"   #'TeX-recenter-output-buffer
-   "e"   #'LaTeX-environment
-   "c"   #'LaTeX-close-environment
-   "i"   #'LaTeX-insert-item
-   "s"   #'LaTeX-section
-   "k"   #'TeX-kill-job
-   "q"   #'TeX-next-error
-   "\\"  #'TeX-electric-macro
+    "a"   #'TeX-command-run-all
+    "b"   #'LaTeX-build
+    "v"   #'TeX-view
+    "h"   #'TeX-doc
+    "l"   #'TeX-recenter-output-buffer
+    "e"   #'LaTeX-environment
+    "c"   #'LaTeX-close-environment
+    "i"   #'LaTeX-insert-item
+    "s"   #'LaTeX-section
+    "k"   #'TeX-kill-job
+    "q"   #'TeX-next-error
+    "\\"  #'TeX-electric-macro
 
-   "p"   '(:ignore t :which-key "preview")
-   "pb"  #'preview-buffer
-   "pp"  #'preview-at-point
-   "pr"  #'preview-region
-   "pc"  '(:ignore t :which-key "clearout")
-   "pcb" #'preview-clearout-buffer
-   "pcp" #'preview-clearout-at-point
+    "p"   '(:ignore t :which-key "preview")
+    "pb"  #'preview-buffer
+    "pp"  #'preview-at-point
+    "pr"  #'preview-region
+    "pc"  '(:ignore t :which-key "clearout")
+    "pcb" #'preview-clearout-buffer
+    "pcp" #'preview-clearout-at-point
 
-   "r"   '(:ignore t :which-key "reftex")
-   "rc"  #'reftex-citation
-   "rl"  #'reftex-label
-   "rr"  #'reftex-reference
-   "rv"  #'reftex-view-crossref)
+    "r"   '(:ignore t :which-key "reftex")
+    "rc"  #'reftex-citation
+    "rl"  #'reftex-label
+    "rr"  #'reftex-reference
+    "rv"  #'reftex-view-crossref)
 
   ;; Rebindings for TeX-font - lifted from spacemacs
   (defun latex/font-bold         () (interactive) (TeX-font nil ?\C-b))
