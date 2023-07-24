@@ -296,31 +296,31 @@
 
     "i"   '(:ignore t :which-key "UI")
     "ib"  #'browse-url-at-point
-    "iu"  #'undo-tree-visualize
+    "ic"  '(:ignore t :which-key "customise")
+    "icf" #'customize-face
+    "icg" #'customize-group
+    "icv" #'customize-variable
+    "il"  '(:ignore t :which-key "calc")
+    "ilc" #'calc
+    "ilq" #'quick-calc
+    "in"  #'set-frame-font
+    "ip"  #'show-paren-mode
+    "is" '(:ignore t :which-key "flyspell")
+    "iss" #'flyspell-mode
+    "isx" #'flyspell-buffer
     "it"  '(:ignore t :which-key "themes")
     "itdo" (lambda () (interactive) (counsel--load-theme-action "doom-one"))
+    "itgs" (lambda () (interactive) (counsel--load-theme-action "gruvbox-light-soft"))
     "itle" (lambda () (interactive) (counsel--load-theme-action "leuven"))
     "itpd" (lambda () (interactive) (counsel--load-theme-action "spacemacs-dark"))
     "itpl" (lambda () (interactive) (counsel--load-theme-action "spacemacs-light"))
     "itsd" (lambda () (interactive) (counsel--load-theme-action "solarized-dark"))
     "itsl" (lambda () (interactive) (counsel--load-theme-action "solarized-light"))
-    "itgs" (lambda () (interactive) (counsel--load-theme-action "gruvbox-light-soft"))
-    "itx"  (lambda () (interactive) (mapc #'disable-theme custom-enabled-themes))
     "itt" #'counsel-load-theme
+    "itx"  (lambda () (interactive) (mapc #'disable-theme custom-enabled-themes))
+    "iu"  #'undo-tree-visualize
     "iw"  #'whitespace-mode
-    "ic"  '(:ignore t :which-key "customise")
-    "icg" #'customize-group
-    "icf" #'customize-face
-    "icv" #'customize-variable
-    "il"  '(:ignore t :which-key "calc")
-    "ilq" #'quick-calc
-    "ilc" #'calc
-    "is" '(:ignore t :which-key "flyspell")
-    "iss" #'flyspell-mode
-    "isx" #'flyspell-buffer
     "ix"  #'toggle-truncate-lines
-    "ip"  #'show-paren-mode
-    "in"  #'set-frame-font
 
     "j"   '(:ignore t :which-key "jump")
     "jw"  #'subword-mode
