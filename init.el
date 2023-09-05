@@ -42,7 +42,7 @@
 (setq display-line-numbers-type 'visual)
 (global-display-line-numbers-mode)
 
-(add-to-list 'default-frame-alist '(font . "Consolas 10"))
+(add-to-list 'default-frame-alist '(font . "Consolas 11"))
 
 
 ;; UI
