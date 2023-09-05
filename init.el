@@ -759,6 +759,16 @@ CHAR and ARG are as in avy."
         (TeX-save-document (TeX-master-file)))
       (TeX-command "LaTeX" 'TeX-master-file -1)))
 
+  (defun TeX-word-count ()
+    (interactive)
+    (let ((temp-buffer (concat "*wordcount: " (buffer-name) "*")))
+      (with-output-to-temp-buffer temp-buffer
+        (call-process
+         "texcount"
+         nil temp-buffer nil
+         (buffer-file-name))
+        (pop-to-buffer temp-buffer))))
+
   :init
   (setq TeX-command-default "LaTeX"
         TeX-auto-save t
@@ -793,6 +803,7 @@ CHAR and ARG are as in avy."
     "k"   #'TeX-kill-job
     "q"   #'TeX-next-error
     "\\"  #'TeX-electric-macro
+    "w"   #'TeX-word-count
 
     "p"   '(:ignore t :which-key "preview")
     "pb"  #'preview-buffer
