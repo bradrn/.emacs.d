@@ -887,14 +887,19 @@ CHAR and ARG are as in avy."
   (setq TeX-source-correlate-method 'synctex)
   (setq TeX-view-program-list
         '(("Sumatra PDF" ("\"C:/Users/bradn/AppData/Local/SumatraPDF/SumatraPDF.exe\" -reuse-instance" (mode-io-correlate " -forward-search \"%b\" %n ") " %o"))
-          ("Okular" "okular --unique %o#src:%n%b")))
+          ("Okular" "okular --unique %o#src:%n%b")
+          ("Zathura"
+           ("zathura "
+            (mode-io-correlate " --synctex-forward %n:0:%b -x \"emacsclient +%{line} %{input}\" ")
+            " %o")
+           "zathura")))
   ;; (add-to-list 'TeX-expand-list '("%(cntxcom)" (lambda () "c:/context/bin/context1.bat")))
 
   (assq-delete-all 'output-pdf TeX-view-program-selection)
   (add-to-list 'TeX-view-program-selection
                (if (eq system-type 'windows-nt)
                    '(output-pdf "Sumatra PDF")
-                 '(output-pdf "Okular"))))
+                 '(output-pdf "Zathura"))))
 
 
 ;; org
