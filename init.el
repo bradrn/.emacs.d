@@ -1112,6 +1112,7 @@ CHAR and ARG are as in avy."
      c-w
      text-objects
      ;; atom-movement
+     additional
      additional-movement
      commentary
      slurp/barf-cp
