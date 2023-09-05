@@ -930,7 +930,7 @@ CHAR and ARG are as in avy."
     "w" #'org-table-toggle-column-width
     "W" #'org-refile
     "K" #'org-ctrl-c-ctrl-c
-    "r" #'org-reveal
+    "z" #'org-reveal
     "s" '(:ignore t :which-key "scheduling")
     "ss" #'org-schedule
     "sd" #'org-deadline
@@ -966,10 +966,10 @@ CHAR and ARG are as in avy."
           org-zotxt-link-description-style :citekey
           zotxt-default-search-method :title-creator-year)
     (mode-leader-define-key org-mode-map
-      "zt" #'org-zotxt-mode
-      "zr" #'org-zotxt-insert-reference-link
-      "zu" #'org-zotxt-update-reference-link-at-point
-      "zo" #'org-zotxt-open-attachment))
+      "rt" #'org-zotxt-mode
+      "rc" #'org-zotxt-insert-reference-link
+      "ru" #'org-zotxt-update-reference-link-at-point
+      "ro" #'org-zotxt-open-attachment))
   
   ;; adapted from https://emacs.stackexchange.com/a/14734/20375
   (defun org-agenda-skip-if-blocked ()
