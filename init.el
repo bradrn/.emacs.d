@@ -728,11 +728,7 @@ CHAR and ARG are as in avy."
 
 ;; LaTeX
 
-(with-eval-after-load 'flyspell
-  ;; (setq flyspell-tex-command-regexp
-  ;;       "\\(\\(begin\\|end\\)[ \t]*{\\|\\(\\(auto\\)?cites?[a-z*]*\\|label\\|ref\\|eqref\\|usepackage\\|documentclass\\)[ \t]*\\(\\[[^]]*\\]\\)?{[^{}]*\\)")
-
-  (put 'latex-mode 'flyspell-mode-predicate 'my-tex-mode-flyspell-verify))
+(put 'latex-mode 'flyspell-mode-predicate 'my-tex-mode-flyspell-verify)
 (defun my-tex-mode-flyspell-verify ()
   (and
    (not (save-excursion
@@ -741,7 +737,7 @@ CHAR and ARG are as in avy."
           (let ((this (point))
                 (eol (line-end-position))
                 (has-match nil)
-                (re "\\\\\\(\\(auto\\)?cite\\|label\\|ref\\|abbr\\){[^}]*}\\|\\\\\\(\\(auto\\)?cites\\)\\({[^}]*}\\)+"))
+                (re "\\\\\\(\\(auto\\|text\\)?cite\\*?\\|label\\|ref\\|abbr\\|input\\)\\(\\[[^\\]*]\\]\\)*{[^}]*}\\|\\\\\\(\\(auto\\)?cites\\*?\\)\\({[^}]*}\\)+"))
             (beginning-of-line)
             (while (re-search-forward re eol t)
               (setq has-match
