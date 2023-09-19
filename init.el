@@ -626,9 +626,7 @@ CHAR and ARG are as in avy."
         lsp-ui-peek-always-show t))
 
 (use-package haskell-mode
-  :mode (("\\.hs\\(c\\|-boot\\)?\\'" . haskell-mode)))
-(use-package lsp-haskell
-  :defer
+  :mode (("\\.hs\\(c\\|-boot\\)?\\'" . haskell-mode))
   :init
   ;; fix indent
   (setq-default haskell-indentation-layout-offset 4
@@ -644,6 +642,11 @@ CHAR and ARG are as in avy."
     "hh" #'hoogle
     "hH" #'haskell-hoogle-lookup-from-local-wrapper))
 
+(use-package lsp-haskell
+  :defer
+  :init
+  ;; (setq-default lsp-haskell-server-path "/home/bradrn/.ghcup/bin/haskell-language-server-wrapper")
+  )
 (use-package company-cabal
   :after (company lsp-haskell)
   :config
