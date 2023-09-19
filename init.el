@@ -207,8 +207,9 @@
     (evil-unimpaired-define-pair "e" '(move-text-up . move-text-down))))
 (use-package evil-collection
   :config
-  (with-eval-after-load 'magit
-    (evil-collection-magit-setup)))
+  (delete 'lispy evil-collection-mode-list)  ; handled by lispyville
+  (evil-collection-init))
+
 ;; from https://oremacs.com/2015/06/23/counsel-load-theme/
 (defun counsel--load-theme-action (x)
   "Disable current themes and load theme X."
@@ -316,6 +317,7 @@
   :config
   (general-create-definer spc-leader-define-key
     :states '(normal visual insert emacs)
+    :keymaps 'override
     :prefix "SPC"
     :non-normal-prefix "C-SPC")
 
