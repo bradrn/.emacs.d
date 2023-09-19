@@ -132,9 +132,6 @@
 
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
-  (evil-set-initial-state 'flycheck-error-list-mode 'emacs)
-  (evil-set-initial-state 'dired-mode 'emacs)
-  (evil-set-initial-state 'Info-mode 'emacs)
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
 
@@ -200,7 +197,6 @@
   :load-path "~/.emacs.d/evil-unimpaired"
   :config
   (evil-unimpaired-mode t)
-  (evil-unimpaired-define-pair "q" '(flycheck-previous-error . flycheck-next-error))
   (use-package move-text
     :defer
     :init
@@ -975,18 +971,6 @@ CHAR and ARG are as in avy."
 
   (if (eq system-type 'windows-nt)
       (add-to-list 'TeX-tree-roots "c:/Users/bradn/AppData/Roaming/MiKTeX/2.9/"))
-
-  ;; docs lookup is too slow, remove it from latex-mode
-  ;; (setf (cdr (assoc 'texdoc TeX-doc-backend-alist)) ;
-  ;;     ;;'((plain-tex-mode latex-mode doctex-mode ams-tex-mode context-mode)
-  ;;       '((plain-tex-mode doctex-mode ams-tex-mode context-mode)
-  ;;         (lambda nil
-  ;;           (when
-  ;;               (executable-find "texdoc")
-  ;;             (TeX-search-files-by-type 'docs 'global t t)))
-  ;;         (lambda
-  ;;           (doc)
-  ;;           (call-process "texdoc" nil 0 nil "--view" doc))))
 
   ;; from https://tex.stackexchange.com/questions/286028/inverse-search-with-emacs-auctex-and-sumatrapdf-on-windows-10
   (setq TeX-PDF-mode t)
