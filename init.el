@@ -54,6 +54,12 @@
       scroll-margin 3
       scroll-conservatively 101)
 
+(let ((editing-hooks '(text-mode-hook prog-mode-hook)))
+  (mapc (lambda (hook)
+          (add-hook hook
+                    #'(lambda () (setq show-trailing-whitespace t))))
+        editing-hooks))
+
 (setq recentf-auto-cleanup 'never
       recentf-max-menu-items 50)
 (recentf-mode 1)
@@ -1074,7 +1080,9 @@ CHAR and ARG are as in avy."
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init
-  (setq markdown-gfm-use-electric-backquote nil))
+  (setq markdown-gfm-use-electric-backquote nil)
+  (add-hook 'markdown-mode-hook
+            #'(lambda () (setq show-trailing-whitespace nil))))
 
 
 ;; LISP
