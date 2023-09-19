@@ -362,6 +362,7 @@
     "icf" #'customize-face
     "icg" #'customize-group
     "icv" #'customize-variable
+    "id"  #'dired
     "il"  '(:ignore t :which-key "calc")
     "ilc" #'calc
     "ilq" #'quick-calc
@@ -525,6 +526,14 @@ CHAR and ARG are as in avy."
         undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
   :config
   (global-undo-tree-mode 1))
+
+(use-package dired
+  :ensure nil
+  :init
+  (setq dired-kill-when-opening-new-dired-buffer t)
+  :config
+  (put 'dired-find-alternate-file 'disabled nil))
+
 
 (use-package magit
   :defer
