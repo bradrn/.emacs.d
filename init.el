@@ -209,50 +209,102 @@
   :config
   (with-eval-after-load 'magit
     (evil-collection-magit-setup)))
+;; from https://oremacs.com/2015/06/23/counsel-load-theme/
+(defun counsel--load-theme-action (x)
+  "Disable current themes and load theme X."
+  (condition-case nil
+      (progn
+        (mapc #'disable-theme custom-enabled-themes)
+        (load-theme (intern x))
+        (when (fboundp 'powerline-reset)
+          (powerline-reset)))
+    (error "Problem loading theme %s" x)))
 
-(use-package ivy
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers nil)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-wrap t)
-  (setq ivy-height 20)
-  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
-  (assq-delete-all 'org-refile ivy-initial-inputs-alist)
-  (assq-delete-all 'org-agenda-refile ivy-initial-inputs-alist)
-  (assq-delete-all 'org-capture-refile ivy-initial-inputs-alist)
-  (add-to-list 'ivy-initial-inputs-alist '(TeX-electric-macro . "^"))
-
-  (define-key ivy-minibuffer-map (kbd "C-j") #'ivy-next-line)
-  (define-key ivy-minibuffer-map (kbd "C-k") #'ivy-previous-line)
-  (define-key ivy-switch-buffer-map (kbd "C-k") #'ivy-previous-line)
-  (define-key ivy-minibuffer-map (kbd "C-l") #'ivy-alt-done)
-  (define-key ivy-minibuffer-map (kbd "<C-return>") #'ivy-immediate-done))
-(use-package counsel
-  :defer
+(use-package vertico
   :init
-  (global-set-key (kbd "M-x") #'counsel-M-x)
-  ;; from https://oremacs.com/2015/06/23/counsel-load-theme/
-  (defun counsel--load-theme-action (x)
-    "Disable current themes and load theme X."
-    (condition-case nil
-        (progn
-          (mapc #'disable-theme custom-enabled-themes)
-          (load-theme (intern x))
-          (when (fboundp 'powerline-reset)
-            (powerline-reset)))
-      (error "Problem loading theme %s" x)))
-  (defun counsel-load-theme ()
-    "Forward to `load-theme'.
-  Usable with `ivy-resume', `ivy-next-line-and-call' and
-  `ivy-previous-line-and-call'."
-    (interactive)
-    (ivy-read "Load custom theme: "
-              (mapcar 'symbol-name
-                      (custom-available-themes))
-              :action #'counsel--load-theme-action))
+  (setq enable-recursive-minibuffers t)
+
+  (setq vertico-count 20
+        vertico-preselect 'directory
+        vertico-cycle t
+        vertico-sort-function #'vertico-sort-alpha)
+
+  (vertico-mode)
+  (vertico-multiform-mode)
+
+  ;; Sort directories before files
+  ;; (from vertico README)
+  (defun sort-directories-first (files)
+    (setq files (vertico-sort-history-length-alpha files))
+    (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) files)
+           (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
+
+  (setq vertico-multiform-categories
+        '((file (vertico-sort-function . sort-directories-first))))
+
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
   :config
-  (define-key counsel-find-file-map (kbd "C-h") #'counsel-up-directory))
+  (evil-define-key '(normal insert) vertico-map (kbd "C-j") #'vertico-next)
+  (evil-define-key '(normal insert) vertico-map (kbd "C-k") #'vertico-previous))
+
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("C-l" . vertico-directory-enter)
+              ("C-h" . vertico-directory-up))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
+(use-package vertico-quick
+  :after vertico
+  :ensure nil
+  :init
+  (evil-define-key '(normal insert) vertico-map (kbd "M-w") #'vertico-quick-insert)
+  (evil-define-key '(normal insert) vertico-map (kbd "C-w") #'vertico-quick-exit))
+
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+(use-package consult
+  :init
+  (setq consult-preview-key nil)
+  :config
+  ;; from consult README
+
+  ;; Use `consult-completion-in-region' if Vertico is enabled.
+  ;; Otherwise use the default `completion--in-region' function.
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
+
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)))
+
+(use-package marginalia
+  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
+
+  :init
+  (setq marginalia-align 'right)
+
+  (marginalia-mode))
 
 (use-package which-key
   :config
@@ -273,7 +325,7 @@
     :non-normal-prefix "C-0")
 
   (spc-leader-define-key
-    "SPC" #'counsel-M-x
+    "SPC" #'execute-extended-command
     "TAB" #'switch-to-previous-buffer
     "RET" #'evil-execute-in-emacs-state
     "$"   #'set-selective-display-current-column
@@ -282,7 +334,8 @@
     "'"   #'shell
 
     "b"   '(:ignore t :which-key "buffers")
-    "bb"  #'ivy-switch-buffer
+    "bb"  #'consult-buffer
+    "bp"  #'consult-project-buffer
     "bd"  #'kill-this-buffer
     "bi"  #'ibuffer
     "bci" #'clone-indirect-buffer
@@ -291,9 +344,10 @@
     "c"   #'evil-ex-nohighlight
 
     "f"   '(:ignore t :which-key "files")
-    "ff"  #'counsel-find-file
+    "ff"  #'find-file
+    "fg"  #'consult-ripgrep
     "fi"  #'find-user-init-file
-    "fr"  #'counsel-recentf
+    "fr"  #'consult-recent-file
     "fs"  #'save-buffer
     "fw"  #'write-file
     "fx"  #'delete-file
@@ -315,14 +369,17 @@
     "iss" #'flyspell-mode
     "isx" #'flyspell-buffer
     "it"  '(:ignore t :which-key "themes")
-    "itdo" (lambda () (interactive) (counsel--load-theme-action "doom-one"))
-    "itgs" (lambda () (interactive) (counsel--load-theme-action "gruvbox-light-soft"))
-    "itle" (lambda () (interactive) (counsel--load-theme-action "leuven"))
-    "itpd" (lambda () (interactive) (counsel--load-theme-action "spacemacs-dark"))
-    "itpl" (lambda () (interactive) (counsel--load-theme-action "spacemacs-light"))
-    "itsd" (lambda () (interactive) (counsel--load-theme-action "solarized-dark"))
-    "itsl" (lambda () (interactive) (counsel--load-theme-action "solarized-light"))
-    "itt" #'counsel-load-theme
+    "itml" (lambda () (interactive) (consult-theme 'modus-operandi))
+    "itmd" (lambda () (interactive) (consult-theme 'modus-vivendi))
+    "itdo" (lambda () (interactive) (consult-theme 'doom-one))
+    "itdi" (lambda () (interactive) (consult-theme 'dichromacy))
+    "itgs" (lambda () (interactive) (consult-theme 'gruvbox-light-soft))
+    "itle" (lambda () (interactive) (consult-theme 'leuven))
+    "itpd" (lambda () (interactive) (consult-theme 'spacemacs-dark))
+    "itpl" (lambda () (interactive) (consult-theme 'spacemacs-light))
+    "itsd" (lambda () (interactive) (consult-theme 'solarized-dark))
+    "itsl" (lambda () (interactive) (consult-theme 'solarized-light))
+    "itt" #'consult-theme
     "itx"  (lambda () (interactive) (mapc #'disable-theme custom-enabled-themes))
     "iu"  #'undo-tree-visualize
     "iw"  #'whitespace-mode
@@ -486,12 +543,6 @@ CHAR and ARG are as in avy."
   (add-hook 'yas-minor-mode-hook #'yas-reload-all))
 (use-package yasnippet-snippets
   :after yasnippet)
-(use-package ivy-yasnippet
-  :after yasnippet
-  :defer t
-  :init
-  (spc-leader-define-key
-    "x" #'ivy-yasnippet))
 
 (use-package company
   :defer t
@@ -500,13 +551,22 @@ CHAR and ARG are as in avy."
         company-dabbrev-downcase nil)
   (add-hook 'prog-mode-hook #'(lambda () (company-mode 1)))
   (add-hook 'comint-mode-hook #'(lambda () (company-mode 1)))
+
+  ;; based on counsel-company
+  (defun move-company-to-minibuffer ()
+    (interactive)
+    (company-mode 1)
+    (unless company-candidates
+      (company-complete))
+    (when company-candidates
+      (company--continue)
+      (let ((candidate (completing-read "Candidate: " company-candidates)))
+        (company-finish candidate))))
+
   :config
-  ;; from spacemacs
-  (define-key company-active-map (kbd "C-j") #'company-select-next)
-  (define-key company-active-map (kbd "C-k") #'company-select-previous)
   (define-key company-active-map (kbd "C-l") #'company-complete-selection)
-  (define-key company-active-map (kbd "C-:") #'counsel-company)
-  (define-key company-mode-map   (kbd "C-:") #'counsel-company)
+  (define-key company-active-map (kbd "C-:") #'move-company-to-minibuffer)
+  (define-key company-mode-map   (kbd "C-:") #'move-company-to-minibuffer)
   (spc-leader-define-key "im" #'company-mode))
 
 (use-package origami
@@ -528,7 +588,6 @@ CHAR and ARG are as in avy."
 (use-package projectile
   :defer
   :init
-  (setq projectile-completion-system 'ivy)
   (if (eq system-type 'windows-nt)
       (setq projectile-indexing-method 'hybrid
             projectile-git-submodule-command nil
