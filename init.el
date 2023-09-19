@@ -734,6 +734,34 @@ CHAR and ARG are as in avy."
 
 ;; LaTeX
 
+(use-package pdf-tools
+  :init
+  (pdf-tools-install)
+  (pdf-loader-install)
+
+  (setq-default pdf-view-display-size 'fit-page)
+
+  (defun my--pdf-sync-goto-current-page ()
+    (interactive)
+    (let ((size (pdf-view-image-size)))
+      (pdf-sync-backward-search
+       (/ (car size) 2)
+       (/ (cdr size) 2))))
+  (mode-leader-define-key pdf-sync-minor-mode-map
+    "K" #'my--pdf-sync-goto-current-page)
+
+  ;; (custom-theme-set-variables
+  ;;  'deeper-blue
+  ;;  '(pdf-view-midnight-colors (cons "gray80" "#181a26")))
+
+  :config
+  ;; swap keys
+  (evil-define-key 'normal pdf-view-mode-map "f" #'pdf-links-action-perform)
+  (evil-define-key 'normal pdf-view-mode-map "F" #'pdf-links-isearch-link)
+  (add-hook 'pdf-view-mode-hook
+            (lambda ()
+              (display-line-numbers-mode 0))))
+
 (put 'latex-mode 'flyspell-mode-predicate 'my-tex-mode-flyspell-verify)
 (defun my-tex-mode-flyspell-verify ()
   (and
@@ -898,15 +926,16 @@ CHAR and ARG are as in avy."
            ("zathura "
             (mode-io-correlate " --synctex-forward %n:0:%b -x \"emacsclient +%{line} %{input}\" ")
             " %o")
-           "zathura")))
+           "zathura")
+          ("PDF Tools" TeX-pdf-tools-sync-view)))
   ;; (add-to-list 'TeX-expand-list '("%(cntxcom)" (lambda () "c:/context/bin/context1.bat")))
 
   (assq-delete-all 'output-pdf TeX-view-program-selection)
-  (add-to-list 'TeX-view-program-selection
-               (if (eq system-type 'windows-nt)
-                   '(output-pdf "Sumatra PDF")
-                 '(output-pdf "Zathura"))))
-
+  (if (eq system-type 'windows-nt)
+      (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF"))
+    (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
+    (add-hook 'TeX-after-compilation-finished-functions
+              #'TeX-revert-document-buffer)))
 
 ;; org
 
