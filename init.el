@@ -359,6 +359,7 @@
     "icg" #'customize-group
     "icv" #'customize-variable
     "id"  #'dired
+    "io"  #'column-number-mode
     "il"  '(:ignore t :which-key "calc")
     "ilc" #'calc
     "ilq" #'quick-calc
@@ -586,7 +587,8 @@ CHAR and ARG are as in avy."
   :defer t
   :init
   (setq-default flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (setq flycheck-check-syntax-automatically '(save mode-enabled)
+        flycheck-navigation-minimum-level 'error)
   (add-hook 'prog-mode-hook #'flycheck-mode)
   (spc-leader-define-key
     "ee" #'flycheck-list-errors
