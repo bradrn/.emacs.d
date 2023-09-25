@@ -343,7 +343,6 @@
 
     "f"   '(:ignore t :which-key "files")
     "ff"  #'find-file
-    "fg"  #'consult-ripgrep
     "fi"  #'find-user-init-file
     "fr"  #'consult-recent-file
     "fs"  #'save-buffer
@@ -353,7 +352,6 @@
     "h"   #'help-command
 
     "i"   '(:ignore t :which-key "UI")
-    "ib"  #'browse-url-at-point
     "ic"  '(:ignore t :which-key "customise")
     "icf" #'customize-face
     "icg" #'customize-group
@@ -404,6 +402,14 @@
     "u"   #'universal-argument
 
     "-"   #'negative-argument
+
+    "/"   '(:ignore t :which-key "find")
+    "/b"  #'browse-url-at-point
+    "/f"  #'ffap
+    "/F"  #'(lambda () (interactive) (consult-find t))
+    "/g"  #'consult-ripgrep
+    "/m"  #'consult-imenu
+    "/M"  #'consult-imenu-multi
 
     "w"   '(:ignore t :which-key "window")
     "wf"  #'make-frame
