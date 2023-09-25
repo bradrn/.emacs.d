@@ -368,6 +368,7 @@
     "isx" #'flyspell-buffer
     "it"  '(:ignore t :which-key "themes")
     "itml" (lambda () (interactive) (consult-theme 'modus-operandi))
+    "itmt" (lambda () (interactive) (consult-theme 'modus-operandi-tinted))
     "itmd" (lambda () (interactive) (consult-theme 'modus-vivendi))
     "itdo" (lambda () (interactive) (consult-theme 'doom-one))
     "itdi" (lambda () (interactive) (consult-theme 'dichromacy))
