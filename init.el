@@ -135,6 +135,7 @@
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
   (evil-set-initial-state 'calc-mode 'emacs)
+  (evil-set-initial-state 'comint-mode 'normal)
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
 
@@ -603,21 +604,54 @@ CHAR and ARG are as in avy."
     "ee" #'flycheck-list-errors
     "ec" #'flycheck-buffer))
 
+;; (use-package flymake
+;;   :config
+;;   (spc-leader-define-key
+;;     "ee" #'flymake-show-buffer-diagnostics
+;;     "ep" #'flymake-show-project-diagnostics))
+
 (use-package projectile
-  :defer
+  :defer nil
   :init
   (if (eq system-type 'windows-nt)
       (setq projectile-indexing-method 'hybrid
             projectile-git-submodule-command nil
             projectile-generic-command "c:/msys64/usr/bin/find.exe . -type f -print0"))
-  (spc-leader-define-key
-    "pf" 'projectile-find-file
-    "pp" 'projectile-switch-project
-    "pl" 'autoload-projectile)
+  (setq projectile-compile-use-comint-mode t
+        projectile-run-use-comint-mode t)
+
   :config
-  (projectile-mode +1)
+  (projectile-mode 1)
   (spc-leader-define-key
-    "p" 'projectile-command-map))
+    "p" 'projectile-command-map)
+
+  (defun my-projectile-compile-and-run (arg)
+    (interactive "P")
+    (let ((old-cff compilation-finish-functions))
+      ;; can't use 'let' here because setting must persist till end of
+      ;; async compilation
+      (setq compilation-finish-functions
+            (lambda (buf msg)
+              (setq compilation-finish-functions old-cff)
+              (if (string-match "finished" msg)
+                  ;; TODO should use 'arg' here but binding gets in
+                  ;; the way
+                  (projectile-run-project nil))
+              t))
+      (projectile-compile-project arg)))
+  (keymap-set projectile-command-map (kbd "r") #'my-projectile-compile-and-run)
+
+  (defun my-projectile-cabal-project-p (&optional dir)
+    (projectile-verify-file-wildcard "?*.cabal" dir))
+
+  (advice-add 'projectile-cabal-project-p
+              :override #'my-projectile-cabal-project-p)
+
+  (projectile-update-project-type 'haskell-cabal :precedence 'high)
+  (projectile-update-project-type 'haskell-stack :precedence 'low)
+  (projectile-update-project-type 'nix :precedence 'low)
+  (projectile-update-project-type 'nix-flake :precedence 'low)
+  )
 
 (use-package scratch
   :defer t
