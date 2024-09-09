@@ -42,6 +42,8 @@
 (setq display-line-numbers-type 'visual)
 (global-display-line-numbers-mode)
 
+(column-number-mode)
+
 (add-to-list 'default-frame-alist '(font . "Consolas 11"))
 
 
