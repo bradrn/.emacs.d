@@ -352,10 +352,12 @@
     "f"   '(:ignore t :which-key "files")
     "ff"  #'find-file
     "fi"  #'find-user-init-file
+    "fd"  #'consult-find
     "fr"  #'consult-recent-file
     "fs"  #'save-buffer
     "fw"  #'write-file
     "fx"  #'delete-file
+    "fy"  #'find-insert-relative-path
 
     "h"   #'help-command
 
@@ -413,10 +415,11 @@
     "-"   #'negative-argument
 
     "/"   '(:ignore t :which-key "find")
+    "//"  #'consult-line
     "/b"  #'browse-url-at-point
     "/f"  #'ffap
     "/F"  #'(lambda () (interactive) (consult-find t))
-    "/g"  #'consult-ripgrep
+    "/r"  #'consult-ripgrep
     "/m"  #'consult-imenu
     "/M"  #'consult-imenu-multi
 
