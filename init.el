@@ -1222,8 +1222,13 @@ CHAR and ARG are as in avy."
   :init
   (setq markdown-gfm-use-electric-backquote nil)
   (add-hook 'markdown-mode-hook
-            #'(lambda () (setq show-trailing-whitespace nil))))
+            #'(lambda () (setq show-trailing-whitespace nil)))
 
+  :config
+  (evil-define-key '(insert visual) markdown-mode-map (kbd "C-b") #'markdown-insert-bold)
+  (evil-define-key '(insert visual) markdown-mode-map (kbd "C-t") #'markdown-insert-code)
+  (evil-define-key '(insert visual) markdown-mode-map (kbd "C-j") #'markdown-insert-italic) ; not C-i as that = TAB and should perform indentation!
+  )
 
 ;; LISP
 
