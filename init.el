@@ -894,9 +894,13 @@ CHAR and ARG are as in avy."
   ;; swap keys
   (evil-define-key 'normal pdf-view-mode-map "f" #'pdf-links-action-perform)
   (evil-define-key 'normal pdf-view-mode-map "F" #'pdf-links-isearch-link)
-  (add-hook 'pdf-view-mode-hook
-            (lambda ()
-              (display-line-numbers-mode 0))))
+  (add-hook 'pdf-view-mode-hook (lambda () (display-line-numbers-mode 0)))
+  ;; (add-hook 'pdf-view-mode-hook (lambda () (setq-local cursor-type nil)))
+
+  ;; annotations
+  (evil-define-key 'normal pdf-view-mode-map "L" #'pdf-annot-list-annotations)
+  (evil-define-key 'normal pdf-annot-list-mode-map "K" #'pdf-annot-list-display-annotation-from-id)
+  (add-hook 'pdf-annot-list-mode-hook (lambda () (pdf-annot-list-follow-minor-mode t))))
 
 (put 'latex-mode 'flyspell-mode-predicate 'my-tex-mode-flyspell-verify)
 (defun my-tex-mode-flyspell-verify ()
@@ -964,13 +968,14 @@ CHAR and ARG are as in avy."
     "a"   #'TeX-command-run-all
     "b"   #'LaTeX-build
     "v"   #'TeX-view
+    "K"   #'TeX-view
     "h"   #'TeX-doc
     "l"   #'TeX-recenter-output-buffer
     "e"   #'LaTeX-environment
     "c"   #'LaTeX-close-environment
     "i"   #'LaTeX-insert-item
     "s"   #'LaTeX-section
-    "k"   #'TeX-kill-job
+    "x"   #'TeX-kill-job
     "q"   #'TeX-next-error
     "\\"  #'TeX-electric-macro
     "w"   #'TeX-word-count
@@ -984,10 +989,12 @@ CHAR and ARG are as in avy."
     "pcp" #'preview-clearout-at-point
 
     "r"   '(:ignore t :which-key "reftex")
+    "ri"  #'reftex-toc
     "rc"  #'reftex-citation
     "rl"  #'reftex-label
     "rr"  #'reftex-reference
-    "rv"  #'reftex-view-crossref)
+    "rv"  #'reftex-view-crossref
+    "rx"  #'reftex-reset-mode)
 
   ;; Rebindings for TeX-font - lifted from spacemacs
   (defun latex/font-bold         () (interactive) (TeX-font nil ?\C-b))
