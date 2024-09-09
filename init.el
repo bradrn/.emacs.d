@@ -317,11 +317,12 @@
 
 (use-package general
   :config
+  (general-auto-unbind-keys)
   (general-create-definer spc-leader-define-key
     :states '(normal visual insert emacs)
     :keymaps 'override
     :prefix "SPC"
-    :non-normal-prefix "C-SPC")
+    :non-normal-prefix "M-SPC")
 
   (general-create-definer mode-leader-define-key
     :states '(normal visual insert emacs)
