@@ -297,7 +297,9 @@
                  args)))
 
   (consult-customize
-   consult-theme :preview-key '(:debounce 0.2 any)))
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep :preview-key '(:debounce 0.2 any)
+   consult-line  :preview-key '(:debounce 0.2 any)))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
