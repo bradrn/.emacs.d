@@ -591,11 +591,6 @@ CHAR and ARG are as in avy."
   (define-key company-mode-map   (kbd "C-:") #'move-company-to-minibuffer)
   (spc-leader-define-key "im" #'company-mode))
 
-(use-package origami
-  :defer
-  :init
-  (add-hook 'prog-mode-hook #'origami-mode)
-  (add-hook 'LaTeX-mode-hook #'origami-mode))
 
 (use-package flycheck
   :defer t
