@@ -554,7 +554,8 @@ CHAR and ARG are as in avy."
   :defer
   :init
   (spc-leader-define-key
-    "g" #'magit-status)
+    "g" #'magit-status
+    "G" #'magit-blame)
   :config
   (add-hook 'git-commit-setup-hook 'evil-insert-state))
 
