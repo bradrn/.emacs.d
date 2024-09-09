@@ -134,6 +134,7 @@
 
   (evil-set-initial-state 'dashboard-mode 'emacs)
   (evil-set-initial-state 'sly-db-mode 'emacs)
+  (evil-set-initial-state 'calc-mode 'emacs)
   (evil-select-search-module 'evil-search-module 'evil-search)
   (evil-mode 1)
 
@@ -206,6 +207,7 @@
 (use-package evil-collection
   :config
   (delete 'lispy evil-collection-mode-list)  ; handled by lispyville
+  (delete 'calc evil-collection-mode-list)   ; use default bindings
   (evil-collection-init))
 
 ;; from https://oremacs.com/2015/06/23/counsel-load-theme/
@@ -634,6 +636,15 @@ CHAR and ARG are as in avy."
   (global-set-key (kbd "C-h c") #'helpful-command)
   :config
   (evil-define-key 'normal helpful-mode-map "q" 'quit-window))
+
+(use-package casual-calc
+  :bind (:map
+         calc-mode-map
+         ("C-o" . casual-calc-tmenu)
+         :map
+         calc-alg-map
+         ("C-o" . casual-calc-tmenu))
+  :after (calc))
 
 (use-package editorconfig
   :config
