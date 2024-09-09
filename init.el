@@ -688,15 +688,21 @@ CHAR and ARG are as in avy."
 
 ;; LSP, Haskell
 
+(setq-default c-default-style "k&r"
+              c-basic-offset 4)
+
 (use-package lsp-mode
   :hook
   ((haskell-mode . lsp)
+   (c-mode . lsp)
+   (c++-mode . lsp)
    (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
   :init
   (setq-default lsp-modeline-diagnostics-enable nil
                 lsp-progress-function 'ignore
-                lsp-lens-enable nil)
+                lsp-lens-enable nil
+                lsp-ui-doc-enable nil)
   ;; mostly copied from Spacemacs
   (spc-leader-define-key
     "l" '(:ignore t :which-key "lsp")
@@ -714,14 +720,14 @@ CHAR and ARG are as in avy."
     "lgd" #'lsp-find-definition
     "lgM" #'lsp-ui-imenu
     ;; help
-    "lh" '(:ignore t :which-key "help")
-    "lhh" #'lsp-describe-thing-at-point
+    "lh"  #'lsp-describe-thing-at-point
     ;; backend
     "lb" '(:ignore t :which-key "backend")
     "lbd" #'lsp-describe-session
     "lbr" #'lsp-workspace-restart
     "lbs" #'lsp-workspace-shutdown
     "lbv" #'lsp-version
+    "lbx" #'lsp-workspace-folders-remove
     ;; peek
     "lp" '(:ignore t :which-key "peek")
     "lpd" #'lsp-ui-peek-find-definitions
