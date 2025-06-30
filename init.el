@@ -325,6 +325,101 @@
 (use-package cbm
   :defer)
 
+;; from hydra-examples
+(defun hydra-move-splitter-left (arg)
+  "Move window splitter left."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'right))
+      (shrink-window-horizontally arg)
+    (enlarge-window-horizontally arg)))
+
+(defun hydra-move-splitter-right (arg)
+  "Move window splitter right."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'right))
+      (enlarge-window-horizontally arg)
+    (shrink-window-horizontally arg)))
+
+(defun hydra-move-splitter-up (arg)
+  "Move window splitter up."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'up))
+      (enlarge-window arg)
+    (shrink-window arg)))
+
+(defun hydra-move-splitter-down (arg)
+  "Move window splitter down."
+  (interactive "p")
+  (if (let ((windmove-wrap-around))
+        (windmove-find-other-window 'up))
+      (shrink-window arg)
+    (enlarge-window arg)))
+
+(use-package hydra
+  :config
+  (defhydra hydra-window ()
+    "
+Movement^^        ^Split^         ^Switch^		^Resize^
+----------------------------------------------------------------
+_h_ ←       	_/_ vertical    _b_uffer		_H_ X←
+_j_ ↓        	_-_ horizontal	 _f_ile		_J_ X↓
+_k_ ↑        	_z_ undo      	_a_ce 1		_K_ X↑
+_l_ →        	_Z_ reset      	_s_wap		_L_ X→
+_F_ollow		_D_lt Other   	_S_ave		max_i_mize
+_q_ cancel	_o_nly this   	_d_elete
+"
+    ("h" windmove-left )
+    ("j" windmove-down )
+    ("k" windmove-up )
+    ("l" windmove-right )
+    ("H" hydra-move-splitter-left)
+    ("J" hydra-move-splitter-down)
+    ("K" hydra-move-splitter-up)
+    ("L" hydra-move-splitter-right)
+    ("F" follow-mode)
+    ("b" consult-buffer)
+    ("f" find-file)
+    ("a" (lambda ()
+           (interactive)
+           (ace-window 1)
+           (add-hook 'ace-window-end-once-hook
+                     'hydra-window/body))
+     )
+    ("/" (lambda ()
+           (interactive)
+           (split-window-right)
+           (windmove-right))
+     )
+    ("-" (lambda ()
+           (interactive)
+           (split-window-below)
+           (windmove-down))
+     )
+    ("s" (lambda ()
+           (interactive)
+           (ace-window 4)
+           (add-hook 'ace-window-end-once-hook
+                     'hydra-window/body)))
+    ("S" save-buffer)
+    ("d" delete-window)
+    ("D" (lambda ()
+           (interactive)
+           (ace-window 16)
+           (add-hook 'ace-window-end-once-hook
+                     'hydra-window/body))
+     )
+    ("o" delete-other-windows)
+    ("i" ace-maximize-window)
+    ("z" (progn
+           (winner-undo)
+           (setq this-command 'winner-undo))
+     )
+    ("Z" winner-redo)
+    ("q" nil)))
+
 (use-package general
   :config
   (general-auto-unbind-keys)
@@ -448,7 +543,8 @@
     "wK"  #'evil-window-move-very-top
     "wQ"  #'kill-buffer-and-window
     "w-"  #'split-window-below
-    "w/"  #'split-window-right)
+    "w/"  #'split-window-right
+    "ww"  #'hydra-window/body)
 
   (evil-define-key 'normal with-editor-mode-map
     (kbd "KK") 'with-editor-finish
