@@ -1028,7 +1028,7 @@ CHAR and ARG are as in avy."
 
 (use-package tex
   :ensure auctex
-  :mode ("\\.tex\\'" . TeX-latex-mode)
+  :mode ("\\.tex\\'" . LaTeX-mode)
 
   :preface
   ;; from spacemacs
