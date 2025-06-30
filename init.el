@@ -681,7 +681,7 @@ CHAR and ARG are as in avy."
 (use-package company
   :defer t
   :init
-  (setq company-idle-delay 0.4
+  (setq company-idle-delay 0.2
         company-dabbrev-downcase nil)
   (add-hook 'prog-mode-hook #'(lambda () (company-mode 1)))
   (add-hook 'comint-mode-hook #'(lambda () (company-mode 1)))
