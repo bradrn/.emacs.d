@@ -498,6 +498,7 @@ _q_ cancel	_o_nly this   	_d_elete
     "iu"  #'undo-tree-visualize
     "iw"  #'whitespace-mode
     "ix"  #'toggle-truncate-lines
+    "iX"  #'toggle-word-wrap
 
     "j"   '(:ignore t :which-key "jump")
     "jw"  #'subword-mode
