@@ -322,6 +322,9 @@
   (which-key-mode)
   (which-key-enable-god-mode-support))
 
+(use-package cbm
+  :defer)
+
 (use-package general
   :config
   (general-auto-unbind-keys)
@@ -339,6 +342,7 @@
   (spc-leader-define-key
     "SPC" #'execute-extended-command
     "TAB" #'switch-to-previous-buffer
+    "`" #'cbm-cycle
     "RET" #'evil-execute-in-emacs-state
     "$"   #'set-selective-display-current-column
     "!"   #'shell-command
