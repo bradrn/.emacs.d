@@ -80,6 +80,12 @@
   (interactive)
   (find-file user-init-file))
 
+(defun find-insert-relative-path (filename)
+  (interactive
+   (list (read-file-name "Find file: " nil default-directory
+                         (confirm-nonexistent-file-or-buffer))))
+  (insert (file-relative-name filename)))
+
 ;; thanks https://emacs.stackexchange.com/a/18064/20375
 (defun switch-to-previous-buffer ()
   (interactive)
