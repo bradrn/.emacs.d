@@ -56,6 +56,8 @@
       scroll-margin 3
       scroll-conservatively 101)
 
+(setopt switch-to-buffer-obey-display-actions t)
+
 (let ((editing-hooks '(text-mode-hook prog-mode-hook)))
   (mapc (lambda (hook)
           (add-hook hook
