@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;; from https://blog.d46.us/advanced-emacs-startup/
 ;; Use a hook so the message doesn't get clobbered by other messages.
 (add-hook 'emacs-startup-hook
