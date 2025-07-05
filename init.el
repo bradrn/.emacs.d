@@ -462,6 +462,7 @@ _q_ cancel	_o_nly this   	_d_elete
     "ff"  #'find-file
     "fi"  #'find-user-init-file
     "fd"  #'consult-find
+    "fm"  #'rename-visited-file
     "fr"  #'consult-recent-file
     "fs"  #'save-buffer
     "fw"  #'write-file
