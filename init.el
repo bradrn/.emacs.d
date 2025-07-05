@@ -451,7 +451,7 @@ _q_ cancel	_o_nly this   	_d_elete
     "b"   '(:ignore t :which-key "buffers")
     "bb"  #'consult-buffer
     "bp"  #'consult-project-buffer
-    "bd"  #'kill-this-buffer
+    "bd"  #'kill-current-buffer
     "bi"  #'ibuffer
     "bci" #'clone-indirect-buffer
     "bco" #'clone-indirect-buffer-other-window
