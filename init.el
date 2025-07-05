@@ -786,14 +786,14 @@ CHAR and ARG are as in avy."
   :config
   (evil-define-key 'normal helpful-mode-map "q" 'quit-window))
 
-(use-package casual-calc
-  :bind (:map
-         calc-mode-map
-         ("C-o" . casual-calc-tmenu)
-         :map
-         calc-alg-map
-         ("C-o" . casual-calc-tmenu))
-  :after (calc))
+;; (use-package casual-calc
+;;   :bind (:map
+;;          calc-mode-map
+;;          ("C-o" . casual-calc-tmenu)
+;;          :map
+;;          calc-alg-map
+;;          ("C-o" . casual-calc-tmenu))
+;;   :after (calc))
 
 (use-package editorconfig
   :config
