@@ -1177,6 +1177,7 @@ CHAR and ARG are as in avy."
   (assq-delete-all 'output-pdf TeX-view-program-selection)
   (if (eq system-type 'windows-nt)
       (add-to-list 'TeX-view-program-selection '(output-pdf "Sumatra PDF"))
+    (require 'pdf-sync)  ; so that TeX-view works first time
     (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
     (add-hook 'TeX-after-compilation-finished-functions
               #'TeX-revert-document-buffer)))
