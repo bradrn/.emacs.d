@@ -668,6 +668,7 @@ CHAR and ARG are as in avy."
   (spc-leader-define-key
     "g" #'magit-status
     "G" #'magit-blame)
+  (setq magit-diff-refine-hunk 'all)
   :config
   (add-hook 'git-commit-setup-hook 'evil-insert-state))
 
