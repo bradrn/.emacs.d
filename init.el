@@ -1166,7 +1166,8 @@ CHAR and ARG are as in avy."
   (evil-define-key 'insert TeX-mode-map (kbd "C-\\") 'TeX-electric-macro)
 
   (if (eq system-type 'windows-nt)
-      (add-to-list 'TeX-tree-roots "c:/Users/bradn/AppData/Roaming/MiKTeX/2.9/"))
+      (add-to-list 'TeX-tree-roots "c:/Users/bradn/AppData/Roaming/MiKTeX/2.9/")
+    (add-to-list 'TeX-tree-roots "/usr/share/texmf-dist"))
 
   ;; from https://tex.stackexchange.com/questions/286028/inverse-search-with-emacs-auctex-and-sumatrapdf-on-windows-10
   (setq TeX-PDF-mode t)
