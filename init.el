@@ -48,6 +48,14 @@
 
 (add-to-list 'default-frame-alist '(font . "Consolas 11"))
 
+(setq variable-font-face-tuple '(:family "Scala Sans Pro" :height 113))
+
+(custom-theme-set-faces
+  'user
+  `(variable-pitch ((t ,variable-font-face-tuple)))
+  '(fixed-pitch ((t (:family "Consolas" :height 113))))
+  '(line-number ((t (:inherit (shadow fixed-pitch))))))
+
 
 ;; UI
 
