@@ -1204,6 +1204,9 @@ CHAR and ARG are as in avy."
     "os" #'org-save-all-org-buffers)
   :config
 
+  ;; see https://stackoverflow.com/a/72919700
+  (require 'org-attach)
+
   (defun toggle-org-hide-stars ()
     (interactive)
     (setq-local org-hide-leading-stars (not org-hide-leading-stars))
@@ -1211,22 +1214,64 @@ CHAR and ARG are as in avy."
     (font-lock-mode nil)
     (font-lock-mode t))
   (mode-leader-define-key org-mode-map
+    "K" #'org-ctrl-c-ctrl-c
+    "W" #'org-refile
     "ci" #'org-clock-in
     "co" #'org-clock-out
     "e" #'org-export-dispatch
-    "i" #'org-insert-item
-    "t" #'org-todo
-    "w" #'org-table-toggle-column-width
-    "W" #'org-refile
-    "K" #'org-ctrl-c-ctrl-c
-    "z" #'org-reveal
-    "s" '(:ignore t :which-key "scheduling")
-    "ss" #'org-schedule
-    "sd" #'org-deadline
-    "s." #'org-time-stamp
     "g" #'org-set-tags-command
+    "i" #'org-insert-item
+    "l" '(:ignore t :which-key "links")
+    "ll" #'org-insert-link
+    "lo" #'org-open-at-point
+    "ls" #'org-store-link
+    "p" #'yank-media
+    "s" '(:ignore t :which-key "scheduling")
+    "s." #'org-time-stamp
+    "sd" #'org-deadline
+    "ss" #'org-schedule
+    "t" #'org-todo
+    "v" '(:ignore t :which-key "preview")
+    "vi" #'org-display-inline-images
+    "vl" #'org-latex-preview
+    "w" #'org-table-toggle-column-width
+    "z" #'org-reveal
     "*" #'toggle-org-hide-stars
     "," #'org-insert-structure-template)
+
+  (use-package org-modern
+    :config
+    (global-org-modern-mode)
+    (setq org-modern-priority nil
+          org-modern-table nil
+          ;; org-modern-timestamp t
+          org-modern-todo nil
+          org-modern-fold-stars '(("▶" . "▼") ("⯈" . "⯆") ("▸" . "▾")))
+    (set-face-attribute 'org-modern-symbol nil :family "DejaVu Sans" :height 80)
+    (set-face-attribute 'org-modern-label  nil :height 'unspecified)
+    (defface my-org-modern-question-override
+      `((t :height ,(/ 1.0 0.8) :background "grey85"))
+      "Face for question blocks.")
+    (defun my-org-modern-font-lock-keywords (kws)
+      (append kws
+              '(("^\\([ 	]*\\)\\(#\\+\\(?:begin\\|BEGIN\\)_\\)\\(question\\).*"
+                 ;; (1 '(face nil invisible org-modern))
+                 ;; (2 '(face nil invisible org-modern))
+                 (3 'my-org-modern-question-override prepend))
+                ;; ("^\\([ 	]*\\)\\(#\\+\\(?:end\\|END\\)_\\)\\(question\\).*"
+                ;;  ;; (1 '(face nil invisible org-modern))
+                ;;  ;; (2 '(face nil invisible org-modern))
+                ;;  (3 'my-org-modern-question-override prepend))
+                )))
+    (advice-add 'org-modern--make-font-lock-keywords :filter-return #'my-org-modern-font-lock-keywords))
+
+  (use-package org-modern-indent
+    :load-path "~/.emacs.d/org-modern-indent"
+    :config
+    (add-hook 'org-mode-hook #'org-modern-indent-mode 90)
+    (custom-theme-set-faces
+     'user
+     '(org-modern-indent-bracket-line ((t (:inherit shadow))))))
 
   (use-package evil-org
     :init
@@ -1259,7 +1304,13 @@ CHAR and ARG are as in avy."
       "rc" #'org-zotxt-insert-reference-link
       "ru" #'org-zotxt-update-reference-link-at-point
       "ro" #'org-zotxt-open-attachment))
-  
+
+  (use-package org-fragtog
+    :init
+    (add-hook 'org-mode-hook 'org-fragtog-mode))
+
+  (set-face-attribute 'org-quote nil :slant 'italic)
+
   ;; adapted from https://emacs.stackexchange.com/a/14734/20375
   (defun org-agenda-skip-if-blocked ()
     (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
@@ -1272,7 +1323,8 @@ CHAR and ARG are as in avy."
         ;; CANCELLED is for tasks for which there is no intention of completion
         org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "INPROGRESS(p)" "|" "DONE(d)")
-          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)"))
+          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(x@)")
+          (sequence "QUESTION(q)" "|" "ANSWERED(a@)"))
         org-agenda-custom-commands
         '(("p" "Block agenda"
            ((tags "-university/INPROGRESS"
@@ -1318,7 +1370,28 @@ CHAR and ARG are as in avy."
         org-enforce-todo-checkbox-dependencies t
         org-log-into-drawer t
         org-startup-folded t
-        org-adapt-indentation t)
+        org-adapt-indentation nil
+        org-cycle-inline-images-display t
+        org-startup-indented t
+        org-startup-with-latex-preview t
+        org-fontify-quote-and-verse-blocks t
+        org-format-latex-options
+        '(:foreground default :background default :scale 0.5
+                      :html-foreground "Black" :html-background "Transparent" :html-scale 1.0
+                      :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
+        org-structure-template-alist
+        '(("a" . "answer")
+          ("c" . "center")
+          ("C" . "comment")
+          ("e" . "example")
+          ("E" . "export")
+          ("Ea" . "export ascii")
+          ("Eh" . "export html")
+          ("El" . "export latex")
+          ("n" . "question")
+          ("q" . "quote")
+          ("s" . "src")
+          ("v" . "verse")))
 
   ;; from https://lists.gnu.org/archive/html/emacs-orgmode/2015-06/msg00266.html
   (defun org-agenda-delete-empty-blocks ()
