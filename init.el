@@ -485,6 +485,7 @@ _q_ cancel	_o_nly this   	_d_elete
     "icg" #'customize-group
     "icv" #'customize-variable
     "id"  #'dired
+    "if"  #'display-fill-column-indicator-mode
     "io"  #'column-number-mode
     "il"  '(:ignore t :which-key "calc")
     "ilc" #'calc
@@ -625,13 +626,13 @@ CHAR and ARG are as in avy."
 
 (use-package hl-todo :defer 3 :config (global-hl-todo-mode))
 
-(use-package fill-column-indicator
-  :defer
-  :init
-  (setq fci-always-use-textual-rule t
-        fci-rule-character 9474)
-  (spc-leader-define-key
-    "if" #'fci-mode))
+;; (use-package fill-column-indicator
+;;   :defer
+;;   :init
+;;   (setq fci-always-use-textual-rule t
+;;         fci-rule-character 9474)
+;;   (spc-leader-define-key
+;;     "if" #'fci-mode))
 
 (use-package rainbow-delimiters
   :init
