@@ -84,6 +84,10 @@
                   "c:/cygwin64/bin/aspell.exe"
                 "/usr/bin/aspell"))
 
+(with-eval-after-load 'comint
+  (define-key comint-mode-map (kbd "M-p") #'comint-previous-matching-input-from-input)
+  (define-key comint-mode-map (kbd "M-n") #'comint-next-matching-input-from-input))
+
 ;; utilities
 
 ;; thanks http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/
@@ -819,13 +823,15 @@ CHAR and ARG are as in avy."
   ((haskell-mode . lsp)
    (c-mode . lsp)
    (c++-mode . lsp)
+   ;; (python-mode . lsp)  ; configured later
    (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
   :init
   (setq-default lsp-modeline-diagnostics-enable nil
                 lsp-progress-function 'ignore
                 lsp-lens-enable nil
-                lsp-ui-doc-enable nil)
+                lsp-ui-doc-enable nil
+                lsp-enable-on-type-formatting)
   ;; mostly copied from Spacemacs
   (spc-leader-define-key
     "l" '(:ignore t :which-key "lsp")
@@ -959,8 +965,19 @@ CHAR and ARG are as in avy."
                     (or (python-shell-get-process)
                         (run-python)))))
 
-  (setq python-shell-interpreter "ipython"
-        python-shell-interpreter-args "-i")
+  (defun python-start-or-restart-repl ()
+    (interactive)
+    (let ((proc (python-shell-get-process)))
+      (if proc
+          (progn
+            (kill-process proc)
+            ;; see https://emacs.stackexchange.com/a/21375
+            (sleep-for 0.05)))
+      (run-python)))
+
+  (setq python-shell-interpreter "uv"
+        python-shell-interpreter-args "run --with ipython --with pyqt6 ipython --simple-prompt --matplotlib=qt --ext=autoreload \"--InteractiveShellApp.exec_lines=%autoreload 2\""
+        python-shell-prompt-detect-failure-warning nil)
 
   (defun python-run-current-file ()
     (interactive)
@@ -969,15 +986,39 @@ CHAR and ARG are as in avy."
       (compile (concat "python "
                        (shell-quote-argument (file-name-nondirectory buffer-file-name)))
                t)))
+
+  (defun python-write-history-line (input)
+    (write-region input nil "~/.emacs.d/.ipython-history" 'append))
+
   :config
   (mode-leader-define-key python-mode-map
     "'" #'python-start-or-switch-repl
+    "\"" #'python-start-or-restart-repl
     "r" #'python-run-current-file
+    "p" '(:ignore t :which-key "send")
+    "pb" #'python-shell-send-block
+    "pd" #'python-shell-send-defun
+    "pe" #'python-shell-send-statement
+    "pr" #'python-shell-send-region
+    "pu" #'python-shell-send-buffer
     "va" #'pyvenv-activate
     "vd" #'pyvenv-deactivate
-    "vw" #'pyvenv-workon))
+    "vw" #'pyvenv-workon)
+
+  (add-hook 'inferior-python-mode-hook
+            (lambda ()
+              (when (ring-empty-p comint-input-ring)
+                (setq comint-input-ring-file-name "~/.emacs.d/.ipython-history")
+                (comint-read-input-ring t))
+              (add-hook 'comint-input-filter-functions #'python-write-history-line 0 t))))
 
 (use-package pyvenv :defer)
+
+(use-package lsp-pyright
+  :custom (lsp-pyright-langserver-command "basedpyright")
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp))))
 
 
 ;; HTML (Emmet)
