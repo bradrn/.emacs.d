@@ -1250,6 +1250,8 @@ CHAR and ARG are as in avy."
   ;; see https://stackoverflow.com/a/72919700
   (require 'org-attach)
 
+  (add-to-list 'org-file-apps '("\\.png\\'" . default))
+
   (defun toggle-org-hide-stars ()
     (interactive)
     (setq-local org-hide-leading-stars (not org-hide-leading-stars))
