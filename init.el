@@ -1650,6 +1650,122 @@ CHAR and ARG are as in avy."
     (add-function :before-until (local 'font-lock-syntactic-face-function)
                   #'company-coq-syntactic-face-function/nospace)))
 
+;; BBCode
+
+(use-package visual-fill-column)
+
+(defvar bbcode-font-lock-keywords
+  '(("\\[.+?\\]" 0 'markdown-html-tag-delimiter-face)
+    ("\\[i]\\(.+?\\)\\[/i]" 1 'italic append)
+    ("\\[b]\\(.+?\\)\\[/b]" 1 'bold append)
+    ("\\[url=\\([^\\]+?\\)]\\(.+?\\)\\[/url]" 2 'link append)
+    ("\\[rowh]\\(.+?\\)\\[/rowh]" 0 'underline append)
+    ("\\[cellh]\\(.+?\\)\\[/cellh]" 0 'underline append)
+    ))
+
+;; based on css--fontify-region
+(defun bbcode--fontify-region (start end &optional loudly)
+  "Fontify a BBCode buffer between START and END."
+  (let ((extended-region (font-lock-default-fontify-region start end loudly)))
+      (when (and (consp extended-region)
+		 (eq (car extended-region) 'jit-lock-bounds))
+	(setq start (cadr extended-region))
+	(setq end (cddr extended-region)))
+      (save-excursion
+        (goto-char start)
+        (while (re-search-forward "\\[size=\\([[:digit:]]+\\)\\]\\(.+?\\)\\[/size]" end t)
+          (let ((size (string-to-number (match-string 1)))
+                (start (match-beginning 2))
+                (end (match-end 2)))
+            (with-silent-modifications
+              (add-face-text-property
+               start end `(:family "Inter" :height ,(/ size 100.0)))))))
+      extended-region))
+
+(define-derived-mode bbcode-mode text-mode "BBCode"
+  "Major mode for ZBB BBCode."
+  (setq-local font-lock-defaults '(bbcode-font-lock-keywords t nil nil nil)
+              font-lock-fontify-region-function #'bbcode--fontify-region
+              word-wrap t
+              fill-column 140)
+  (visual-fill-column-mode 1)
+  )
+
+(defun bbcode-insert-italic ()
+  "Insert [i][/i]."
+  (interactive)
+  (markdown-wrap-or-insert "[i]" "[/i]"))
+
+(defun bbcode-insert-bold ()
+  "Insert [b][/b]."
+  (interactive)
+  (markdown-wrap-or-insert "[b]" "[/b]"))
+
+(defun bbcode-insert-tt ()
+  "Insert [tt][/tt]."
+  (interactive)
+  (markdown-wrap-or-insert "[tt]" "[/tt]"))
+
+(defun bbcode-insert-size (n)
+  "Insert [size=N][/size]."
+  (interactive "nSize: ")
+  (markdown-wrap-or-insert (format "[size=%d]" n) "[/size]"))
+
+(defun bbcode-insert-tag (tag params)
+  "Insert TAG with given PARAMS."
+  (interactive "MTag: \nMParameters: ")
+  (let ((begin-tag
+         (if (string-empty-p params)
+             (format "[%s]" tag)
+           (format "[%s=%s]" tag params)))
+        (end-tag (format "[/%s]" tag)))
+    (markdown-wrap-or-insert begin-tag end-tag)))
+
+(evil-define-key '(insert visual) bbcode-mode-map (kbd "C-b") #'bbcode-insert-bold)
+(evil-define-key '(insert visual) bbcode-mode-map (kbd "C-j") #'bbcode-insert-italic)
+(evil-define-key '(insert visual) bbcode-mode-map (kbd "C-t") #'bbcode-insert-tt)
+(evil-define-key '(insert visual) bbcode-mode-map (kbd "C-=") #'bbcode-insert-size)
+(evil-define-key '(insert visual) bbcode-mode-map (kbd "C--") #'(lambda () (interactive) (bbcode-insert-size 85)))
+(evil-define-key '(insert visual) bbcode-mode-map (kbd "C-+") #'(lambda () (interactive) (bbcode-insert-size 150)))
+(evil-define-key '(insert visual) bbcode-mode-map (kbd "C-w") #'bbcode-insert-tag)
+
+(defvar mdf-font-lock-keywords
+  '(("^\\\\lx .+$" 0 'bold)
+    ("^\\\\ge \\(.+\\)$" 1 'package-name)
+    ("^\\\\[a-z]+" 0 'markdown-html-tag-delimiter-face)))
+
+(define-derived-mode mdf-mode outline-mode "MDF"
+  "Major mode for Multi Dictionary Formatter."
+  (setq-local outline-regexp "\\\\lx"
+              font-lock-defaults '(mdf-font-lock-keywords nil nil nil))
+  (face-remap-add-relative
+   'outline-3
+   '(:weight bold)))
+
+(defun mdf-show-by-body-regexp (regexp)
+  "Show only words whose bodies match REGEXP."
+  (interactive (list (read-regexp "Regexp to show words")))
+  (let (outline-view-change-hook)
+    (outline-hide-body)
+    (outline-map-region
+     (lambda ()
+       (let ((body-end (save-excursion
+                         (outline-next-heading)
+                         (pos-bol))))
+        (when (string-match-p regexp (buffer-substring (pos-bol) body-end))
+            (outline-show-branches) ;; To reveal all parent headings
+            (outline-show-entry))))
+     (point-min) (point-max)))
+  (setq evil-ex-search-pattern (evil-ex-make-pattern regexp 'sensitive t))
+  (evil-ex-search-next )
+  (run-hooks 'outline-view-change-hook))
+
+(evil-define-key '(normal insert) mdf-mode-map (kbd "TAB") #'outline-cycle)
+
+(add-to-list 'auto-mode-alist '("/Dictionary\\.txt$" . mdf-mode))
+
+(mode-leader-define-key mdf-mode-map
+  "/" #'mdf-show-by-body-regexp)
 
 ;; reset garbage collection
 
