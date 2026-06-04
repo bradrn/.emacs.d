@@ -323,7 +323,14 @@
   (consult-customize
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-ripgrep :preview-key '(:debounce 0.2 any)
-   consult-line  :preview-key '(:debounce 0.2 any)))
+   consult-line  :preview-key '(:debounce 0.2 any))
+
+  (setq consult-find-args
+        (concat
+         "find . -not ( ( "
+         "-name .[A-Za-z]* -or -name node_modules "
+         "-or -name dist-newstyle -or -name matlab-* )"
+         " -prune )")))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
