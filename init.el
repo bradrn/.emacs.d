@@ -48,7 +48,7 @@
 
 (add-to-list 'default-frame-alist '(font . "Consolas 11"))
 
-(setq variable-font-face-tuple '(:family "Scala Sans Pro" :height 113))
+(setq variable-font-face-tuple '(:family "Inter" :height 113))
 
 (custom-theme-set-faces
   'user
