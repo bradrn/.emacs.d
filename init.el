@@ -1093,7 +1093,8 @@ CHAR and ARG are as in avy."
 
 (use-package tex
   :ensure auctex
-  :mode ("\\.tex\\'" . LaTeX-mode)
+  :mode (("\\.tex\\'" . LaTeX-mode)
+         ("\\.lhs\\'" . LaTeX-mode))
 
   :preface
   ;; from spacemacs
@@ -1239,7 +1240,9 @@ CHAR and ARG are as in avy."
     (require 'pdf-sync)  ; so that TeX-view works first time
     (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
     (add-hook 'TeX-after-compilation-finished-functions
-              #'TeX-revert-document-buffer)))
+              #'TeX-revert-document-buffer))
+
+  (add-to-list 'TeX-file-extensions "lhs"))
 
 ;; org
 
