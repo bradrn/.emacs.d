@@ -220,14 +220,6 @@
   (setq evil-snipe-scope 'buffer
         evil-snipe-smart-case t)
   (evil-snipe-mode 1))
-(use-package evil-unimpaired
-  :load-path "~/.emacs.d/evil-unimpaired"
-  :config
-  (evil-unimpaired-mode t)
-  (use-package move-text
-    :defer
-    :init
-    (evil-unimpaired-define-pair "e" '(move-text-up . move-text-down))))
 (use-package evil-collection
   :config
   (delete 'lispy evil-collection-mode-list)  ; handled by lispyville
