@@ -1058,7 +1058,7 @@ CHAR and ARG are as in avy."
 
 (use-package pdf-tools
   :init
-  (pdf-tools-install)
+  ;; (pdf-tools-install)
   (pdf-loader-install)
 
   (setq-default pdf-view-display-size 'fit-page)
