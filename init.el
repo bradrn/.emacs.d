@@ -992,6 +992,23 @@ CHAR and ARG are as in avy."
   (defun python-write-history-line (input)
     (write-region input nil "~/.emacs.d/.ipython-history" 'append))
 
+  (defun my--comint-dynamic-list-input-ring ()
+    (interactive nil comint-mode)
+    (let* ((completions (ring-elements comint-input-ring))
+           (input
+            (completing-read
+             "Input: "
+             (lambda (string pred action)
+                 (if (eq action 'metadata)
+                     ;; Keep sorted by recency
+                     '(metadata (display-sort-function . identity))
+                 (complete-with-action action completions string pred))))))
+      (delete-region
+        (or (marker-position comint-accum-marker)
+            (process-mark (get-buffer-process (current-buffer))))
+        (point))
+      (insert input)))
+
   :config
   (mode-leader-define-key python-mode-map
     "'" #'python-start-or-switch-repl
@@ -1012,7 +1029,10 @@ CHAR and ARG are as in avy."
               (when (ring-empty-p comint-input-ring)
                 (setq comint-input-ring-file-name "~/.emacs.d/.ipython-history")
                 (comint-read-input-ring t))
-              (add-hook 'comint-input-filter-functions #'python-write-history-line 0 t))))
+              (add-hook 'comint-input-filter-functions #'python-write-history-line 0 t)))
+
+  (mode-leader-define-key inferior-python-mode-map
+    "l" #'my--comint-dynamic-list-input-ring))
 
 (use-package pyvenv :defer)
 
