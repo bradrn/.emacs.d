@@ -262,7 +262,8 @@
            (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
 
   (setq vertico-multiform-categories
-        '((file (vertico-sort-function . sort-directories-first))))
+        '((file (:keymap . vertico-directory-map)
+                (vertico-sort-function . sort-directories-first))))
 
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
@@ -282,7 +283,7 @@
 (use-package vertico-directory
   :after vertico
   :ensure nil
-  :bind (:map vertico-map
+  :bind (:map vertico-directory-map
               ("RET" . vertico-directory-enter)
               ("C-l" . vertico-directory-enter)
               ("C-h" . vertico-directory-up))
