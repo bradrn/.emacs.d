@@ -224,6 +224,11 @@
   :config
   (delete 'lispy evil-collection-mode-list)  ; handled by lispyville
   (delete 'calc evil-collection-mode-list)   ; use default bindings
+  ;; https://github.com/emacs-evil/evil/issues/2034
+  (setq evil-collection-repl-submit-state 'insert
+        evil-collection-setup-minibuffer t)
+  (put 'evil-default-state 'permanent-local t)
+  (put 'evil-echo-state 'permanent-local t)
   (evil-collection-init))
 
 ;; from https://oremacs.com/2015/06/23/counsel-load-theme/
