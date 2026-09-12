@@ -1659,6 +1659,7 @@ CHAR and ARG are as in avy."
   '(("\\[.+?\\]" 0 'markdown-html-tag-delimiter-face)
     ("\\[i]\\(.+?\\)\\[/i]" 1 'italic append)
     ("\\[b]\\(.+?\\)\\[/b]" 1 'bold append)
+    ("\\[u]\\(.+?\\)\\[/u]" 1 'underline append)
     ("\\[url=\\([^\\]+?\\)]\\(.+?\\)\\[/url]" 2 'link append)
     ("\\[rowh]\\(.+?\\)\\[/rowh]" 0 'underline append)
     ("\\[cellh]\\(.+?\\)\\[/cellh]" 0 'underline append)
