@@ -278,7 +278,8 @@
 
   :config
   (evil-define-key '(normal insert) vertico-map (kbd "C-j") #'vertico-next)
-  (evil-define-key '(normal insert) vertico-map (kbd "C-k") #'vertico-previous))
+  (evil-define-key '(normal insert) vertico-map (kbd "C-k") #'vertico-previous)
+  (evil-define-key '(normal insert) vertico-map (kbd "C-l") #'vertico-insert))
 
 (use-package vertico-directory
   :after vertico
