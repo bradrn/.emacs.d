@@ -703,30 +703,25 @@ CHAR and ARG are as in avy."
 (use-package yasnippet-snippets
   :after yasnippet)
 
-(use-package company
-  :defer t
+(use-package corfu
   :init
-  (setq company-idle-delay 0.3
-        company-dabbrev-downcase nil)
-  (add-hook 'prog-mode-hook #'(lambda () (company-mode 1)))
-  (add-hook 'comint-mode-hook #'(lambda () (company-mode 1)))
+  (global-corfu-mode)
+  (corfu-popupinfo-mode)
 
-  ;; based on counsel-company
-  (defun move-company-to-minibuffer ()
-    (interactive)
-    (company-mode 1)
-    (unless company-candidates
-      (company-complete))
-    (when company-candidates
-      (company--continue)
-      (let ((candidate (completing-read "Candidate: " company-candidates)))
-        (company-finish candidate))))
+  (setq corfu-cycle t
+        corfu-auto t
+        corfu-auto-delay 0.3
+        corfu-quit-no-match 'separator
+        corfu-popupinfo-delay '(1.0 . 0.5))
 
+  (add-hook 'eshell-mode-hook (lambda () (setq-local corfu-auto nil)))
+
+  (define-key corfu-map (kbd "C-l") #'corfu-complete)
+  (define-key corfu-map (kbd "C-`") #'corfu-insert-separator))
+
+(use-package cape
   :config
-  (define-key company-active-map (kbd "C-l") #'company-complete-selection)
-  (define-key company-active-map (kbd "C-:") #'move-company-to-minibuffer)
-  (define-key company-mode-map   (kbd "C-:") #'move-company-to-minibuffer)
-  (spc-leader-define-key "im" #'company-mode))
+  (spc-leader-define-key "a" 'cape-prefix-map))
 
 
 (use-package flycheck
