@@ -911,10 +911,10 @@ CHAR and ARG are as in avy."
   ;; (setq-default lsp-haskell-server-path "/home/bradrn/.ghcup/bin/haskell-language-server-wrapper")
   (setq-default lsp-haskell-plugin-stan-global-on nil)
   )
-(use-package company-cabal
-  :after (company lsp-haskell)
-  :config
-  (add-to-list 'company-backends 'company-cabal))
+;; (use-package company-cabal
+;;   :after (company lsp-haskell)
+;;   :config
+;;   (add-to-list 'company-backends 'company-cabal))
 
 ;; (use-package hasky-extensions
 ;;   :defer t
