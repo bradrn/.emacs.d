@@ -1089,23 +1089,8 @@ CHAR and ARG are as in avy."
   (evil-define-key 'normal pdf-annot-list-mode-map "K" #'pdf-annot-list-display-annotation-from-id)
   (add-hook 'pdf-annot-list-mode-hook (lambda () (pdf-annot-list-follow-minor-mode t))))
 
-(put 'latex-mode 'flyspell-mode-predicate 'my-tex-mode-flyspell-verify)
-(defun my-tex-mode-flyspell-verify ()
-  (and
-   (not (save-excursion
-          (re-search-backward "^[ \t]*%%%[ \t]+Local" nil t)))
-   (not (save-excursion
-          (let ((this (point))
-                (eol (line-end-position))
-                (has-match nil)
-                (re "\\\\\\(\\(auto\\|text\\)?cite\\*?\\|label\\|ref\\|abbr\\|input\\)\\(\\[[^\\]*]\\]\\)*{[^}]*}\\|\\\\\\(\\(auto\\)?cites\\*?\\)\\({[^}]*}\\)+"))
-            (beginning-of-line)
-            (while (re-search-forward re eol t)
-              (setq has-match
-                    (or has-match
-                        (and (>= this (match-beginning 0))
-                             (<= this (match-end 0))))))
-            has-match)))))
+(setq flyspell-tex-command-regexp
+        "\\(\\(begin\\|end\\)[ 	]*{\\|\\(\\(auto\\|text\\)?cite[a-z*]*\\|label\\|ref\\|eqref\\|usepackage\\|documentclass\\)[ 	]*\\(\\[[^]]*\\]\\)?{[^{}]*\\)")
 
 (use-package tex
   :ensure auctex
