@@ -1070,7 +1070,8 @@ CHAR and ARG are as in avy."
        (/ (car size) 2)
        (/ (cdr size) 2))))
   (mode-leader-define-key pdf-sync-minor-mode-map
-    "K" #'my--pdf-sync-goto-current-page)
+    "K" #'my--pdf-sync-goto-current-page
+    "t" #'pdf-view-themed-minor-mode)
 
   ;; (custom-theme-set-variables
   ;;  'deeper-blue
