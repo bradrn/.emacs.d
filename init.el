@@ -329,7 +329,11 @@
          "find . -not ( ( "
          "-name .[A-Za-z]* -or -name node_modules "
          "-or -name dist-newstyle -or -name matlab-* )"
-         " -prune )")))
+         " -prune )"))
+  (setq consult-fd-args
+        '("fd --full-path --color never"
+          "--exclude node_modules --exclude dist-newstyle"
+          "--exclude matlab-*")))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
@@ -480,7 +484,7 @@ _q_ cancel	_o_nly this   	_d_elete
     "f"   '(:ignore t :which-key "files")
     "ff"  #'find-file
     "fi"  #'find-user-init-file
-    "fd"  #'consult-find
+    "fd"  #'consult-fd
     "fm"  #'rename-visited-file
     "fr"  #'consult-recent-file
     "fs"  #'save-buffer
