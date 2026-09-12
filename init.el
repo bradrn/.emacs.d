@@ -831,7 +831,8 @@ CHAR and ARG are as in avy."
                 lsp-progress-function 'ignore
                 lsp-lens-enable nil
                 lsp-ui-doc-enable nil
-                lsp-enable-on-type-formatting)
+                lsp-completion-provider :none
+                lsp-enable-on-type-formatting nil)
   ;; mostly copied from Spacemacs
   (spc-leader-define-key
     "l" '(:ignore t :which-key "lsp")
