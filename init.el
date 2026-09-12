@@ -339,7 +339,8 @@
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
 
   :init
-  (setq marginalia-align 'right)
+  (setq marginalia-align 'right
+        marginalia-max-relative-age 0)
 
   (marginalia-mode))
 
