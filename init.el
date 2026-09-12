@@ -1025,6 +1025,13 @@ CHAR and ARG are as in avy."
     "vd" #'pyvenv-deactivate
     "vw" #'pyvenv-workon)
 
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (remove-hook 'completion-at-point-functions #'python-completion-at-point 'local)))
+  (add-hook 'inferior-python-mode-hook
+            (lambda ()
+              (remove-hook 'completion-at-point-functions #'python-shell-completion-at-point 'local)))
+
   (add-hook 'inferior-python-mode-hook
             (lambda ()
               (when (ring-empty-p comint-input-ring)
