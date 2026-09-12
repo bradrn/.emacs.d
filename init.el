@@ -548,6 +548,7 @@ _q_ cancel	_o_nly this   	_d_elete
     "/"   '(:ignore t :which-key "find")
     "//"  #'consult-line
     "/b"  #'browse-url-at-point
+    "/B"  #'browse-url-of-buffer
     "/f"  #'ffap
     "/F"  #'(lambda () (interactive) (consult-find t))
     "/r"  #'consult-ripgrep
