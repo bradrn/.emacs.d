@@ -344,6 +344,19 @@
 
   (marginalia-mode))
 
+(use-package embark-consult)
+
+;; from emacs-bedrock
+(use-package embark
+  :demand t
+  :after (embark-consult)
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+  (evil-define-key '(normal insert) 'global (kbd "C-a") #'embark-act)
+  :config
+  (keymap-set embark-become-file+buffer-map (kbd "r") #'consult-recent-file)
+  (keymap-set embark-become-file+buffer-map (kbd "d") #'consult-fd))
+
 (use-package which-key
   :config
   (setq which-key-allow-evil-operators t)
